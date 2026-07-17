@@ -1,0 +1,9 @@
+{
+  "name": "lionx777-minbar",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "mongodb": "^6.0.0"
+  }
+}
+

@@ -1,0 +1,2436 @@
+<!-- update -->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F5C34">
+<meta name="description" content="Minbar — A self-contained Arabic learning platform with flashcards, SRS review, typing/listening quizzes, exams, and a built-in student–teacher hub.">
+<meta property="og:title" content="Minbar — Advanced Arabic Learning Platform">
+<meta property="og:description" content="A self-contained Arabic learning platform with flashcards, spaced-repetition review, quizzes, exams, and a built-in student–teacher hub.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ar_SA">
+<meta name="twitter:card" content="summary_large_image">
+<title>Minbar — Advanced Arabic Learning Platform</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap');
+
+:root{
+  --bg:#F3FAF6; --bg-card:#FFFFFF; --ink:#17281F; --ink-soft:#5C7768;
+  --teal:#1D8348; --teal-dark:#0F5C34; --teal-soft:#E4F5EA;
+  --gold:#6FA95C; --gold-soft:#E3F0DC; --rose:#B5484F; --rose-soft:#FBE7E4;
+  --blue:#3D7DC6; --green:#1F8A46; --green-soft:#DFF2E4;
+  --border:#DCEAE0;
+  --shadow-sm:0 1px 3px rgba(34,48,58,.06);
+  --shadow:0 8px 24px rgba(34,48,58,.07);
+  --shadow-lg:0 16px 40px rgba(34,48,58,.10);
+  --radius-lg:16px; --radius-md:11px; --radius-sm:8px;
+}
+body.dark{
+  --bg:#0F1712; --bg-card:#18221C; --ink:#E7F3EA; --ink-soft:#8FA79A;
+  --teal:#3FBD82; --teal-dark:#1C4E36; --teal-soft:#1D3A2A;
+  --gold:#8FCB6F; --gold-soft:#23331B; --rose:#D97C82; --rose-soft:#3A2224;
+  --blue:#6FA8DC; --green:#5FC584; --green-soft:#1E3226;
+  --border:#293B31;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.35);
+  --shadow:0 8px 24px rgba(0,0,0,.32);
+  --shadow-lg:0 16px 40px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{margin:0;background:
+    radial-gradient(circle at 10% 0%, rgba(111,169,92,0.08), transparent 40%),
+    radial-gradient(circle at 90% 100%, rgba(29,131,72,0.06), transparent 40%),
+    var(--bg);
+  font-family:'Tajawal',sans-serif;color:var(--ink);min-height:100vh;transition:background .3s,color .3s;
+  overscroll-behavior-y:contain;-webkit-font-smoothing:antialiased;position:relative;}
+/* Instant tap feedback — press states fire before rendering, so it FEELS instant */
+button,.tab,.role-card,.icon-btn,.ghost-btn,.primary-btn,.quiz-opt,.flashcard,.enter-btn,.theme-toggle,.switch-btn,.q-reply-btn{
+  -webkit-user-select:none;user-select:none;
+}
+button:active,.tab:active,.role-card:active,.icon-btn:active,.ghost-btn:active,.primary-btn:active,.quiz-opt:active,.enter-btn:active{
+  transform:scale(.97);opacity:.88;
+}
+@media (prefers-reduced-motion: reduce){
+  button:active,.tab:active,.role-card:active,.icon-btn:active,.ghost-btn:active,.primary-btn:active,.quiz-opt:active,.enter-btn:active{
+    transform:none;opacity:.85;
+  }
+}
+/* Signature motif: a faint eight-point star lattice, echoing the geometric wood/tile
+   inlay of a real minbar. Repeated at low opacity throughout the page, then reused
+   at full strength as accents on the gate medallion, section markers and cards. */
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpolygon%20points%3D%2224%2C15%2025.38%2C20.67%2030.36%2C17.64%2027.33%2C22.62%2033%2C24%2027.33%2C25.38%2030.36%2C30.36%2025.38%2C27.33%2024%2C33%2022.62%2C27.33%2017.64%2C30.36%2020.67%2C25.38%2015%2C24%2020.67%2C22.62%2017.64%2C17.64%2022.62%2C20.67%22%20fill%3D%22none%22%20stroke%3D%22%230F5C34%22%20stroke-width%3D%220.6%22%2F%3E%3C%2Fsvg%3E");
+  background-size:48px 48px;opacity:.05;transition:opacity .3s;}
+body.dark:before{
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2248%22%20height%3D%2248%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpolygon%20points%3D%2224%2C15%2025.38%2C20.67%2030.36%2C17.64%2027.33%2C22.62%2033%2C24%2027.33%2C25.38%2030.36%2C30.36%2025.38%2C27.33%2024%2C33%2022.62%2C27.33%2017.64%2C30.36%2020.67%2C25.38%2015%2C24%2020.67%2C22.62%2017.64%2C17.64%2022.62%2C20.67%22%20fill%3D%22none%22%20stroke%3D%22%238FCB6F%22%20stroke-width%3D%220.6%22%2F%3E%3C%2Fsvg%3E");
+  opacity:.07;}
+button,.tab,.role-card,.icon-btn,.ghost-btn,.primary-btn,.quiz-opt,.flashcard,.enter-btn,.theme-toggle,.switch-btn{touch-action:manipulation;font-family:inherit;}
+input,select,textarea{font-size:16px!important;} /* prevents iOS auto-zoom on focus */
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+button{transition:transform .15s ease, box-shadow .15s ease, background-color .15s ease, border-color .15s ease, opacity .15s ease;}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+.wrap{max-width:980px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-left)) calc(40px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));width:100%;position:relative;z-index:1;}
+@media (max-width:480px){
+  .wrap{padding-inline:10px;}
+}
+
+.masthead{position:relative;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gold);padding-bottom:18px;margin-bottom:26px;flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:14px;min-width:0;}
+.brand-mark{width:46px;height:46px;flex-shrink:0;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;color:var(--gold-soft);font-size:24px;font-weight:700;box-shadow:0 3px 10px rgba(29,131,72,.35);}
+.brand h1{font-family:'Amiri',serif;font-size:clamp(22px,5vw,28px);margin:0;color:var(--teal-dark);letter-spacing:.2px;}
+body.dark .brand h1{color:var(--gold);}
+.brand p{margin:1px 0 0;font-size:11.5px;color:var(--ink-soft);letter-spacing:.4px;text-transform:uppercase;}
+.header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+@media (max-width:480px){
+  .brand p{display:none;}
+  .role-badge span,.role-badge{font-size:11px;}
+  .streak-chip{font-size:11px;padding:5px 10px;}
+}
+.role-badge{font-size:12.5px;background:var(--bg-card);border:1px solid var(--border);padding:7px 14px;border-radius:999px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-sm);}
+.role-badge b{color:var(--teal-dark);}
+body.dark .role-badge b{color:var(--gold);}
+.switch-btn{border:none;background:none;color:var(--rose);font-weight:700;cursor:pointer;font-size:12px;text-decoration:underline;text-underline-offset:2px;}
+.switch-btn:hover{opacity:.75;}
+.theme-toggle{border:1px solid var(--border);background:var(--bg-card);border-radius:999px;padding:7px 12px;cursor:pointer;font-size:14px;box-shadow:var(--shadow-sm);}
+.theme-toggle:hover{border-color:var(--gold);}
+.streak-chip{background:linear-gradient(135deg,#FFB74D,#FF7043);color:#fff;font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;display:flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(255,112,67,.3);}
+
+.gate{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:48px 32px;text-align:center;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;animation:gateIn .5s cubic-bezier(.2,.7,.3,1);}
+.gate:before{content:"";position:absolute;inset:10px;border:1px solid var(--gold-soft);border-radius:12px;pointer-events:none;}
+.gate:after{content:"";position:absolute;top:-40px;left:50%;width:260px;height:260px;margin-inline-start:-130px;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%22100%22%20r%3D%2266%22%20fill%3D%22none%22%20stroke%3D%22%236FA95C%22%20stroke-width%3D%220.7%22%2F%3E%3Cpolygon%20points%3D%22100.0%2C18.0%20113.0%2C68.6%20158.0%2C42.0%20131.4%2C87.0%20182.0%2C100.0%20131.4%2C113.0%20158.0%2C158.0%20113.0%2C131.4%20100.0%2C182.0%2087.0%2C131.4%2042.0%2C158.0%2068.6%2C113.0%2018.0%2C100.0%2068.6%2C87.0%2042.0%2C42.0%2087.0%2C68.6%22%20fill%3D%22none%22%20stroke%3D%22%236FA95C%22%20stroke-width%3D%221%22%2F%3E%3Cpolygon%20points%3D%22100.0%2C48.0%20108.4%2C79.7%20136.8%2C63.2%20120.3%2C91.6%20152.0%2C100.0%20120.3%2C108.4%20136.8%2C136.8%20108.4%2C120.3%20100.0%2C152.0%2091.6%2C120.3%2063.2%2C136.8%2079.7%2C108.4%2048.0%2C100.0%2079.7%2C91.6%2063.2%2C63.2%2091.6%2C79.7%22%20fill%3D%22none%22%20stroke%3D%22%236FA95C%22%20stroke-width%3D%221%22%2F%3E%3C%2Fsvg%3E");
+  background-size:200px 200px;background-repeat:no-repeat;opacity:.16;pointer-events:none;
+  animation:medallionTurn 120s linear infinite;}
+body.dark .gate:after{opacity:.14;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%20viewBox%3D%220%200%20200%20200%22%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%22100%22%20r%3D%2266%22%20fill%3D%22none%22%20stroke%3D%22%238FCB6F%22%20stroke-width%3D%220.7%22%2F%3E%3Cpolygon%20points%3D%22100.0%2C18.0%20113.0%2C68.6%20158.0%2C42.0%20131.4%2C87.0%20182.0%2C100.0%20131.4%2C113.0%20158.0%2C158.0%20113.0%2C131.4%20100.0%2C182.0%2087.0%2C131.4%2042.0%2C158.0%2068.6%2C113.0%2018.0%2C100.0%2068.6%2C87.0%2042.0%2C42.0%2087.0%2C68.6%22%20fill%3D%22none%22%20stroke%3D%22%238FCB6F%22%20stroke-width%3D%221%22%2F%3E%3Cpolygon%20points%3D%22100.0%2C48.0%20108.4%2C79.7%20136.8%2C63.2%20120.3%2C91.6%20152.0%2C100.0%20120.3%2C108.4%20136.8%2C136.8%20108.4%2C120.3%20100.0%2C152.0%2091.6%2C120.3%2063.2%2C136.8%2079.7%2C108.4%2048.0%2C100.0%2079.7%2C91.6%2063.2%2C63.2%2091.6%2C79.7%22%20fill%3D%22none%22%20stroke%3D%22%238FCB6F%22%20stroke-width%3D%221%22%2F%3E%3C%2Fsvg%3E");}
+.gate>*{position:relative;z-index:1;}
+@media (max-width:480px){.gate{padding:32px 18px;} .gate:before{inset:6px;}}
+@keyframes gateIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes medallionTurn{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion: reduce){.gate{animation:none;} .gate:after{animation:none;}}
+.gate-crest{width:60px;height:60px;margin:0 auto 14px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;color:var(--gold-soft);font-size:30px;font-weight:700;box-shadow:0 6px 18px rgba(29,131,72,.32);}
+.gate h2{font-family:'Amiri',serif;font-size:28px;color:var(--teal-dark);margin-top:0;}
+body.dark .gate h2{color:var(--gold);}
+.gate p{color:var(--ink-soft);font-size:14px;max-width:460px;margin:8px auto 28px;line-height:1.6;}
+.gate-step{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--gold);background:var(--gold-soft);display:inline-block;padding:4px 14px;border-radius:999px;margin-bottom:16px;}
+.role-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:22px;}
+.role-card{position:relative;width:220px;max-width:100%;flex:1 1 200px;padding:26px 18px;border:1.5px solid var(--border);border-radius:var(--radius-md);cursor:pointer;transition:.2s ease;background:var(--bg-card);box-shadow:var(--shadow-sm);text-align:center;}
+.role-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:var(--shadow);}
+.role-card.active{border-color:var(--teal);background:linear-gradient(180deg,var(--bg-card),var(--gold-soft) 220%);box-shadow:var(--shadow);}
+.role-card.active:after{content:"✓";position:absolute;top:10px;inset-inline-end:10px;width:20px;height:20px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.role-card .ic-wrap{width:52px;height:52px;margin:0 auto;border-radius:14px;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;transition:.2s;}
+.role-card.active .ic-wrap{background:var(--teal);}
+.role-card .ic{font-size:24px;}
+.role-card.active .ic{filter:brightness(2.4);}
+.role-card h3{font-family:'Amiri',serif;margin:12px 0 4px;font-size:19px;color:var(--teal-dark);}
+body.dark .role-card h3{color:var(--gold);}
+.role-card p{font-size:12px;margin:0;color:var(--ink-soft);line-height:1.5;}
+.gate-form{max-width:300px;margin:0 auto;}
+.gate-field{margin-bottom:14px;text-align:start;}
+.gate-field label{display:block;font-size:11px;color:var(--ink-soft);margin-bottom:6px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+input.name-input{padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:16px;width:100%;max-width:100%;text-align:center;background:var(--bg-card);color:var(--ink);transition:border-color .15s, box-shadow .15s;}
+input.name-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);}
+.code-field{position:relative;}
+.code-field input{padding-inline-end:42px;letter-spacing:3px;}
+.code-toggle{position:absolute;top:50%;transform:translateY(-50%);inset-inline-end:6px;border:none;background:none;cursor:pointer;font-size:15px;padding:8px;line-height:1;color:var(--ink-soft);border-radius:50%;}
+.code-toggle:hover{color:var(--ink);background:var(--teal-soft);}
+.gate-hint{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--ink-soft);margin-top:4px;}
+.gate.shake{animation:shakeErr .4s;}
+@keyframes shakeErr{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+.code-field.err input{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-soft);}
+.enter-btn{margin-top:6px;padding:13px 34px;border:none;border-radius:var(--radius-sm);background:linear-gradient(155deg,var(--teal),var(--teal-dark));color:#fff;font-weight:700;font-size:14px;letter-spacing:.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-inline:auto;box-shadow:0 4px 14px rgba(29,131,72,.28);}
+.enter-btn:hover:not(:disabled){background:var(--teal-dark);transform:translateY(-1px);}
+.enter-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none;}
+.gate-foot{margin-top:18px;font-size:11px;color:var(--ink-soft);}
+
+.tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;}
+.tab{padding:9px 17px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);cursor:pointer;font-weight:700;font-size:13px;color:var(--ink-soft);white-space:nowrap;min-height:40px;display:flex;align-items:center;transition:.15s ease;}
+.tab:hover{border-color:var(--gold);color:var(--ink);}
+.tab.active{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 3px 10px rgba(29,131,72,.25);}
+@media (max-width:640px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin-inline:-14px;padding-inline:14px;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex-shrink:0;}
+}
+
+.panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;box-shadow:var(--shadow);}
+.panel h2{font-family:'Amiri',serif;color:var(--teal-dark);margin-top:0;font-size:20px;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;position:relative;padding-inline-start:21px;}
+.panel h2:before{content:"";position:absolute;inset-inline-start:0;top:6px;width:11px;height:11px;background:var(--gold);
+  clip-path:polygon(50% 4%, 57.3% 32.4%, 82.5% 17.5%, 67.6% 42.7%, 96% 50%, 67.6% 57.3%, 82.5% 82.5%, 57.3% 67.6%, 50% 96%, 42.7% 67.6%, 17.5% 82.5%, 32.4% 57.3%, 4% 50%, 32.4% 42.7%, 17.5% 17.5%, 42.7% 32.4%);}
+body.dark .panel h2{color:var(--gold);}
+.panel h2 small{font-size:11px;color:var(--ink-soft);font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);padding:3px 10px;border-radius:999px;}
+
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--ink);transition:border-color .15s, box-shadow .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);}
+.field textarea{resize:vertical;min-height:60px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+@media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr;}}
+.primary-btn{padding:12px 24px;min-height:44px;border:none;border-radius:var(--radius-sm);background:linear-gradient(155deg,var(--gold) 0%,var(--gold) 55%,#4F7F41 100%);color:#fff;font-weight:900;font-size:14px;letter-spacing:.2px;cursor:pointer;box-shadow:0 4px 12px rgba(111,169,92,.3);}
+body.dark .primary-btn{background:linear-gradient(155deg,var(--gold) 0%,var(--gold) 55%,#5C9A4A 100%);color:#0F1712;}
+.primary-btn:hover{filter:brightness(1.05);transform:translateY(-1px);}
+.primary-btn:active{transform:translateY(0);}
+.ghost-btn{padding:10px 15px;min-height:40px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--ink-soft);font-weight:700;font-size:12px;cursor:pointer;}
+.ghost-btn:hover{border-color:var(--teal);color:var(--ink);}
+.ghost-btn.danger{color:var(--rose);border-color:var(--rose);}
+.ghost-btn.danger:hover{background:var(--rose-soft);}
+.ghost-btn.active-mode{background:var(--teal);color:#fff;border-color:var(--teal);}
+
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:9px;background:var(--bg);transition:border-color .15s;}
+.row:hover{border-color:var(--gold);}
+.row .info b{font-family:'Amiri',serif;font-size:17px;color:var(--teal-dark);}
+body.dark .row .info b{color:var(--gold);}
+.row .info span{display:block;font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.tag{font-size:10px;padding:3px 10px;border-radius:999px;background:var(--gold-soft);color:var(--teal-dark);font-weight:700;letter-spacing:.2px;margin-inline-end:6px;}
+body.dark .tag{color:var(--gold);}
+.tag.due{background:var(--rose-soft);color:var(--rose);}
+.tag.new{background:var(--teal-soft);color:var(--teal);}
+
+.mode-switch{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.deck-controls{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.deck-controls select,.deck-controls input{padding:9px 13px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:12.5px;background:var(--bg);color:var(--ink);}
+.flash-stage{display:flex;flex-direction:column;align-items:center;gap:18px;}
+.flashcard{width:100%;max-width:480px;height:min(260px,52vw);min-height:190px;border-radius:var(--radius-lg);cursor:pointer;position:relative;perspective:1400px;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,.1,.2,1);transform-style:preserve-3d;}
+.flashcard:hover .flashcard-inner{filter:brightness(1.015);}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.face{position:absolute;inset:0;border-radius:var(--radius-lg);backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;border:1.5px solid var(--gold);box-shadow:var(--shadow);}
+.face.front{background:linear-gradient(160deg,var(--bg-card),var(--gold-soft) 200%);}
+.face.front:before,.face.front:after{content:"";position:absolute;width:22px;height:22px;background:var(--gold);top:13px;opacity:.6;
+  clip-path:polygon(50% 4%, 57.3% 32.4%, 82.5% 17.5%, 67.6% 42.7%, 96% 50%, 67.6% 57.3%, 82.5% 82.5%, 57.3% 67.6%, 50% 96%, 42.7% 67.6%, 17.5% 82.5%, 32.4% 57.3%, 4% 50%, 32.4% 42.7%, 17.5% 17.5%, 42.7% 32.4%);}
+.face.front:before{right:13px;} .face.front:after{left:13px;}
+.face .word{font-family:'Amiri',serif;font-size:clamp(28px,7vw,42px);color:var(--teal-dark);font-weight:700;}
+body.dark .face .word{color:var(--gold);}
+.face .hint{font-size:11.5px;color:var(--ink-soft);margin-top:12px;letter-spacing:.2px;}
+.face.back{background:linear-gradient(160deg,var(--teal),var(--teal-dark));color:#fff;transform:rotateY(180deg);}
+.face.back .meaning{font-size:21px;font-weight:700;}
+.face.back .example{font-family:'Amiri',serif;font-size:16px;margin-top:12px;opacity:.9;}
+.deck-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.fav-star{position:absolute;top:-14px;inset-inline-end:6px;z-index:5;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--gold);background:var(--bg-card);color:var(--gold);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);transition:.15s ease;}
+.fav-star:hover{transform:scale(1.08);}
+.fav-star.active{background:var(--gold);color:#fff;box-shadow:0 3px 10px rgba(111,169,92,.4);}
+.deck-quickstats{margin-bottom:0;}
+.activity-chart{display:flex;justify-content:space-between;gap:6px;}
+.activity-day{display:flex;flex-direction:column;align-items:center;gap:7px;flex:1;min-width:0;}
+.activity-dot{width:100%;aspect-ratio:1;max-width:38px;border-radius:10px;background:var(--border);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;transition:.2s;}
+.activity-dot.active{background:var(--teal);box-shadow:0 3px 8px rgba(29,131,72,.3);}
+.activity-label{font-size:11px;color:var(--ink-soft);}
+.activity-day.today .activity-label{color:var(--teal-dark);font-weight:800;}
+body.dark .activity-day.today .activity-label{color:var(--gold);}
+.timer-compact-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.timer-card{flex:1 1 170px;max-width:220px;background:linear-gradient(165deg,var(--bg-card),var(--teal-soft) 260%);
+  border:1px solid var(--border);border-radius:18px;padding:22px 16px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:var(--shadow);}
+.timer-ring{width:112px;height:112px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;background:var(--bg-card);box-shadow:var(--shadow-lg), inset 0 0 0 5px var(--border);}
+.timer-ring.running{box-shadow:var(--shadow-lg), inset 0 0 0 5px var(--teal-soft);}
+.timer-ring:before{content:"";position:absolute;inset:-5px;border-radius:50%;padding:5px;
+  background:conic-gradient(from 0deg, var(--teal) 0deg, var(--gold) 70deg, transparent 100deg 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  opacity:0;transition:opacity .25s;}
+.timer-ring.running:before{opacity:1;animation:ringSpin 2.4s linear infinite;}
+@keyframes ringSpin{to{transform:rotate(360deg);}}
+.timer-ring-inner{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.timer-icon-lg{font-size:24px;line-height:1;}
+.timer-time-lg{font-family:'Amiri',serif;font-size:22px;font-weight:700;color:var(--teal-dark);letter-spacing:.3px;}
+body.dark .timer-time-lg{color:var(--gold);}
+.timer-card-label{font-size:12.5px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.6px;}
+.tc-btns{display:flex;gap:8px;width:100%;}
+.tc-btn{flex:1;padding:10px 6px;border-radius:999px;font-weight:800;font-size:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:.15s ease;}
+.tc-btn.start{background:var(--green);color:#fff;box-shadow:0 4px 12px rgba(31,138,70,.32);}
+.tc-btn.start:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(31,138,70,.4);}
+.tc-btn.start:disabled{background:var(--green-soft);color:var(--green);box-shadow:none;opacity:.65;cursor:not-allowed;}
+.tc-btn.stop{background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(181,72,79,.3);}
+.tc-btn.stop:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(181,72,79,.38);}
+.tc-btn.stop:disabled{background:var(--rose-soft);color:var(--rose);box-shadow:none;opacity:.65;cursor:not-allowed;}
+@media (max-width:420px){
+  .timer-card{padding:18px 12px 14px;gap:10px;}
+  .timer-ring{width:96px;height:96px;}
+  .timer-time-lg{font-size:19px;}
+}
+.icon-btn{padding:11px 18px;min-height:44px;border-radius:var(--radius-sm);border:none;font-weight:700;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.icon-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm);}
+.icon-btn.speak{background:var(--teal-soft);color:var(--teal-dark);border:1px solid var(--teal);}
+body.dark .icon-btn.speak{color:var(--teal);}
+.icon-btn.know{background:var(--green-soft);color:var(--green);border:1px solid var(--green);}
+.icon-btn.review{background:var(--rose-soft);color:var(--rose);border:1px solid var(--rose);}
+.icon-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+.deck-progress{font-size:12px;color:var(--ink-soft);font-weight:700;}
+.empty{text-align:center;color:var(--ink-soft);font-size:13px;padding:34px 10px;line-height:1.6;}
+
+.progress-wrap{margin-bottom:20px;}
+.progress-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:7px;font-weight:700;}
+.bar-bg{height:11px;border-radius:999px;background:var(--gold-soft);overflow:hidden;}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:999px;transition:width .5s ease;}
+.stats-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;}
+.stat-box{flex:1;min-width:120px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 14px;text-align:center;}
+.stat-box .num{font-family:'Amiri',serif;font-size:25px;color:var(--teal-dark);font-weight:700;}
+body.dark .stat-box .num{color:var(--gold);}
+.stat-box .lab{font-size:10.5px;color:var(--ink-soft);margin-top:3px;letter-spacing:.3px;text-transform:uppercase;}
+.timer-btns{display:flex;gap:8px;margin-top:12px;}
+
+.res-row{border-inline-start:4px solid var(--teal);}
+.res-row.type-Listening{border-inline-start-color:var(--blue);}
+.res-row.type-Conversation{border-inline-start-color:var(--rose);}
+.res-row.type-Reading{border-inline-start-color:var(--gold);}
+.res-row a{color:var(--teal-dark);font-weight:700;text-decoration:none;}
+body.dark .res-row a{color:var(--gold);}
+.res-row a:hover{text-decoration:underline;}
+
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+.badge{position:relative;border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 10px;text-align:center;background:var(--bg);transition:.15s;}
+.badge:not(.locked){border-color:var(--gold);box-shadow:var(--shadow-sm);}
+.badge:not(.locked):after{content:"";position:absolute;top:8px;inset-inline-end:8px;width:8px;height:8px;background:var(--gold);
+  clip-path:polygon(50% 4%, 57.3% 32.4%, 82.5% 17.5%, 67.6% 42.7%, 96% 50%, 67.6% 57.3%, 82.5% 82.5%, 57.3% 67.6%, 50% 96%, 42.7% 67.6%, 17.5% 82.5%, 32.4% 57.3%, 4% 50%, 32.4% 42.7%, 17.5% 17.5%, 42.7% 32.4%);}
+.badge.locked{opacity:.35;filter:grayscale(1);}
+.badge .bic{font-size:26px;}
+.badge .bname{font-size:11.5px;font-weight:700;margin-top:7px;color:var(--teal-dark);}
+body.dark .badge .bname{color:var(--gold);}
+
+.lb-row{display:flex;align-items:center;gap:12px;padding:11px 15px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:7px;background:var(--bg);}
+.lb-rank{width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+.lb-rank.top1{background:linear-gradient(145deg,#F6DE8C,#C9971F);color:#4A3A08;box-shadow:0 2px 8px rgba(201,151,31,.45);}
+.lb-rank.top2{background:linear-gradient(145deg,#EDEDED,#9B9B9B);color:#3A3A3A;box-shadow:0 2px 8px rgba(130,130,130,.35);}
+.lb-rank.top3{background:linear-gradient(145deg,#DDAF78,#9C6F3B);color:#3B2308;box-shadow:0 2px 8px rgba(156,111,59,.4);}
+.lb-name{font-weight:700;flex:1;}
+.lb-stat{font-size:12px;color:var(--ink-soft);font-weight:600;}
+
+.quiz-q{text-align:center;padding:12px 0 22px;}
+.quiz-q .qword{font-family:'Amiri',serif;font-size:clamp(24px,6vw,34px);color:var(--teal-dark);word-break:break-word;}
+body.dark .quiz-q .qword{color:var(--gold);}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:500px){.quiz-options{grid-template-columns:1fr;}}
+.quiz-opt{padding:14px;min-height:48px;border:1.5px solid var(--border);border-radius:var(--radius-md);background:var(--bg);cursor:pointer;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;text-align:center;transition:.15s;}
+.quiz-opt:hover{border-color:var(--gold);background:var(--gold-soft);}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-soft);}
+.quiz-opt.wrong{border-color:var(--rose);background:var(--rose-soft);}
+.quiz-score{text-align:center;font-size:13px;color:var(--ink-soft);margin-bottom:10px;}
+.type-input-row{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+.type-input-row input{max-width:260px;width:100%;text-align:center;font-family:'Amiri',serif;font-size:20px;}
+
+.exam-qbuilder{border:1px dashed var(--border);border-radius:var(--radius-md);padding:16px;margin:14px 0;background:var(--bg);}
+.exam-qlist{margin-top:16px;}
+.exam-card{border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:12px;background:var(--bg);}
+.exam-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.exam-card .info b{font-family:'Amiri',serif;font-size:17px;color:var(--teal-dark);}
+body.dark .exam-card .info b{color:var(--gold);}
+.exam-card .info span{display:block;font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.score-badge{background:var(--green-soft);color:var(--green);font-weight:800;font-size:12.5px;padding:6px 14px;border-radius:999px;white-space:nowrap;}
+.theme-toggle.spin{animation:spinRefresh .6s linear;}
+@keyframes spinRefresh{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.tab{position:relative;}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 5px;margin-inline-start:6px;border-radius:999px;background:var(--rose);color:#fff;font-size:10px;font-weight:800;line-height:1;}
+.tab.active .tab-badge{background:#fff;color:var(--rose);}
+
+.announce-card{position:relative;border:1px solid var(--border);border-radius:var(--radius-md);padding:15px 16px 14px;margin-bottom:12px;background:var(--bg);border-inline-start:4px solid var(--teal);transition:border-color .15s, box-shadow .15s;}
+.announce-card:hover{box-shadow:var(--shadow-sm);}
+.announce-card.prio-important{border-inline-start-color:var(--gold);}
+.announce-card.prio-urgent{border-inline-start-color:var(--rose);}
+.announce-card.is-new{background:linear-gradient(180deg,var(--teal-soft),var(--bg) 140%);}
+.announce-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.announce-title-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.announce-title-row b{font-family:'Amiri',serif;font-size:17px;color:var(--teal-dark);}
+body.dark .announce-title-row b{color:var(--gold);}
+.announce-prio-dot{width:9px;height:9px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+.prio-important .announce-prio-dot{background:var(--gold);}
+.prio-urgent .announce-prio-dot{background:var(--rose);}
+.announce-body{font-size:13.5px;line-height:1.65;color:var(--ink);margin:9px 0 8px;white-space:pre-wrap;}
+.announce-meta{font-size:11px;color:var(--ink-soft);letter-spacing:.2px;}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--teal-dark);color:#fff;padding:11px 24px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:50;max-width:90vw;text-align:center;box-shadow:var(--shadow-lg);}
+.toast.show{opacity:1;}
+.kbd-hint{font-size:11px;color:var(--ink-soft);text-align:center;margin-top:8px;letter-spacing:.2px;}
+
+/* ================= Q&A (student ↔ teacher) ================= */
+.q-card{position:relative;border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 15px 12px;margin-bottom:12px;background:var(--bg);border-inline-start:4px solid var(--teal);transition:border-color .15s, box-shadow .15s;}
+.q-card:hover{box-shadow:var(--shadow-sm);}
+.q-card.q-open{border-inline-start-color:var(--gold);}
+.q-card.q-answered{border-inline-start-color:var(--green);}
+.q-card.q-new{background:linear-gradient(180deg,var(--teal-soft),var(--bg) 140%);}
+.q-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.q-who{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);min-width:0;}
+.q-who b{color:var(--teal-dark);font-family:'Amiri',serif;font-size:15px;}
+body.dark .q-who b{color:var(--gold);}
+.q-time{color:var(--ink-soft);font-size:11.5px;font-weight:500;}
+.q-avatar{width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:12.5px;flex-shrink:0;}
+.q-status{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.2px;white-space:nowrap;}
+.q-status.pending{background:var(--gold-soft);color:var(--teal-dark);}
+body.dark .q-status.pending{color:var(--gold);}
+.q-status.done{background:var(--green-soft);color:var(--green);}
+.q-body{font-size:13.5px;line-height:1.6;color:var(--ink);margin:6px 0 8px;white-space:pre-wrap;word-break:break-word;}
+.q-reply{background:var(--teal-soft);border-radius:10px;padding:10px 12px;margin-top:8px;}
+body.dark .q-reply{background:var(--teal-dark);}
+.q-reply-label{font-size:10.5px;font-weight:800;color:var(--teal-dark);letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px;}
+body.dark .q-reply-label{color:var(--gold);}
+.q-reply p{margin:0;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word;color:var(--ink);}
+body.dark .q-reply p{color:#E7F3EA;}
+.q-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.q-reply-form{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+.q-reply-input{width:100%;min-height:80px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;resize:vertical;background:var(--bg-card);color:var(--ink);margin-bottom:8px;}
+.q-reply-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);}
+
+/* ================= Preferences panel ================= */
+.pref-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 0;border-bottom:1px dashed var(--border);}
+.pref-row:last-child{border-bottom:none;padding-bottom:0;}
+.pref-row:first-of-type{padding-top:2px;}
+.pref-info{flex:1 1 260px;min-width:0;}
+.pref-info b{display:block;color:var(--teal-dark);font-family:'Amiri',serif;font-size:15.5px;margin-bottom:3px;}
+body.dark .pref-info b{color:var(--gold);}
+.pref-info span{font-size:12px;color:var(--ink-soft);line-height:1.5;display:block;}
+.pref-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pref-pill{font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;white-space:nowrap;}
+.pref-pill.pref-on{background:var(--green-soft);color:var(--green);}
+.pref-pill.pref-off{background:var(--rose-soft);color:var(--rose);}
+.pref-pill.pref-pending{background:var(--gold-soft);color:var(--teal-dark);}
+body.dark .pref-pill.pref-pending{color:var(--gold);}
+
+@media (max-width:640px){
+  .q-card{padding:12px 12px 10px;}
+  .q-body{font-size:14px;}
+  .q-reply p{font-size:13.5px;}
+  .pref-row{padding:12px 0;gap:10px;}
+  .pref-info{flex:1 1 100%;}
+  .pref-actions{flex:1 1 100%;}
+  .pref-actions .primary-btn{width:100%;}
+}
+
+/* ================= MOBILE POLISH ================= */
+/* Tablet and below */
+@media (max-width:768px){
+  .panel{padding:18px 16px;border-radius:14px;margin-bottom:16px;}
+  .panel h2{font-size:18px;padding-bottom:10px;margin-bottom:14px;}
+  .kbd-hint{display:none;} /* keyboard shortcuts are irrelevant on phones */
+}
+/* Phone */
+@media (max-width:640px){
+  .wrap{padding-inline:12px;padding-top:calc(14px + env(safe-area-inset-top));}
+  .masthead{padding-bottom:14px;margin-bottom:18px;gap:8px;}
+  .masthead .brand{gap:10px;flex:1 1 auto;min-width:0;}
+  .brand-mark{width:40px;height:40px;font-size:21px;border-radius:9px;}
+  .brand h1{font-size:20px;}
+  .header-actions{gap:6px;}
+  .role-badge{padding:5px 10px;font-size:11px;gap:5px;}
+  .theme-toggle{padding:6px 9px;font-size:13px;}
+  .streak-chip{padding:4px 9px;}
+
+  .panel{padding:16px 14px;}
+  .panel h2{font-size:17px;padding-inline-start:19px;}
+  .field label{font-size:11px;}
+  .field input,.field select,.field textarea{padding:12px 12px;font-size:16px;} /* 16px prevents iOS zoom */
+
+  /* Tabs get a subtle fade indicator at the right edge so users know to swipe */
+  .tabs{position:relative;padding-right:18px;}
+  .tab{padding:9px 14px;font-size:12.5px;}
+
+  /* Content Overview stat boxes wrap to 2 columns */
+  .stats-row{gap:8px;}
+  .stat-box{flex:1 1 calc(50% - 4px);min-width:0;padding:12px 10px;}
+  .stat-box .num{font-size:22px;}
+  .stat-box .lab{font-size:10px;}
+
+  /* Flashcard sizing */
+  .flashcard{max-width:100%;height:min(260px,60vw);min-height:170px;}
+  .face{padding:16px;}
+  .face .word{font-size:clamp(26px,8vw,38px);}
+  .face.back .meaning{font-size:19px;}
+
+  .deck-controls{gap:8px;}
+  .deck-controls select,.deck-controls input{flex:1 1 auto;min-width:0;font-size:14px;padding:10px 12px;}
+  .deck-actions{gap:8px;width:100%;}
+  .icon-btn{flex:1 1 0;justify-content:center;padding:12px 8px;font-size:12.5px;min-height:46px;}
+
+  /* Rows in Manage Content / Resources / Exams */
+  .row{padding:12px 12px;gap:8px;flex-wrap:wrap;}
+  .row .info{flex:1 1 100%;min-width:0;}
+  .row .info b{font-size:16px;line-height:1.4;word-break:break-word;}
+
+  /* Exam cards */
+  .exam-card{padding:14px 12px;}
+  .exam-card-top{gap:8px;}
+
+  /* Announcements */
+  .announce-card{padding:14px 14px 12px;}
+  .announce-title-row b{font-size:16px;}
+
+  /* Leaderboard */
+  .lb-row{padding:10px 12px;gap:10px;}
+  .lb-name{font-size:14px;word-break:break-word;}
+  .lb-stat{font-size:11px;}
+
+  /* Badges */
+  .badges-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;}
+  .badge{padding:12px 8px;}
+  .badge .bname{font-size:11px;}
+
+  /* Activity chart labels */
+  .activity-label{font-size:10px;}
+  .activity-dot{font-size:12px;}
+
+  /* Quiz */
+  .quiz-opt{padding:14px 10px;font-size:13.5px;min-height:52px;}
+
+  /* Timer cards side-by-side but compact */
+  .timer-compact-row{gap:10px;}
+  .timer-card{flex:1 1 calc(50% - 5px);max-width:none;padding:16px 10px 14px;gap:10px;}
+  .timer-ring{width:88px;height:88px;}
+  .timer-time-lg{font-size:17px;}
+  .timer-icon-lg{font-size:20px;}
+  .tc-btn{padding:9px 4px;font-size:11.5px;}
+
+  /* Buttons full-width for easier tapping */
+  .primary-btn{width:100%;padding:14px 20px;font-size:15px;}
+  .ghost-btn{padding:11px 14px;font-size:12.5px;}
+
+  /* Toast a bit higher above nav gestures */
+  .toast{bottom:calc(20px + env(safe-area-inset-bottom));font-size:13px;padding:11px 20px;}
+}
+/* Very small phones (< 380px) */
+@media (max-width:380px){
+  .brand h1{font-size:18px;}
+  .brand-mark{width:36px;height:36px;font-size:19px;}
+  .role-badge{padding:5px 8px;font-size:10.5px;}
+  .role-badge .switch-btn{font-size:11px;}
+  .theme-toggle{padding:5px 8px;}
+  .panel{padding:14px 12px;}
+  .panel h2{font-size:16px;padding-inline-start:17px;}
+  .stat-box .num{font-size:20px;}
+  .tab{padding:8px 12px;font-size:12px;}
+  .gate{padding:26px 14px;}
+  .gate h2{font-size:24px;}
+  .gate p{font-size:13px;}
+}
+/* Landscape phones — reduce vertical padding to make more room */
+@media (max-height:520px) and (orientation:landscape){
+  .wrap{padding-top:12px;}
+  .gate{padding:20px 24px;}
+  .gate-crest{width:44px;height:44px;font-size:22px;margin-bottom:8px;}
+  .gate h2{font-size:22px;}
+  .gate p{margin:6px auto 16px;}
+}
+</style>
+</head>
+<body>
+<div id="root" style="display:none"></div>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= SERVER-BACKED STORAGE SHIM =================
+   Polyfills the same window.storage.get/set/delete/list contract that
+   Claude artifacts provide, but backed by this project's own Express +
+   SQLite API (see src/routes/kv.js). No changes were needed anywhere
+   else in the app below — it still just calls window.storage.* exactly
+   as before. The "shared" flag is accepted for API compatibility but is
+   not otherwise meaningful here, since this deployment has a single
+   classroom database rather than per-account sandboxes. */
+(function () {
+const API_BASE = '/api/kv';
+/* Set API_SECRET to the same value as the Vercel env var API_SECRET.
+   Leave empty if the API has no auth configured (dev mode). */
+const API_SECRET = '';
+  async function parseJsonSafe(res) {
+    try { return await res.json(); } catch (e) { return null; }
+  }
+  function authHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (API_SECRET) h['Authorization'] = 'Bearer ' + API_SECRET;
+    return h;
+  }
+
+  window.storage = {
+    async get(key, shared) {
+      const res = await fetch(API_BASE + '?key=' + encodeURIComponent(key), {
+        headers: API_SECRET ? { 'Authorization': 'Bearer ' + API_SECRET } : {}
+      });
+      if (res.status === 401) throw new Error('Unauthorized — check API_SECRET');
+      if (res.status === 404) throw new Error('Key not found: ' + key);
+      if (!res.ok) throw new Error('storage.get failed with status ' + res.status);
+      const data = await parseJsonSafe(res);
+      if (!data) throw new Error('storage.get received an invalid response');
+      return { key: data.key, value: data.value, shared: !!shared };
+    },
+    async set(key, value, shared) {
+      const res = await fetch(API_BASE + '?key=' + encodeURIComponent(key), {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ value }),
+      });
+      if (res.status === 401) throw new Error('Unauthorized — check API_SECRET');
+      if (!res.ok) throw new Error('storage.set failed with status ' + res.status);
+      const data = await parseJsonSafe(res);
+      if (!data) throw new Error('storage.set received an invalid response');
+      return { key: data.key, value: data.value, shared: !!shared };
+    },
+    async delete(key, shared) {
+      const res = await fetch(API_BASE + '?key=' + encodeURIComponent(key), {
+        method: 'DELETE',
+        headers: API_SECRET ? { 'Authorization': 'Bearer ' + API_SECRET } : {}
+      });
+      if (res.status === 401) throw new Error('Unauthorized — check API_SECRET');
+      if (!res.ok) throw new Error('storage.delete failed with status ' + res.status);
+      const data = await parseJsonSafe(res);
+      if (!data) throw new Error('storage.delete received an invalid response');
+      return { key: data.key, deleted: true, shared: !!shared };
+    },
+    async list(prefix, shared) {
+      const url = API_BASE + (prefix ? '?prefix=' + encodeURIComponent(prefix) : '');
+      const res = await fetch(url, {
+        headers: API_SECRET ? { 'Authorization': 'Bearer ' + API_SECRET } : {}
+      });
+      if (res.status === 401) throw new Error('Unauthorized — check API_SECRET');
+      if (!res.ok) throw new Error('storage.list failed with status ' + res.status);
+      const data = await parseJsonSafe(res);
+      if (!data) throw new Error('storage.list received an invalid response');
+      return { keys: data.keys, prefix: prefix, shared: !!shared };
+    },
+  };
+})();
+</script>
+<script>
+/* ================= STATE ================= */
+const STATE = {
+  role: null, name: '', tab: 'deck',
+  flashcards: [], resources: [], announcements: [],
+  progress: { srs:{}, listeningSec:0, speakingSec:0, activityDates:[], quiz:{attempts:0,correct:0}, examResults:{}, favorites:[], readAnnouncements:[] },
+  filterCat: 'All', filterLevel: 'All', searchQ:'',
+  deckMode: 'due', // 'due' | 'browse'
+  deckIndex: 0, flipped: false,
+  managePage: 0,
+  timers: { listening:null, speaking:null, listeningStart:0, speakingStart:0 },
+  quiz: { active:false, direction:'w2m', question:null, options:[], answered:false, picked:null, score:0, total:0 },
+  typing: { active:false, question:null, feedback:null },
+  dark: localStorage.getItem('minbar_dark') === 'true',
+  leaderboard: [],
+  bulkText: '',
+  codes: { teacher:'2580', student:'1234' },
+  codesReady: false,
+  exams: [],
+  examBuilder: { title:'', qType:'mcq', options:['','','',''], questions:[] },
+  examOpenResults: {},
+  examSession: null,
+  /* Q&A (student writes problem → teacher sees & replies) */
+  questions: [],
+  qDraft: '',
+  qOpenReply: {},         // teacher-side: which question thread is "reply open"
+  qReplyDrafts: {},       // teacher-side per-question draft text
+  /* Notifications */
+  notifPrompted: false,   // did we already ask this user for permission this session
+  lastDueNotification: null,
+  installDismissed: false,
+  installEvent: null
+};
+const CATS = ['Vocabulary','Grammar','Sentences & Conversation'];
+const LEVELS = ['Beginner','Intermediate','Advanced'];
+const SRS_INTERVALS = [0,1,3,7,14,30]; // days per srsLevel index
+const DAY_MS = 86400000;
+
+function uid(){ return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8); }
+
+const ACHIEVEMENTS = [
+  {id:'first', icon:'🌱', name:'First Step', check:p=>masteredCount(p)>=1},
+  {id:'ten', icon:'📗', name:'Ten Words', check:p=>masteredCount(p)>=10},
+  {id:'fifty', icon:'📚', name:'Fifty Words', check:p=>masteredCount(p)>=50},
+  {id:'hundred', icon:'🏆', name:'One Hundred Words', check:p=>masteredCount(p)>=100},
+  {id:'streak3', icon:'🔥', name:'Three-Day Streak', check:p=>computeStreak(p)>=3},
+  {id:'streak7', icon:'⚡', name:'Full Week Streak', check:p=>computeStreak(p)>=7},
+  {id:'listen30', icon:'🎧', name:'30 Minutes of Listening', check:p=>p.listeningSec>=1800},
+  {id:'speak30', icon:'🗣️', name:'30 Minutes of Speaking', check:p=>p.speakingSec>=1800},
+  {id:'quiz20', icon:'🎯', name:'20 Correct Answers', check:p=>p.quiz.correct>=20},
+];
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ================= STORAGE (server-backed via window.storage shim) ================= */
+/* window.storage is defined above by a small shim that calls this project's own
+   /api/kv REST API (Express + SQLite). Every value written here is visible to
+   every teacher and student who opens this site — that's what makes
+   "teacher adds a card -> student sees it" work through a real, shared backend. */
+function storageAvailable(){ return typeof window!=='undefined' && !!window.storage; }
+async function safeGet(key, shared){
+  if(!storageAvailable()) return null;
+  try{
+    const res = await window.storage.get(key, !!shared);
+    if(!res || res.value===undefined) return null;
+    try{ return JSON.parse(res.value); }catch(e){ return res.value; }
+  }catch(e){ return null; }
+}
+async function safeSet(key, value, shared){
+  if(!storageAvailable()){ toast('Cannot save — server unreachable'); return; }
+  try{
+    const res = await window.storage.set(key, JSON.stringify(value), !!shared);
+    if(!res) throw new Error('storage.set returned null');
+  }catch(e){ console.error('storage set failed', e); toast('Save failed, please check your connection'); }
+}
+/* Fire-and-forget save: never blocks the UI. Errors are logged, not shown as a toast
+   (a toast during rapid interactions would be jarring). */
+function safeSetBg(key, value, shared){
+  if(!storageAvailable()) return;
+  try{
+    window.storage.set(key, JSON.stringify(value), !!shared).catch(err=>console.warn('bg save failed', key, err));
+  }catch(e){ console.warn('bg save threw', key, e); }
+}
+async function loadShared(){
+  STATE.flashcards = (await safeGet('flashcards', true)) || [];
+  STATE.resources = (await safeGet('resources', true)) || [];
+  STATE.exams = (await safeGet('exams', true)) || [];
+  STATE.announcements = (await safeGet('announcements', true)) || [];
+  STATE.questions = (await safeGet('questions', true)) || [];
+}
+async function saveQuestions(){
+  await safeSet('questions', STATE.questions, true);
+}
+async function saveAnnouncements(){
+  await safeSet('announcements', STATE.announcements, true);
+}
+async function saveExams(){
+  await safeSet('exams', STATE.exams, true);
+}
+async function loadCodes(){
+  const c = await safeGet('accessCodes', true);
+  if(c && c.teacher && c.student){ STATE.codes = c; }
+  else { await safeSet('accessCodes', STATE.codes, true); }
+  STATE.codesReady = true;
+}
+async function saveCodes(teacherCode, studentCode){
+  STATE.codes = { teacher: teacherCode, student: studentCode };
+  await safeSet('accessCodes', STATE.codes, true);
+}
+async function loadProgress(){
+  if(!STATE.name) return;
+  const p = await safeGet('progress:'+STATE.name, false);
+  STATE.progress = p || { srs:{}, listeningSec:0, speakingSec:0, activityDates:[], quiz:{attempts:0,correct:0}, examResults:{}, favorites:[], readAnnouncements:[] };
+  if(!STATE.progress.quiz) STATE.progress.quiz = {attempts:0,correct:0};
+  if(!STATE.progress.activityDates) STATE.progress.activityDates = [];
+  if(!STATE.progress.examResults) STATE.progress.examResults = {};
+  if(!STATE.progress.favorites) STATE.progress.favorites = [];
+  if(!STATE.progress.readAnnouncements) STATE.progress.readAnnouncements = [];
+  if(!STATE.progress.readReplies) STATE.progress.readReplies = [];
+}
+async function saveExamResultForTeacher(examId, result){
+  await safeSet('examresult:'+examId+':'+STATE.name, { name:STATE.name, ...result }, true);
+  let list = (await safeGet('examtakers:'+examId, true)) || [];
+  if(!list.includes(STATE.name)){ list.push(STATE.name); await safeSet('examtakers:'+examId, list, true); }
+}
+async function loadExamResults(examId){
+  const list = (await safeGet('examtakers:'+examId, true)) || [];
+  const items = [];
+  for(const n of list){
+    const r = await safeGet('examresult:'+examId+':'+n, true);
+    if(r) items.push(r);
+  }
+  items.sort((a,b)=> b.score-a.score || (b.date-a.date));
+  return items;
+}
+async function saveProgress(){
+  if(!STATE.name) return;
+  await safeSet('progress:'+STATE.name, STATE.progress, false);
+  await saveSummary();
+}
+/* Non-blocking variant used by tap-heavy interactions (answering cards, quiz, etc.). */
+function saveProgressBg(){
+  if(!STATE.name) return;
+  safeSetBg('progress:'+STATE.name, STATE.progress, false);
+  saveSummaryBg();
+}
+async function saveSummary(){
+  const summary = {
+    name: STATE.name,
+    mastered: masteredCount(STATE.progress),
+    streak: computeStreak(STATE.progress),
+    minutes: Math.round((STATE.progress.listeningSec+STATE.progress.speakingSec)/60),
+    updatedAt: Date.now()
+  };
+  await safeSet('summary:'+STATE.name, summary, true);
+  let list = (await safeGet('students_list', true)) || [];
+  if(!list.includes(STATE.name)){ list.push(STATE.name); await safeSet('students_list', list, true); }
+}
+function saveSummaryBg(){
+  const summary = {
+    name: STATE.name,
+    mastered: masteredCount(STATE.progress),
+    streak: computeStreak(STATE.progress),
+    minutes: Math.round((STATE.progress.listeningSec+STATE.progress.speakingSec)/60),
+    updatedAt: Date.now()
+  };
+  safeSetBg('summary:'+STATE.name, summary, true);
+  // Roster update — cheap, do async without blocking
+  (async ()=>{
+    let list = (await safeGet('students_list', true)) || [];
+    if(!list.includes(STATE.name)){ list.push(STATE.name); safeSetBg('students_list', list, true); }
+  })();
+}
+async function loadLeaderboard(){
+  const list = (await safeGet('students_list', true)) || [];
+  const items = [];
+  for(const n of list){
+    const s = await safeGet('summary:'+n, true);
+    if(s) items.push(s);
+  }
+  items.sort((a,b)=> b.mastered-a.mastered || b.streak-a.streak);
+  STATE.leaderboard = items;
+}
+function markActivityToday(){
+  const today = new Date().toISOString().slice(0,10);
+  if(!STATE.progress.activityDates.includes(today)) STATE.progress.activityDates.push(today);
+}
+function computeStreak(p){
+  const dates = new Set(p.activityDates||[]);
+  let streak = 0;
+  let d = new Date();
+  const todayStr = d.toISOString().slice(0,10);
+  if(!dates.has(todayStr)){
+    d.setDate(d.getDate()-1);
+  }
+  while(true){
+    const s = d.toISOString().slice(0,10);
+    if(dates.has(s)){ streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+function masteredCount(p){
+  const validIds = new Set(STATE.flashcards.map(c=>String(c.id)));
+  return Object.entries(p.srs||{}).filter(([id,e])=> validIds.has(id) && e.srsLevel>=3).length;
+}
+
+function speak(text){
+  try{ window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang='ar-SA'; u.rate=0.9;
+    window.speechSynthesis.speak(u);
+  }catch(e){ toast('Your browser does not support text-to-speech'); }
+}
+function stripTashkeel(s){ return (s||'').replace(/[\u064B-\u0652\u0640]/g,'').trim(); }
+function normalizeArabic(s){
+  return stripTashkeel(s)
+    .replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627')  // أ إ آ ٱ → ا
+    .replace(/[\u0629]/g, '\u0647')                       // ة → ه
+    .replace(/[\u0649]/g, '\u064A')                       // ى → ي
+    .replace(/[\u0626]/g, '\u064A')                       // ئ → ي
+    .replace(/[\u0624]/g, '\u0648')                       // ؤ → و
+    .replace(/[\u0621]/g, '\u064A')                       // ء → ي (hamza standalone)
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+/* Only allow http(s) links in resource URLs — blocks javascript:/data: URI XSS via the href attribute. */
+function safeUrl(u){
+  const s = (u||'').trim();
+  if(/^https?:\/\//i.test(s)) return escapeHtml(s);
+  return '#';
+}
+function timeAgo(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'just now';
+  const m = Math.floor(s/60); if(m<60) return m+' minute'+(m>1?'s':'')+' ago';
+  const h = Math.floor(m/60); if(h<24) return h+' hour'+(h>1?'s':'')+' ago';
+  const d = Math.floor(h/24); if(d<7) return d+' day'+(d>1?'s':'')+' ago';
+  return new Date(ts).toLocaleDateString();
+}
+function unreadAnnouncementsCount(){
+  const read = new Set((STATE.progress.readAnnouncements||[]).map(String));
+  return STATE.announcements.filter(a=>!read.has(String(a.id))).length;
+}
+
+/* -- Q&A counts -- */
+function unansweredQuestionsCount(){
+  return STATE.questions.filter(q=>!q.reply).length;
+}
+function unreadRepliesCount(){
+  if(!STATE.name) return 0;
+  const seen = new Set((STATE.progress.readReplies||[]).map(String));
+  return STATE.questions.filter(q =>
+    q.name === STATE.name && q.reply && !seen.has(String(q.id))
+  ).length;
+}
+
+/* ================= RENDER ROOT ================= */
+function render(){
+  const app = document.getElementById('app');
+  document.body.classList.toggle('dark', STATE.dark);
+  if(!STATE.codesReady){ app.innerHTML = '<div class="gate"><p style="margin:0;">Loading…</p></div>'; return; }
+  if(!STATE.role){ app.innerHTML = renderGate(); attachGate(); return; }
+  app.innerHTML = renderHeader() + renderTabs() + renderBody();
+  attachHandlers();
+}
+
+function renderHeader(){
+  const streak = STATE.role==='student' ? computeStreak(STATE.progress) : 0;
+  return `
+  <div class="masthead">
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div><h1>Minbar</h1><p>An advanced spaced-repetition platform for learning Arabic</p></div>
+    </div>
+    <div class="header-actions">
+      ${STATE.role==='student' && streak>0 ? `<div class="streak-chip">🔥 ${streak}-day streak</div>` : ''}
+      <div class="role-badge">${STATE.role==='teacher'?'👨‍🏫 <b>Teacher</b> mode':'🎓 Student <b>'+STATE.name+'</b>'} <button class="switch-btn" id="switchRole">Switch</button></div>
+      <button class="theme-toggle" id="refreshBtn" title="Refresh content">🔄</button>
+      <button class="theme-toggle" id="themeToggle">${STATE.dark?'☀️':'🌙'}</button>
+    </div>
+  </div>`;
+}
+
+function renderGate(){
+  return `
+  <div class="gate" id="gateBox">
+    <div class="gate-crest">M</div>
+    <span class="gate-step">Step 1 · Choose your role</span>
+    <h2>Welcome to Minbar</h2>
+    <p>An advanced flashcard platform built on spaced repetition (SRS), with quizzes, streak tracking, achievements, and a leaderboard.</p>
+    <div class="role-cards">
+      <div class="role-card" data-role="teacher" id="cardTeacher" tabindex="0" role="button" aria-pressed="false"><div class="ic-wrap"><div class="ic">🗂️</div></div><h3>Teacher</h3><p>Add content one at a time or in bulk, and track every student</p></div>
+      <div class="role-card" data-role="student" id="cardStudent" tabindex="0" role="button" aria-pressed="false"><div class="ic-wrap"><div class="ic">📖</div></div><h3>Student</h3><p>Scheduled review, quizzes, achievements, and detailed progress</p></div>
+    </div>
+    <div class="gate-form">
+      <div class="gate-field" id="nameWrap" style="display:none;">
+        <label for="nameInput">Your name</label>
+        <input class="name-input" id="nameInput" placeholder="e.g. Layla Ahmad" autocomplete="off" />
+      </div>
+      <div class="gate-field" id="codeWrap" style="display:none;">
+        <label for="codeInput">Access code</label>
+        <div class="code-field" id="codeFieldWrap">
+          <input class="name-input" id="codeInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" />
+          <button type="button" class="code-toggle" id="codeToggle" aria-label="Show access code">👁️</button>
+        </div>
+        <div class="gate-hint">🔒 Provided by your instructor</div>
+      </div>
+      <button class="enter-btn" id="enterBtn" disabled>Enter Minbar →</button>
+    </div>
+    <div class="gate-foot">Your access code keeps this classroom private to your group</div>
+  </div>`;
+}
+
+function attachGate(){
+  let picked = null;
+  const gateBox = document.getElementById('gateBox');
+  const cardTeacher = document.getElementById('cardTeacher');
+  const cardStudent = document.getElementById('cardStudent');
+  const nameInput = document.getElementById('nameInput');
+  const codeInput = document.getElementById('codeInput');
+  const codeFieldWrap = document.getElementById('codeFieldWrap');
+  const enterBtn = document.getElementById('enterBtn');
+
+  function refreshEnter(){
+    const nameOk = picked==='teacher' || !!nameInput.value.trim();
+    const codeOk = !!codeInput.value.trim();
+    enterBtn.disabled = !(picked && nameOk && codeOk);
+  }
+  function selectRole(role){
+    picked = role;
+    const isTeacher = role==='teacher';
+    cardTeacher.classList.toggle('active', isTeacher);
+    cardStudent.classList.toggle('active', !isTeacher);
+    cardTeacher.setAttribute('aria-pressed', String(isTeacher));
+    cardStudent.setAttribute('aria-pressed', String(!isTeacher));
+    document.getElementById('nameWrap').style.display = isTeacher ? 'none' : 'block';
+    document.getElementById('codeWrap').style.display = 'block';
+    codeInput.placeholder = isTeacher ? 'Teacher access code' : 'Student access code';
+    codeFieldWrap.classList.remove('err');
+    refreshEnter();
+    setTimeout(()=>{ (isTeacher ? codeInput : nameInput).focus(); }, 0);
+  }
+  [[cardTeacher,'teacher'],[cardStudent,'student']].forEach(([el,role])=>{
+    el.onclick = ()=> selectRole(role);
+    el.onkeydown = (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); selectRole(role); } };
+  });
+  document.getElementById('codeToggle').onclick = ()=>{
+    const btn = document.getElementById('codeToggle');
+    const showing = codeInput.type==='text';
+    codeInput.type = showing ? 'password' : 'text';
+    btn.textContent = showing ? '👁️' : '🙈';
+    btn.setAttribute('aria-label', showing ? 'Show access code' : 'Hide access code');
+    codeInput.focus();
+  };
+  nameInput.addEventListener('input', refreshEnter);
+  nameInput.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' && !enterBtn.disabled){ e.preventDefault(); enterBtn.click(); }
+  });
+  codeInput.addEventListener('input', ()=>{ codeFieldWrap.classList.remove('err'); refreshEnter(); });
+  codeInput.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' && !enterBtn.disabled){ e.preventDefault(); enterBtn.click(); }
+  });
+  enterBtn.onclick = async ()=>{
+    if(!picked) return;
+    const enteredCode = codeInput.value.trim();
+    if(enteredCode !== STATE.codes[picked]){
+      toast('Incorrect access code');
+      codeFieldWrap.classList.add('err');
+      gateBox.classList.remove('shake'); void gateBox.offsetWidth; gateBox.classList.add('shake');
+      codeInput.value=''; codeInput.focus();
+      return;
+    }
+    STATE.role = picked;
+    if(picked==='student') STATE.name = nameInput.value.trim();
+    await loadShared();
+    await loadProgress();
+    if(picked==='teacher') await loadLeaderboard();
+    STATE.tab = picked==='teacher' ? 'addcard' : 'deck';
+    startPolling();
+    startNotificationLoop();
+    render();
+  };
+}
+
+function renderTabs(){
+  const tTeacher = [
+    {k:'addcard', l:'➕ Add Card'}, {k:'announcements', l:'📢 Announcements'}, {k:'bulk', l:'📥 Quick Import'},
+    {k:'addres', l:'📚 Add Resource'}, {k:'manage', l:'🗂️ Manage Content'},
+    {k:'exams', l:'📝 Exams'}, {k:'students', l:'👥 Student Dashboard'},
+    {k:'questions', l:'📩 Questions'},
+    {k:'settings', l:'⚙️ Settings'},
+  ];
+  const tStudent = [
+    {k:'announcements', l:'📢 Announcements'},
+    {k:'deck', l:'🃏 Review'}, {k:'quiz', l:'🎯 Quiz'},
+    {k:'exam', l:'📝 Exam'},
+    {k:'ask', l:'📩 Ask Teacher'},
+    {k:'resources', l:'📚 Resources'}, {k:'progress', l:'📈 My Progress'},
+    {k:'leaderboard', l:'🏅 Leaderboard'},
+  ];
+  const tabs = STATE.role==='teacher' ? tTeacher : tStudent;
+  const unread = STATE.role==='student' ? unreadAnnouncementsCount() : 0;
+  const teacherQBadge = STATE.role==='teacher' ? unansweredQuestionsCount() : 0;
+  const studentReplyBadge = STATE.role==='student' ? unreadRepliesCount() : 0;
+  return `<div class="tabs">${tabs.map(t=>{
+    let badge = 0;
+    if(t.k==='announcements' && unread>0) badge = unread;
+    else if(t.k==='questions' && teacherQBadge>0) badge = teacherQBadge;
+    else if(t.k==='ask' && studentReplyBadge>0) badge = studentReplyBadge;
+    return `<div class="tab ${STATE.tab===t.k?'active':''}" data-tab="${t.k}">${t.l}${badge>0?`<span class="tab-badge">${badge>9?'9+':badge}</span>`:''}</div>`;
+  }).join('')}</div>`;
+}
+
+function renderBody(){
+  if(STATE.role==='teacher'){
+    if(STATE.tab==='addcard') return renderAddCard();
+    if(STATE.tab==='announcements') return renderAnnouncementsTeacher();
+    if(STATE.tab==='bulk') return renderBulk();
+    if(STATE.tab==='addres') return renderAddRes();
+    if(STATE.tab==='manage') return renderManage();
+    if(STATE.tab==='exams') return renderExamsTab();
+    if(STATE.tab==='students') return renderStudentsPanel();
+    if(STATE.tab==='questions') return renderQuestionsTeacher();
+    if(STATE.tab==='settings') return renderSettings();
+  } else {
+    if(STATE.tab==='announcements') return renderAnnouncementsStudent();
+    if(STATE.tab==='deck') return renderDeck();
+    if(STATE.tab==='quiz') return renderQuiz();
+    if(STATE.tab==='exam') return renderExamStudentTab();
+    if(STATE.tab==='ask') return renderAskTeacher();
+    if(STATE.tab==='resources') return renderResourcesView();
+    if(STATE.tab==='progress') return renderProgress();
+    if(STATE.tab==='leaderboard') return renderLeaderboardTab();
+  }
+  return '';
+}
+
+/* ---------- TEACHER: add card ---------- */
+function renderAddCard(){
+  return `
+  <div class="panel"><h2>Add a New Flashcard</h2>
+    <div class="grid2">
+      <div class="field"><label>Arabic Word or Phrase *</label><input id="fWord" placeholder="e.g. سفر"/></div>
+      <div class="field"><label>Meaning / Translation *</label><input id="fMeaning" placeholder="e.g. Travel"/></div>
+    </div>
+    <div class="field"><label>Example Sentence (optional)</label><textarea id="fExample" placeholder="e.g. أحب السفر إلى بلدان جديدة"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>Category</label><select id="fCat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Level</label><select id="fLevel">${LEVELS.map(l=>`<option>${l}</option>`).join('')}</select></div>
+    </div>
+    <div class="field"><label>Audio File URL (optional — otherwise text-to-speech is used)</label><input id="fAudio" placeholder="https://..."/></div>
+    <button class="primary-btn" id="saveCardBtn">Save Flashcard</button>
+  </div>
+  <div class="panel"><h2>Current Flashcards <small>${STATE.flashcards.length} cards</small></h2>
+    ${STATE.flashcards.length===0 ? '<div class="empty">No flashcards added yet</div>' :
+      STATE.flashcards.slice().reverse().slice(0,12).map(c=>`
+      <div class="row"><div class="info"><b>${escapeHtml(c.word)}</b> — ${escapeHtml(c.meaning)}<span><span class="tag">${escapeHtml(c.category)}</span><span class="tag">${escapeHtml(c.level)}</span></span></div>
+      <button class="ghost-btn danger" data-del-card="${c.id}">Delete</button></div>`).join('')}
+  </div>`;
+}
+
+/* ---------- TEACHER: announcements ---------- */
+function renderAnnouncementsTeacher(){
+  return `
+  <div class="panel"><h2>Post an Announcement</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-4px;">Write a quick note to your students — it appears instantly on their Announcements tab.</p>
+    <div class="field"><label>Title *</label><input id="annTitle" placeholder="e.g. No class this Thursday" maxlength="80"/></div>
+    <div class="field"><label>Message *</label><textarea id="annBody" placeholder="Write your announcement here..." style="min-height:100px;" maxlength="600"></textarea></div>
+    <div class="field"><label>Priority</label>
+      <select id="annPriority">
+        <option value="normal">🟢 Normal</option>
+        <option value="important">🟡 Important</option>
+        <option value="urgent">🔴 Urgent</option>
+      </select>
+    </div>
+    <button class="primary-btn" id="postAnnBtn">📢 Post Announcement</button>
+  </div>
+  <div class="panel"><h2>Posted Announcements <small>${STATE.announcements.length}</small></h2>
+    ${STATE.announcements.length===0 ? '<div class="empty">No announcements posted yet</div>' :
+      STATE.announcements.slice().reverse().map(a=>`
+      <div class="announce-card prio-${a.priority||'normal'}">
+        <div class="announce-top">
+          <div class="announce-title-row"><span class="announce-prio-dot"></span><b>${escapeHtml(a.title)}</b></div>
+          <button class="ghost-btn danger" data-del-ann="${a.id}">Delete</button>
+        </div>
+        <p class="announce-body">${escapeHtml(a.body)}</p>
+        <span class="announce-meta">${a.priority==='urgent'?'Urgent · ':a.priority==='important'?'Important · ':''}Posted ${timeAgo(a.createdAt)}</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+/* ---------- TEACHER: bulk import ---------- */
+function renderBulk(){
+  return `
+  <div class="panel"><h2>Bulk Import Flashcards</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);">Enter one line per card in the format: <b>word - meaning - example sentence (optional)</b>. Use spaces around the dash (<code> - </code>).</p>
+    <div class="field"><textarea id="bulkArea" style="min-height:160px;" placeholder="سفر - Travel - أحب السفر كثيراً
+مدرسة - School
+كتاب - Book - أقرأ كتاباً جديداً"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>Category for all cards</label><select id="bCat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Level for all cards</label><select id="bLevel">${LEVELS.map(l=>`<option>${l}</option>`).join('')}</select></div>
+    </div>
+    <button class="primary-btn" id="importBtn">Import Cards</button>
+  </div>`;
+}
+
+/* ---------- TEACHER: add resource ---------- */
+function renderAddRes(){
+  return `
+  <div class="panel"><h2>Add a Learning Resource</h2>
+    <div class="field"><label>Resource Title *</label><input id="rTitle" placeholder="e.g. Daily Conversations Podcast"/></div>
+    <div class="field"><label>Link *</label><input id="rUrl" placeholder="https://..."/></div>
+    <div class="grid2">
+      <div class="field"><label>Type</label><select id="rType"><option>Listening</option><option>Conversation</option><option>Reading</option></select></div>
+      <div class="field"><label>Short Description</label><input id="rDesc" placeholder="Optional"/></div>
+    </div>
+    <button class="primary-btn" id="saveResBtn">Save Resource</button>
+  </div>
+  <div class="panel"><h2>Current Resources <small>${STATE.resources.length}</small></h2>
+    ${STATE.resources.length===0 ? '<div class="empty">No resources yet</div>' :
+      STATE.resources.slice().reverse().map(r=>`
+      <div class="row res-row type-${r.type}"><div class="info"><a href="${safeUrl(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.title)}</a><span><span class="tag">${escapeHtml(r.type)}</span>${escapeHtml(r.desc||'')}</span></div>
+      <button class="ghost-btn danger" data-del-res="${r.id}">Delete</button></div>`).join('')}
+  </div>`;
+}
+
+/* ---------- TEACHER: manage ---------- */
+function renderManageCardsListHtml(){
+  const PAGE_SIZE = 50;
+  const filtered = STATE.flashcards.filter(c=>{
+      if(!STATE.searchQ) return true;
+      const q = normalizeArabic(STATE.searchQ);
+      return normalizeArabic(c.word).includes(q) || normalizeArabic(c.meaning).includes(q);
+    }).slice().reverse();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if(STATE.managePage >= totalPages) STATE.managePage = totalPages - 1;
+  const page = filtered.slice(STATE.managePage * PAGE_SIZE, (STATE.managePage + 1) * PAGE_SIZE);
+  const pagination = totalPages > 1 ? `
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;">
+      <button class="ghost-btn" data-manage-page="prev" ${STATE.managePage===0?'disabled':''}>← Prev</button>
+      <span style="font-size:12px;color:var(--ink-soft);font-weight:700;">Page ${STATE.managePage+1} / ${totalPages} (${filtered.length} cards)</span>
+      <button class="ghost-btn" data-manage-page="next" ${STATE.managePage>=totalPages-1?'disabled':''}>Next →</button>
+    </div>` : '';
+  return (page.map(c=>`
+    <div class="row"><div class="info"><b>${escapeHtml(c.word)}</b> — ${escapeHtml(c.meaning)}<span><span class="tag">${escapeHtml(c.category)}</span><span class="tag">${escapeHtml(c.level)}</span></span></div>
+    <button class="ghost-btn danger" data-del-card="${c.id}">Delete</button></div>`).join('') || '<div class="empty">No results</div>') + pagination;
+}
+function renderManage(){
+  const byCat = {}; CATS.forEach(c=>byCat[c]=0);
+  STATE.flashcards.forEach(c=>byCat[c.category]=(byCat[c.category]||0)+1);
+  return `
+  <div class="panel"><h2>Content Overview</h2>
+    <div class="stats-row">
+      <div class="stat-box"><div class="num">${STATE.flashcards.length}</div><div class="lab">Total Flashcards</div></div>
+      <div class="stat-box"><div class="num">${STATE.resources.length}</div><div class="lab">Total Resources</div></div>
+      ${CATS.map(c=>`<div class="stat-box"><div class="num">${byCat[c]}</div><div class="lab">${c}</div></div>`).join('')}
+    </div>
+    <p style="font-size:12px;color:var(--ink-soft);margin-top:16px;">Any flashcard or resource you add appears automatically for all students as soon as they log in.</p>
+  </div>
+  <div class="panel"><h2>All Cards</h2>
+  <div class="field"><input id="manageSearch" placeholder="Search for a word..." value="${(STATE.searchQ||'').replace(/"/g,'&quot;')}"/></div>
+  <div id="manageCardsList">${renderManageCardsListHtml()}</div>
+  </div>`;
+}
+
+/* ---------- TEACHER: exams ---------- */
+function renderExamsTab(){
+  return renderExamBuilder() + renderPublishedExams();
+}
+function renderExamBuilder(){
+  const b = STATE.examBuilder;
+  const isMcq = b.qType==='mcq';
+  const canPublish = !!b.title.trim() && b.questions.length>0;
+  return `
+  <div class="panel"><h2>Create New Exam <small>${b.questions.length} question(s) added</small></h2>
+    <div class="field"><label>Exam Title</label><input id="examTitle" placeholder="e.g. Unit 3 Vocabulary Test" value="${(b.title||'').replace(/"/g,'&quot;')}"/></div>
+    <div class="exam-qbuilder">
+      <div class="field"><label>Question Type</label>
+        <select id="examQType">
+          <option value="mcq" ${isMcq?'selected':''}>Multiple Choice</option>
+          <option value="text" ${!isMcq?'selected':''}>Short Answer</option>
+        </select>
+      </div>
+      <div class="field"><label>Question</label><textarea id="examQText" placeholder="Type the question..."></textarea></div>
+      ${isMcq ? `
+      <div class="grid2">
+        ${[0,1,2,3].map(i=>`<div class="field"><label>Option ${i+1}</label><input id="examOpt${i}" placeholder="Option ${i+1}"/></div>`).join('')}
+      </div>
+      <div class="field"><label>Correct Option</label>
+        <select id="examCorrectOpt"><option value="0">Option 1</option><option value="1">Option 2</option><option value="2">Option 3</option><option value="3">Option 4</option></select>
+      </div>` : `
+      <div class="field"><label>Correct Answer</label><input id="examCorrectText" placeholder="Expected answer"/></div>`}
+      <button class="ghost-btn active-mode" id="addExamQBtn" type="button">➕ Add Question to Exam</button>
+    </div>
+    ${b.questions.length ? `<div class="exam-qlist">
+      ${b.questions.map((q,i)=>`<div class="row"><div class="info"><b>Q${i+1}.</b> ${escapeHtml(q.q)}<span>${q.type==='mcq' ? 'Multiple choice · correct: '+escapeHtml(q.options[q.correct]) : 'Short answer · correct: '+escapeHtml(q.correct)}</span></div>
+      <button class="ghost-btn danger" data-del-q="${q.id}">Remove</button></div>`).join('')}
+    </div>` : ''}
+    <button class="primary-btn" id="publishExamBtn" style="margin-top:14px;" ${canPublish?'':'disabled'}>📤 Publish Exam</button>
+  </div>`;
+}
+function renderPublishedExams(){
+  if(STATE.exams.length===0) return `<div class="panel"><h2>Published Exams</h2><div class="empty">No exams published yet — build one above and your students will see it instantly</div></div>`;
+  return `<div class="panel"><h2>Published Exams <small>${STATE.exams.length} exam(s)</small></h2>
+    ${STATE.exams.slice().reverse().map(ex=>`
+    <div class="exam-card">
+      <div class="exam-card-top">
+        <div class="info"><b>${escapeHtml(ex.title)}</b><span>${ex.questions.length} question(s) · published ${new Date(ex.createdAt).toLocaleDateString()}</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="ghost-btn" data-view-results="${ex.id}">${STATE.examOpenResults[ex.id]?'Hide Results':'📊 View Results'}</button>
+          <button class="ghost-btn danger" data-del-exam="${ex.id}">Delete</button>
+        </div>
+      </div>
+      <div id="examResults-${ex.id}">${STATE.examOpenResults[ex.id] ? '<div class="empty">Loading…</div>' : ''}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+/* ---------- TEACHER: settings ---------- */
+function renderSettings(){
+  return `
+  <div class="panel"><h2>Access Codes</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);">These codes control who can enter as a teacher or student. Change them any time — students already logged in are not affected until they switch roles again.</p>
+    <div class="grid2">
+      <div class="field"><label>Teacher Code</label><input id="setTeacherCode" value="${STATE.codes.teacher}"/></div>
+      <div class="field"><label>Student Code</label><input id="setStudentCode" value="${STATE.codes.student}"/></div>
+    </div>
+    <button class="primary-btn" id="saveCodesBtn">Save Codes</button>
+  </div>
+  <div class="panel"><h2>Data Backup</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);">Export all classroom data (flashcards, resources, announcements, exams) as a JSON file. Save this file safely — you can share it with another teacher or use it to restore data.</p>
+    <button class="primary-btn" id="exportBtn" style="width:auto;">📥 Export All Data (JSON)</button>
+  </div>
+  ${renderPreferencesPanel()}`;
+}
+
+/* ---------- SHARED: preferences (notifications + install) ---------- */
+function renderPreferencesPanel(){
+  const notif = notificationsSupported() ? Notification.permission : 'unsupported';
+  const notifStatus =
+    notif==='granted' ? '<span class="pref-pill pref-on">✅ Enabled</span>' :
+    notif==='denied' ? '<span class="pref-pill pref-off">🚫 Blocked in browser settings</span>' :
+    notif==='unsupported' ? '<span class="pref-pill pref-off">Not supported on this browser</span>' :
+    '<span class="pref-pill pref-pending">🔔 Not enabled yet</span>';
+  const canInstall = !!STATE.installEvent;
+  const installedHint = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+  return `
+  <div class="panel"><h2>App Preferences</h2>
+    <div class="pref-row">
+      <div class="pref-info">
+        <b>🔔 Study reminders</b>
+        <span>Get notified when cards are due, when your streak is at risk, or when a new ${STATE.role==='teacher'?'student question':'reply'} arrives.</span>
+      </div>
+      <div class="pref-actions">
+        ${notifStatus}
+        ${notif==='default' ? '<button class="ghost-btn" id="enableNotifBtn">Enable</button>' : ''}
+        ${notif==='granted' ? '<button class="ghost-btn" id="testNotifBtn">Test notification</button>' : ''}
+      </div>
+    </div>
+    <div class="pref-row">
+      <div class="pref-info">
+        <b>📲 Install app to home screen</b>
+        <span>${installedHint ? 'Already installed — opening in app mode.' : 'Install Minbar as a real app for instant launch and full-screen study.'}</span>
+      </div>
+      <div class="pref-actions">
+        ${installedHint ? '<span class="pref-pill pref-on">✅ Installed</span>' :
+          canInstall ? '<button class="primary-btn" id="installBtn" style="width:auto;padding:10px 18px;">📲 Install now</button>' :
+          '<span class="pref-pill pref-pending">Use browser menu → "Add to Home Screen"</span>'}
+      </div>
+    </div>
+    <div class="pref-row">
+      <div class="pref-info">
+        <b>📥 Export my progress</b>
+        <span>Download all your flashcards, exam results, study stats and achievements as a JSON file.</span>
+      </div>
+      <div class="pref-actions">
+        <button class="ghost-btn" id="exportStudentProgressBtn">📥 Export</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- TEACHER: students overview ---------- */
+function renderStudentsPanel(){
+  const lb = STATE.leaderboard;
+  return `
+  <div class="panel"><h2>Student Dashboard <small>${lb.length} students registered</small></h2>
+    ${lb.length===0 ? '<div class="empty">No students have logged in yet</div>' :
+      lb.map((s,i)=>`
+      <div class="lb-row"><div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
+        <div class="lb-name">${s.name}</div>
+        <div class="lb-stat">🏆 ${s.mastered} mastered</div>
+        <div class="lb-stat">🔥 ${s.streak}-day streak</div>
+        <div class="lb-stat">⏱️ ${s.minutes} min</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+/* ---------- TEACHER: questions from students ---------- */
+function renderQuestionsTeacher(){
+  const open = STATE.questions.filter(q=>!q.reply).sort((a,b)=>b.createdAt-a.createdAt);
+  const answered = STATE.questions.filter(q=>q.reply).sort((a,b)=>b.repliedAt-a.repliedAt);
+
+  const renderQ = (q, isOpen) => {
+    const showReply = !!STATE.qOpenReply[q.id];
+    const draft = STATE.qReplyDrafts[q.id] || '';
+    return `
+    <div class="q-card ${isOpen?'q-open':'q-answered'}">
+      <div class="q-head">
+        <div class="q-who"><span class="q-avatar">${escapeHtml((q.name||'?').charAt(0).toUpperCase())}</span><b>${escapeHtml(q.name)}</b> <span class="q-time">· ${timeAgo(q.createdAt)}</span></div>
+        <span class="q-status ${isOpen?'pending':'done'}">${isOpen?'⏳ Open':'✅ Answered'}</span>
+      </div>
+      <p class="q-body">${escapeHtml(q.body)}</p>
+      ${q.reply ? `
+        <div class="q-reply">
+          <div class="q-reply-label">📩 Your reply · ${timeAgo(q.repliedAt)}</div>
+          <p>${escapeHtml(q.reply)}</p>
+        </div>` : ''}
+      <div class="q-actions">
+        ${isOpen ? `<button class="ghost-btn q-reply-btn" data-q-toggle="${q.id}">${showReply?'✕ Cancel':'✍️ Reply'}</button>` : ''}
+        <button class="ghost-btn danger" data-q-del="${q.id}">Delete</button>
+      </div>
+      ${(isOpen && showReply) ? `
+        <div class="q-reply-form">
+          <textarea class="q-reply-input" data-q-input="${q.id}" placeholder="Write a helpful reply to ${escapeHtml(q.name)}...">${escapeHtml(draft)}</textarea>
+          <button class="primary-btn" data-q-send="${q.id}">📤 Send Reply</button>
+        </div>` : ''}
+    </div>`;
+  };
+
+  return `
+  <div class="panel"><h2>Student Questions <small>${open.length} awaiting reply</small></h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-4px;">Anything a student writes here shows up in real time so you can help fast.</p>
+    ${open.length===0 ? '<div class="empty">🎉 No open questions right now</div>' : open.map(q=>renderQ(q,true)).join('')}
+  </div>
+  ${answered.length ? `
+  <div class="panel"><h2>Answered <small>${answered.length}</small></h2>
+    ${answered.map(q=>renderQ(q,false)).join('')}
+  </div>` : ''}`;
+}
+
+/* ---------- STUDENT: ask teacher ---------- */
+function renderAskTeacher(){
+  const mine = STATE.questions.filter(q=>q.name===STATE.name).sort((a,b)=>b.createdAt-a.createdAt);
+  return `
+  <div class="panel"><h2>Ask Your Teacher</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-4px;">Stuck on grammar? Need clarification? Write your question here — your teacher will see it and reply.</p>
+    <div class="field"><label>Your Question / Study Problem</label>
+      <textarea id="qInput" placeholder="e.g. I don't understand when to use ال before nouns..." style="min-height:110px;" maxlength="1000">${escapeHtml(STATE.qDraft||'')}</textarea>
+    </div>
+    <button class="primary-btn" id="qSendBtn">📤 Send to Teacher</button>
+  </div>
+  <div class="panel"><h2>My Questions <small>${mine.length}</small></h2>
+    ${mine.length===0 ? '<div class="empty">You haven&#39;t asked anything yet</div>' :
+      mine.map(q=>{
+        const isNew = q.reply && !((STATE.progress.readReplies||[]).map(String).includes(String(q.id)));
+        return `
+        <div class="q-card ${q.reply?'q-answered':'q-open'} ${isNew?'q-new':''}">
+          <div class="q-head">
+            <div class="q-who"><b>You asked</b> <span class="q-time">· ${timeAgo(q.createdAt)}</span></div>
+            <span class="q-status ${q.reply?'done':'pending'}">${q.reply?'✅ Answered':'⏳ Waiting for teacher'}</span>
+          </div>
+          <p class="q-body">${escapeHtml(q.body)}</p>
+          ${q.reply ? `
+            <div class="q-reply">
+              <div class="q-reply-label">📩 Teacher's reply · ${timeAgo(q.repliedAt)}</div>
+              <p>${escapeHtml(q.reply)}</p>
+            </div>` : ''}
+          ${!q.reply ? `<div class="q-actions"><button class="ghost-btn danger" data-student-del-q="${q.id}">🗑️ Delete</button></div>` : ''}
+        </div>`;
+      }).join('')}
+  </div>`;
+}
+
+/* ---------- STUDENT: deck (SRS) ---------- */
+function filteredCards(){
+  return STATE.flashcards.filter(c =>
+    (STATE.filterCat==='All' || c.category===STATE.filterCat) &&
+    (STATE.filterLevel==='All' || c.level===STATE.filterLevel)
+  );
+}
+function dueCards(){
+  const now = Date.now();
+  return filteredCards().filter(c=>{
+    const e = STATE.progress.srs[c.id];
+    return !e || e.due<=now;
+  }).sort((a,b)=>{
+    const ea = STATE.progress.srs[a.id], eb = STATE.progress.srs[b.id];
+    return (ea?ea.due:0) - (eb?eb.due:0);
+  });
+}
+function dueTomorrowCount(){
+  const now = Date.now();
+  return filteredCards().filter(c=>{
+    const e = STATE.progress.srs[c.id];
+    return e && e.due>now && e.due<=now+DAY_MS;
+  }).length;
+}
+function currentDeckPool(){
+  return STATE.deckMode==='due' ? dueCards() : STATE.deckMode==='favorites' ? favoriteCards() : filteredCards();
+}
+function favoriteCards(){
+  const favs = new Set((STATE.progress.favorites||[]).map(String));
+  return filteredCards().filter(c=>favs.has(String(c.id)));
+}
+function toggleFavorite(cardId){
+  const favs = (STATE.progress.favorites||[]).map(String);
+  const idStr = String(cardId);
+  const idx = favs.indexOf(idStr);
+  if(idx===-1){ favs.push(idStr); toast('⭐ Added to favorites'); }
+  else { favs.splice(idx,1); toast('Removed from favorites'); }
+  STATE.progress.favorites = favs;
+  saveProgressBg();
+}
+function renderDeck(){
+  const pool = currentDeckPool();
+  if(STATE.deckIndex >= pool.length) STATE.deckIndex = 0;
+  const c = pool[STATE.deckIndex];
+  const dueTotal = dueCards().length;
+  const favTotal = favoriteCards().length;
+  const total = filteredCards().length;
+  const masteredTotal = masteredCount(STATE.progress);
+  const remaining = Math.max(0, total - masteredTotal);
+  const tomorrowTotal = dueTomorrowCount();
+  const reviewedToday = Object.values(STATE.progress.srs||{}).filter(e => {
+    if(!e || !e.due) return false;
+    const reviewedDay = new Date(e.due - SRS_INTERVALS[e.srsLevel||0]*DAY_MS).toISOString().slice(0,10);
+    return reviewedDay === new Date().toISOString().slice(0,10);
+  }).length;
+  const isFav = c && (STATE.progress.favorites||[]).map(String).includes(String(c.id));
+  return `
+  <div class="panel">
+    <div class="stats-row deck-quickstats">
+      <div class="stat-box"><div class="num">${dueTotal}</div><div class="lab">Due Now</div></div>
+      <div class="stat-box"><div class="num">${tomorrowTotal}</div><div class="lab">Due Tomorrow</div></div>
+      <div class="stat-box"><div class="num">${masteredTotal}</div><div class="lab">Mastered</div></div>
+      <div class="stat-box"><div class="num">${remaining}</div><div class="lab">Remaining</div></div>
+      <div class="stat-box"><div class="num">${reviewedToday}</div><div class="lab">Reviewed Today</div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="mode-switch">
+      <button class="ghost-btn ${STATE.deckMode==='due'?'active-mode':''}" data-mode="due">📌 Due for Review (${dueTotal})</button>
+      <button class="ghost-btn ${STATE.deckMode==='browse'?'active-mode':''}" data-mode="browse">📖 Browse All</button>
+      <button class="ghost-btn ${STATE.deckMode==='favorites'?'active-mode':''}" data-mode="favorites">⭐ Favorites (${favTotal})</button>
+    </div>
+    <div class="deck-controls">
+      <select id="filterCat"><option>All</option>${CATS.map(c=>`<option ${STATE.filterCat===c?'selected':''}>${c}</option>`).join('')}</select>
+      <select id="filterLevel"><option>All</option>${LEVELS.map(l=>`<option ${STATE.filterLevel===l?'selected':''}>${l}</option>`).join('')}</select>
+      <span class="deck-progress">${pool.length? (STATE.deckIndex+1)+' / '+pool.length : ''}</span>
+    </div>
+    ${!c ? `<div class="empty">${STATE.deckMode==='due' ? '🎉 No cards due right now — check back later or browse all cards' : STATE.deckMode==='favorites' ? 'No favorite cards yet — tap ⭐ on any tricky card to save it here' : 'No flashcards match this filter yet'}</div>` : `
+    <div class="flash-stage">
+      <div class="flashcard ${STATE.flipped?'flipped':''}" id="flashcard">
+        <button class="fav-star ${isFav?'active':''}" id="favBtn" title="Save to favorites" aria-label="Save to favorites">${isFav?'⭐':'☆'}</button>
+        <div class="flashcard-inner">
+          <div class="face front"><div class="word">${escapeHtml(c.word)}</div><div class="hint">Tap or press space to reveal the meaning</div></div>
+          <div class="face back"><div class="meaning">${escapeHtml(c.meaning)}</div>${c.example? `<div class="example">${escapeHtml(c.example)}</div>` : ''}</div>
+        </div>
+      </div>
+      <div class="deck-actions">
+        <button class="icon-btn speak" id="speakBtn">🔊 Listen</button>
+        <button class="icon-btn know" id="knowBtn">✅ I Know It</button>
+        <button class="icon-btn review" id="reviewBtn">🔁 Needs Review</button>
+      </div>
+      <div class="kbd-hint">Shortcuts: Space = flip card · ← I Know It · → Needs Review</div>
+    </div>`}
+  </div>`;
+}
+
+/* ---------- STUDENT: quiz ---------- */
+function buildQuizQuestion(){
+  const pool = STATE.flashcards;
+  if(pool.length<4) return null;
+  const idx = Math.floor(Math.random()*pool.length);
+  const card = pool[idx];
+  const direction = Math.random()<0.5 ? 'w2m' : 'm2w';
+  const correct = direction==='w2m' ? card.meaning : card.word;
+  const distractors = pool.filter(c=>c.id!==card.id)
+    .sort(()=>Math.random()-0.5).slice(0,3)
+    .map(c=> direction==='w2m' ? c.meaning : c.word);
+  const options = [correct, ...distractors].sort(()=>Math.random()-0.5);
+  const correctIndex = options.indexOf(correct);
+  return { card, direction, correct, options, correctIndex };
+}
+function renderQuiz(){
+  if(STATE.flashcards.length<4){
+    return `<div class="panel"><div class="empty">You need at least 4 flashcards to start a quiz — wait for your teacher to add more</div></div>`;
+  }
+  if(!STATE.quiz.question) STATE.quiz.question = buildQuizQuestion();
+  const q = STATE.quiz.question;
+  const promptText = q.direction==='w2m' ? q.card.word : q.card.meaning;
+  return `
+  <div class="panel">
+    <h2>Multiple Choice Quiz <small>Score: ${STATE.quiz.score} / ${STATE.quiz.total}</small></h2>
+    <div class="quiz-q">
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;">${q.direction==='w2m' ? 'What does this word mean?' : 'Which Arabic word matches?'}</div>
+      <div class="qword">${escapeHtml(promptText)}</div>
+    </div>
+    <div class="quiz-options">
+      ${q.options.map((o,i)=>`<div class="quiz-opt ${STATE.quiz.answered ? (i===q.correctIndex?'correct':(i===STATE.quiz.picked?'wrong':'')) : ''}" data-opt-index="${i}">${escapeHtml(o)}</div>`).join('')}
+    </div>
+    ${STATE.quiz.answered ? `<div style="text-align:center;margin-top:16px;"><button class="primary-btn" id="nextQuizBtn">Next Question</button></div>` : ''}
+  </div>
+  <div class="panel"><h2>Typing Quiz</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);">Type the correct Arabic word based on the meaning shown.</p>
+    ${renderTypingBlock()}
+  </div>`;
+}
+function renderTypingBlock(){
+  if(!STATE.typing.question) STATE.typing.question = STATE.flashcards[Math.floor(Math.random()*STATE.flashcards.length)];
+  const q = STATE.typing.question;
+  return `
+  <div class="quiz-q"><div style="font-size:12.5px;color:var(--ink-soft);">Meaning:</div><div class="qword" style="font-size:24px;">${escapeHtml(q.meaning)}</div></div>
+  <div class="type-input-row">
+    <input id="typeInput" placeholder="Type here..." ${STATE.typing.feedback?'disabled':''} value="${STATE.typing.feedback? escapeHtml(q.word):''}"/>
+    ${STATE.typing.feedback ? `<button class="primary-btn" id="typeNextBtn">Next</button>` : `<button class="primary-btn" id="typeCheckBtn">Check</button>`}
+  </div>
+  ${STATE.typing.feedback ? `<div style="text-align:center;margin-top:10px;font-weight:700;color:${STATE.typing.feedback==='correct'?'var(--green)':'var(--rose)'}">${STATE.typing.feedback==='correct'?'✅ Correct answer':'❌ Correct answer: '+escapeHtml(q.word)}</div>` : ''}
+  `;
+}
+
+/* ---------- STUDENT: exam ---------- */
+function renderExamStudentTab(){
+  if(STATE.examSession) return renderExamSession();
+  if(STATE.exams.length===0) return `<div class="panel"><h2>Exams</h2><div class="empty">Your teacher hasn't published any exams yet</div></div>`;
+  return `<div class="panel"><h2>Available Exams</h2>
+    ${STATE.exams.map(ex=>{
+      const res = STATE.progress.examResults[ex.id];
+      return `<div class="exam-card">
+        <div class="exam-card-top">
+          <div class="info"><b>${escapeHtml(ex.title)}</b><span>${ex.questions.length} question(s)</span></div>
+          ${res ? `<div class="score-badge">✅ ${res.score}/${res.total}</div>` : ''}
+        </div>
+        <button class="primary-btn" data-start-exam="${ex.id}" style="margin-top:12px;width:100%;">${res?'🔁 Retake Exam':'▶ Start Exam'}</button>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function renderExamSession(){
+  const sess = STATE.examSession;
+  const ex = STATE.exams.find(e=>e.id===sess.examId);
+  if(!ex){ return `<div class="panel"><div class="empty">This exam is no longer available</div></div>`; }
+  if(sess.index >= ex.questions.length){
+    return `<div class="panel"><h2>Exam Complete 🎉</h2>
+      <div style="text-align:center;padding:12px 0 20px;">
+        <div class="stat-box" style="max-width:220px;margin:0 auto;"><div class="num">${sess.score}/${ex.questions.length}</div><div class="lab">Your Score</div></div>
+      </div>
+      <button class="primary-btn" id="examBackBtn" style="display:block;margin:0 auto;">Back to Exams</button>
+    </div>`;
+  }
+  const q = ex.questions[sess.index];
+  const pct = Math.round((sess.index/ex.questions.length)*100);
+  return `<div class="panel">
+    <h2>${escapeHtml(ex.title)} <small>Question ${sess.index+1} / ${ex.questions.length}</small></h2>
+    <div class="bar-bg" style="margin-bottom:20px;"><div class="bar-fill" style="width:${pct}%"></div></div>
+    <div class="quiz-q"><div class="qword" style="font-size:22px;">${escapeHtml(q.q)}</div></div>
+    ${q.type==='mcq' ? `
+    <div class="quiz-options">
+      ${q.options.map((o,i)=>`<div class="quiz-opt ${sess.answered ? (i===q.correct?'correct':(i===sess.picked?'wrong':'')) : ''}" data-exam-opt="${i}">${escapeHtml(o)}</div>`).join('')}
+    </div>` : `
+    <div class="type-input-row">
+      <input id="examTypeInput" placeholder="Type your answer..." ${sess.answered?'disabled':''} value="${sess.answered?q.correct:''}"/>
+      ${sess.answered ? '' : '<button class="primary-btn" id="examCheckBtn">Submit</button>'}
+    </div>
+    ${sess.answered ? `<div style="text-align:center;margin-top:10px;font-weight:700;color:${sess.wasCorrect?'var(--green)':'var(--rose)'}">${sess.wasCorrect?'✅ Correct answer':'❌ Correct answer: '+escapeHtml(q.correct)}</div>` : ''}`}
+    ${sess.answered ? `<div style="text-align:center;margin-top:16px;"><button class="primary-btn" id="examNextBtn">${sess.index+1 < ex.questions.length ? 'Next Question' : 'Finish Exam'}</button></div>` : ''}
+  </div>`;
+}
+
+/* ---------- STUDENT: announcements ---------- */
+function renderAnnouncementsStudent(){
+  if(STATE.announcements.length===0) return `<div class="panel"><h2>Announcements</h2><div class="empty">Your teacher hasn't posted any announcements yet</div></div>`;
+  const read = new Set((STATE.progress.readAnnouncements||[]).map(String));
+  return `<div class="panel"><h2>Announcements <small>${STATE.announcements.length}</small></h2>
+    ${STATE.announcements.slice().reverse().map(a=>{
+      const isNew = !read.has(String(a.id));
+      const prio = a.priority||'normal';
+      return `<div class="announce-card prio-${prio} ${isNew?'is-new':''}">
+        <div class="announce-top">
+          <div class="announce-title-row"><span class="announce-prio-dot"></span><b>${escapeHtml(a.title)}</b>${isNew?'<span class="tag new">New</span>':''}</div>
+        </div>
+        <p class="announce-body">${escapeHtml(a.body)}</p>
+        <span class="announce-meta">${prio==='urgent'?'🔴 Urgent · ':prio==='important'?'🟡 Important · ':''}${timeAgo(a.createdAt)}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ---------- STUDENT: resources ---------- */
+function renderResourcesView(){
+  if(STATE.resources.length===0) return `<div class="panel"><div class="empty">Your teacher hasn't added any resources yet</div></div>`;
+  const groups = {'Listening':[], 'Conversation':[], 'Reading':[]};
+  STATE.resources.forEach(r=>{ (groups[r.type]||(groups[r.type]=[])).push(r); });
+  return Object.keys(groups).filter(t=>groups[t].length).map(t=>`
+    <div class="panel"><h2>${t==='Listening'?'🎧':t==='Conversation'?'🗣️':'📘'} ${t} Resources</h2>
+      ${groups[t].map(r=>`<div class="row res-row type-${r.type}"><div class="info"><a href="${safeUrl(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.title)}</a><span>${escapeHtml(r.desc||'')}</span></div></div>`).join('')}
+    </div>`).join('');
+}
+
+const AR_DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function renderActivityChart(){
+  const dates = new Set(STATE.progress.activityDates||[]);
+  const today = new Date();
+  const cells = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    const key = d.toISOString().slice(0,10);
+    cells.push({ label: AR_DAY_NAMES[d.getDay()], active: dates.has(key), isToday: i===0 });
+  }
+  return `
+  <div class="panel"><h2>Your Activity in the Last 7 Days</h2>
+    <div class="activity-chart">
+      ${cells.map(c=>`<div class="activity-day ${c.isToday?'today':''}"><div class="activity-dot ${c.active?'active':''}">${c.active?'✓':''}</div><div class="activity-label">${c.label}</div></div>`).join('')}
+    </div>
+  </div>`;
+}
+/* ---------- STUDENT: progress ---------- */
+function renderProgress(){
+  const total = STATE.flashcards.length;
+  const mastered = masteredCount(STATE.progress);
+  const pct = total ? Math.round((mastered/total)*100) : 0;
+  const lm = Math.floor(STATE.progress.listeningSec/60);
+  const sm = Math.floor(STATE.progress.speakingSec/60);
+  const streak = computeStreak(STATE.progress);
+  return `
+  <div class="panel"><h2>My Learning Progress</h2>
+    <div class="progress-wrap">
+      <div class="progress-top"><span>Flashcard Mastery Rate</span><span>${pct}%</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:6px;">${mastered} of ${total} cards mastered (after multiple reviews)</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="num">${lm}</div><div class="lab">Minutes Listening</div></div>
+      <div class="stat-box"><div class="num">${sm}</div><div class="lab">Minutes Speaking</div></div>
+      <div class="stat-box"><div class="num">${streak}</div><div class="lab">Day Streak 🔥</div></div>
+      <div class="stat-box"><div class="num">${STATE.progress.quiz.correct}/${STATE.progress.quiz.attempts}</div><div class="lab">Quiz Accuracy</div></div>
+    </div>
+  </div>
+  <div class="panel"><h2>Study Timers</h2>
+    ${renderTimersCompact()}
+  </div>
+  ${renderActivityChart()}
+  <div class="panel"><h2>Achievements</h2>
+    <div class="badges-grid">
+      ${ACHIEVEMENTS.map(a=>{const unlocked=a.check(STATE.progress);return `<div class="badge ${unlocked?'':'locked'}"><div class="bic">${a.icon}</div><div class="bname">${a.name}</div></div>`;}).join('')}
+    </div>
+  </div>
+  ${renderPreferencesPanel()}`;
+}
+function renderTimersCompact(){
+  return `
+  <div class="timer-compact-row">
+    ${renderTimerCompact('listening','🎧','Listening')}
+    ${renderTimerCompact('speaking','🗣️','Speaking')}
+  </div>`;
+}
+function renderTimerCompact(kind, icon, label){
+  const isListen = kind==='listening';
+  const running = STATE.timers[kind];
+  const clockId = isListen ? 'listenClock' : 'speakClock';
+  const time = running ? fmtClock(Date.now()-STATE.timers[kind+'Start']) : '00:00';
+  return `
+  <div class="timer-card">
+    <div class="timer-ring ${running?'running':''}">
+      <div class="timer-ring-inner">
+        <div class="timer-icon-lg">${icon}</div>
+        <div class="timer-time-lg" id="${clockId}">${time}</div>
+      </div>
+    </div>
+    <div class="timer-card-label">${label}</div>
+    <div class="tc-btns">
+      <button class="tc-btn start" id="start${isListen?'Listen':'Speak'}" ${running?'disabled':''}>▶ Start</button>
+      <button class="tc-btn stop" id="stop${isListen?'Listen':'Speak'}" ${running?'':'disabled'}>⏹ Stop</button>
+    </div>
+  </div>`;
+}
+
+function renderLeaderboardTab(){
+  const lb = STATE.leaderboard;
+  return `<div class="panel"><h2>Leaderboard <small>${lb.length} students</small></h2>
+    ${lb.length===0 ? '<div class="empty">Be the first to appear here by reviewing your cards!</div>' :
+    lb.map((s,i)=>`<div class="lb-row"><div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
+      <div class="lb-name">${s.name}${s.name===STATE.name?' (You)':''}</div>
+      <div class="lb-stat">🏆 ${s.mastered}</div><div class="lb-stat">🔥 ${s.streak}</div><div class="lb-stat">⏱️ ${s.minutes}m</div></div>`).join('')}
+  </div>`;
+}
+
+/* ================= HANDLERS ================= */
+function attachHandlers(){
+  document.getElementById('themeToggle').onclick = ()=>{ STATE.dark=!STATE.dark; localStorage.setItem('minbar_dark', STATE.dark); render(); };
+  document.getElementById('switchRole').onclick = ()=>{
+    stopAllTimers();
+    stopPolling();
+    stopNotificationLoop();
+    STATE.role=null; STATE.name=''; STATE.tab='deck'; STATE.deckIndex=0; STATE.flipped=false;
+    STATE.quiz={active:false,direction:'w2m',question:null,options:[],answered:false,picked:null,score:0,total:0};
+    STATE.typing={active:false,question:null,feedback:null};
+    STATE.examBuilder={title:'',qType:'mcq',options:['','','',''],questions:[]};
+    STATE.examSession=null; STATE.examOpenResults={};
+    render();
+  };
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.onclick = ()=>{
+      // Stop and save running timers before switching tabs
+      stopAllTimers();
+      STATE.tab = t.dataset.tab; STATE.deckIndex=0; STATE.flipped=false;
+      // Render instantly so tab feels snappy — refresh data in the background.
+      render();
+      // Kick off any tab-specific background loads (don't block UI):
+      const needsLeaderboard = (t.dataset.tab==='students' || t.dataset.tab==='leaderboard');
+      if(needsLeaderboard){
+        loadLeaderboard().then(()=>{ if(STATE.tab===t.dataset.tab) render(); }).catch(()=>{});
+      }
+      // Mark announcements as read (background save)
+      if(STATE.role==='student' && t.dataset.tab==='announcements' && STATE.announcements.length){
+        STATE.progress.readAnnouncements = STATE.announcements.map(a=>String(a.id));
+        saveProgressBg();
+      }
+    };
+  });
+  const refreshBtn = document.getElementById('refreshBtn');
+  if(refreshBtn) refreshBtn.onclick = async ()=>{
+    refreshBtn.disabled = true; refreshBtn.classList.add('spin');
+    try {
+      await loadShared();
+      if(STATE.role==='teacher' && (STATE.tab==='students')) await loadLeaderboard();
+      if(STATE.role==='student' && STATE.tab==='leaderboard') await loadLeaderboard();
+      render();
+      toast('Content updated');
+    } finally {
+      // The re-render replaces refreshBtn, so we don't need to re-enable — safe.
+    }
+  };
+
+  if(STATE.role==='teacher') attachTeacherHandlers();
+  else attachStudentHandlers();
+  attachPreferencesHandlers();
+}
+
+/* Wire up the shared preferences panel buttons (notifications + install). */
+function attachPreferencesHandlers(){
+  const enableBtn = document.getElementById('enableNotifBtn');
+  if(enableBtn) enableBtn.onclick = async ()=>{
+    const perm = await requestNotificationPermission();
+    if(perm==='granted'){
+      notifyUser('🔔 Reminders enabled', "You'll get notifications for due cards and streaks.", 'minbar-welcome');
+      toast('Notifications enabled');
+    } else if(perm==='denied'){
+      toast('Notifications blocked — enable in your browser settings');
+    }
+    render();
+  };
+  const testBtn = document.getElementById('testNotifBtn');
+  if(testBtn) testBtn.onclick = ()=>{
+    notifyUser('🌟 Minbar test notification', 'Great — reminders are working on this device.', 'minbar-test');
+  };
+  const installBtn = document.getElementById('installBtn');
+  if(installBtn) installBtn.onclick = async ()=>{
+    if(!STATE.installEvent){ toast('Install prompt not available yet — try again in a moment'); return; }
+    STATE.installEvent.prompt();
+    const choice = await STATE.installEvent.userChoice;
+    STATE.installEvent = null;
+    if(choice && choice.outcome==='accepted') toast('Installing Minbar…');
+    render();
+  };
+  const exportStudentBtn = document.getElementById('exportStudentProgressBtn');
+  if(exportStudentBtn) exportStudentBtn.onclick = ()=>{
+    const exportData = {
+      name: STATE.name,
+      exportDate: new Date().toISOString(),
+      flashcards: STATE.flashcards,
+      progress: STATE.progress,
+      examResults: STATE.progress.examResults || {},
+      favorites: STATE.progress.favorites || [],
+      badges: (ACHIEVEMENTS.filter(a=>a.check(STATE.progress))).map(a=>a.name),
+      stats: {
+        mastered: masteredCount(STATE.progress),
+        total: STATE.flashcards.length,
+        listeningSec: STATE.progress.listeningSec||0,
+        speakingSec: STATE.progress.speakingSec||0,
+        streak: STATE.progress.streak||0
+      }
+    };
+    const blob = new Blob([JSON.stringify(exportData,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'minbar-progress-'+STATE.name+'-'+new Date().toISOString().slice(0,10)+'.json';
+    a.click(); URL.revokeObjectURL(url);
+    toast('📥 Progress exported');
+  };
+}
+
+function attachTeacherHandlers(){
+  if(STATE.tab==='addcard'){
+    document.getElementById('saveCardBtn').onclick = ()=>{
+      const word = document.getElementById('fWord').value.trim();
+      const meaning = document.getElementById('fMeaning').value.trim();
+      if(!word || !meaning){ toast('Please enter both the word and the meaning'); return; }
+      STATE.flashcards.push({ id:uid(), word, meaning,
+        example: document.getElementById('fExample').value.trim(),
+        category: document.getElementById('fCat').value, level: document.getElementById('fLevel').value,
+        audio: document.getElementById('fAudio').value.trim() });
+      safeSetBg('flashcards', STATE.flashcards, true);
+      toast('Flashcard added'); render();
+    };
+    document.querySelectorAll('[data-del-card]').forEach(b=>{
+      b.onclick = ()=>{
+        if(!confirm('Delete this flashcard?')) return;
+        STATE.flashcards = STATE.flashcards.filter(c=>c.id!==Number(b.dataset.delCard));
+        safeSetBg('flashcards', STATE.flashcards, true); render();
+      };
+    });
+  }
+  if(STATE.tab==='bulk'){
+    document.getElementById('importBtn').onclick = ()=>{
+      const text = document.getElementById('bulkArea').value;
+      const cat = document.getElementById('bCat').value, lvl = document.getElementById('bLevel').value;
+      const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+      let added = 0;
+      lines.forEach(line=>{
+        const parts = line.split(' - ').map(p=>p.trim());
+        if(parts.length>=2 && parts[0] && parts[1]){
+          STATE.flashcards.push({ id:uid(), word:parts[0], meaning:parts[1], example:parts[2]||'', category:cat, level:lvl, audio:'' });
+          added++;
+        }
+      });
+      if(added>0){ safeSetBg('flashcards', STATE.flashcards, true); toast(`Imported ${added} cards`); STATE.tab='addcard'; render(); }
+      else toast('No valid lines were recognized');
+    };
+  }
+  if(STATE.tab==='addres'){
+    document.getElementById('saveResBtn').onclick = ()=>{
+      const title = document.getElementById('rTitle').value.trim(), url = document.getElementById('rUrl').value.trim();
+      if(!title || !url){ toast('Please enter both the title and the link'); return; }
+      STATE.resources.push({ id:uid(), title, url, type:document.getElementById('rType').value, desc:document.getElementById('rDesc').value.trim() });
+      safeSetBg('resources', STATE.resources, true); toast('Resource added'); render();
+    };
+    document.querySelectorAll('[data-del-res]').forEach(b=>{
+      b.onclick = ()=>{
+        if(!confirm('Delete this resource?')) return;
+        STATE.resources = STATE.resources.filter(r=>r.id!==Number(b.dataset.delRes)); safeSetBg('resources', STATE.resources, true); render();
+      };
+    });
+  }
+  if(STATE.tab==='manage'){
+    const s = document.getElementById('manageSearch');
+    if(s){
+      let searchTimer = null;
+      s.oninput = (e)=>{
+        STATE.searchQ = e.target.value;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(()=>{
+          const listEl = document.getElementById('manageCardsList');
+          if(listEl){ listEl.innerHTML = renderManageCardsListHtml(); attachManageDeleteHandlers(); }
+        }, 150);
+      };
+    }
+    attachManageDeleteHandlers();
+    document.querySelectorAll('[data-manage-page]').forEach(b=>{
+      b.onclick = ()=>{
+        if(b.dataset.managePage==='prev') STATE.managePage = Math.max(0, STATE.managePage-1);
+        else STATE.managePage++;
+        const listEl = document.getElementById('manageCardsList');
+        if(listEl){ listEl.innerHTML = renderManageCardsListHtml(); attachManageDeleteHandlers(); }
+      };
+    });
+  }
+  if(STATE.tab==='exams'){
+    const titleInput = document.getElementById('examTitle');
+    if(titleInput) titleInput.oninput = (e)=>{
+      STATE.examBuilder.title = e.target.value;
+      const pubBtn = document.getElementById('publishExamBtn');
+      if(pubBtn) pubBtn.disabled = !(STATE.examBuilder.title.trim() && STATE.examBuilder.questions.length);
+    };
+    const qTypeSel = document.getElementById('examQType');
+    if(qTypeSel) qTypeSel.onchange = (e)=>{ STATE.examBuilder.qType = e.target.value; render(); };
+    const addQBtn = document.getElementById('addExamQBtn');
+    if(addQBtn) addQBtn.onclick = ()=>{
+      const qText = document.getElementById('examQText').value.trim();
+      if(!qText){ toast('Please enter the question text'); return; }
+      const b = STATE.examBuilder;
+      if(b.qType==='mcq'){
+        const options = [0,1,2,3].map(i=>document.getElementById('examOpt'+i).value.trim());
+        if(options.some(o=>!o)){ toast('Please fill in all four options'); return; }
+        const correct = Number(document.getElementById('examCorrectOpt').value);
+        b.questions.push({ id:uid(), type:'mcq', q:qText, options, correct });
+      } else {
+        const correctText = document.getElementById('examCorrectText').value.trim();
+        if(!correctText){ toast('Please enter the correct answer'); return; }
+        b.questions.push({ id:uid(), type:'text', q:qText, correct:correctText });
+      }
+      toast('Question added'); render();
+    };
+    document.querySelectorAll('[data-del-q]').forEach(b=>{
+      b.onclick = ()=>{ STATE.examBuilder.questions = STATE.examBuilder.questions.filter(q=>q.id!==Number(b.dataset.delQ)); render(); };
+    });
+    const pubBtn = document.getElementById('publishExamBtn');
+    if(pubBtn) pubBtn.onclick = ()=>{
+      const b = STATE.examBuilder;
+      if(!b.title.trim() || b.questions.length===0) return;
+      STATE.exams.push({ id:uid(), title:b.title.trim(), questions:b.questions, createdAt:Date.now() });
+      safeSetBg('exams', STATE.exams, true);
+      STATE.examBuilder = { title:'', qType:'mcq', options:['','','',''], questions:[] };
+      toast('Exam published — students can see it now'); render();
+    };
+    document.querySelectorAll('[data-del-exam]').forEach(b=>{
+      b.onclick = ()=>{
+        if(!confirm('Delete this exam?')) return;
+        STATE.exams = STATE.exams.filter(e=>e.id!==Number(b.dataset.delExam)); safeSetBg('exams', STATE.exams, true); render();
+      };
+    });
+    document.querySelectorAll('[data-view-results]').forEach(b=>{
+      b.onclick = async ()=>{
+        const id = Number(b.dataset.viewResults);
+        STATE.examOpenResults[id] = !STATE.examOpenResults[id];
+        render();
+        if(STATE.examOpenResults[id]){
+          const results = await loadExamResults(id);
+          const el = document.getElementById('examResults-'+id);
+          if(el){
+            el.innerHTML = results.length===0 ? '<div class="empty">No students have taken this exam yet</div>' :
+              results.map(r=>`<div class="lb-row"><div class="lb-name">${r.name}</div><div class="lb-stat">🏆 ${r.score}/${r.total}</div><div class="lb-stat">${new Date(r.date).toLocaleDateString()}</div></div>`).join('');
+          }
+        }
+      };
+    });
+  }
+  if(STATE.tab==='announcements'){
+    document.getElementById('postAnnBtn').onclick = ()=>{
+      const title = document.getElementById('annTitle').value.trim();
+      const body = document.getElementById('annBody').value.trim();
+      const priority = document.getElementById('annPriority').value;
+      if(!title || !body){ toast('Please enter both a title and a message'); return; }
+      STATE.announcements.push({ id:uid(), title, body, priority, createdAt:Date.now() });
+      safeSetBg('announcements', STATE.announcements, true);
+      toast('Announcement posted — students will see it now'); render();
+    };
+    document.querySelectorAll('[data-del-ann]').forEach(b=>{
+      b.onclick = ()=>{
+        if(!confirm('Delete this announcement?')) return;
+        STATE.announcements = STATE.announcements.filter(a=>a.id!==Number(b.dataset.delAnn));
+        safeSetBg('announcements', STATE.announcements, true); render();
+      };
+    });
+  }
+  if(STATE.tab==='settings'){
+    document.getElementById('saveCodesBtn').onclick = ()=>{
+      const t = document.getElementById('setTeacherCode').value.trim();
+      const s = document.getElementById('setStudentCode').value.trim();
+      if(!t || !s){ toast('Both codes are required'); return; }
+      STATE.codes = { teacher: t, student: s };
+      safeSetBg('accessCodes', STATE.codes, true);
+      toast('Access codes updated'); render();
+    };
+    const exportBtn = document.getElementById('exportBtn');
+    if(exportBtn) exportBtn.onclick = ()=>{
+      const data = {
+        exportedAt: new Date().toISOString(),
+        app: 'Minbar',
+        flashcards: STATE.flashcards,
+        resources: STATE.resources,
+        announcements: STATE.announcements,
+        exams: STATE.exams,
+        codes: STATE.codes
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'minbar-backup-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Backup downloaded');
+    };
+  }
+  if(STATE.tab==='questions'){
+    document.querySelectorAll('[data-q-toggle]').forEach(b=>{
+      b.onclick = ()=>{
+        const id = Number(b.dataset.qToggle);
+        // Save draft before re-render if input existed
+        const input = document.querySelector(`[data-q-input="${id}"]`);
+        if(input) STATE.qReplyDrafts[id] = input.value;
+        STATE.qOpenReply[id] = !STATE.qOpenReply[id];
+        render();
+        setTimeout(()=>{ const el = document.querySelector(`[data-q-input="${id}"]`); if(el){ el.focus(); const v=el.value; el.value=''; el.value=v; } }, 40);
+      };
+    });
+    document.querySelectorAll('[data-q-input]').forEach(inp=>{
+      inp.oninput = (e)=>{ STATE.qReplyDrafts[Number(e.target.dataset.qInput)] = e.target.value; };
+    });
+    document.querySelectorAll('[data-q-send]').forEach(b=>{
+      b.onclick = ()=>{
+        const id = Number(b.dataset.qSend);
+        const text = (STATE.qReplyDrafts[id] || '').trim();
+        if(!text){ toast('Please write a reply'); return; }
+        const idx = STATE.questions.findIndex(q=>q.id===id);
+        if(idx<0) return;
+        STATE.questions[idx] = { ...STATE.questions[idx], reply:text, repliedAt:Date.now() };
+        delete STATE.qReplyDrafts[id];
+        delete STATE.qOpenReply[id];
+        safeSetBg('questions', STATE.questions, true);
+        toast('Reply sent'); render();
+      };
+    });
+    document.querySelectorAll('[data-q-del]').forEach(b=>{
+      b.onclick = ()=>{
+        if(!confirm('Delete this question?')) return;
+        const id = Number(b.dataset.qDel);
+        STATE.questions = STATE.questions.filter(q=>q.id!==id);
+        delete STATE.qReplyDrafts[id];
+        delete STATE.qOpenReply[id];
+        safeSetBg('questions', STATE.questions, true);
+        render();
+      };
+    });
+  }
+}
+
+function attachManageDeleteHandlers(){
+  document.querySelectorAll('#manageCardsList [data-del-card]').forEach(b=>{
+    b.onclick = ()=>{
+      if(!confirm('Delete this flashcard?')) return;
+      STATE.flashcards = STATE.flashcards.filter(c=>c.id!==Number(b.dataset.delCard)); safeSetBg('flashcards', STATE.flashcards, true); render();
+    };
+  });
+}
+
+function attachStudentHandlers(){
+  if(STATE.tab==='deck'){
+    document.querySelectorAll('[data-mode]').forEach(b=>{
+      b.onclick = ()=>{ STATE.deckMode = b.dataset.mode; STATE.deckIndex=0; STATE.flipped=false; render(); };
+    });
+    const filterCat = document.getElementById('filterCat'), filterLevel = document.getElementById('filterLevel');
+    if(filterCat) filterCat.onchange = e=>{ STATE.filterCat=e.target.value; STATE.deckIndex=0; STATE.flipped=false; render(); };
+    if(filterLevel) filterLevel.onchange = e=>{ STATE.filterLevel=e.target.value; STATE.deckIndex=0; STATE.flipped=false; render(); };
+    const fc = document.getElementById('flashcard');
+    if(fc) fc.onclick = ()=>{ STATE.flipped=!STATE.flipped; render(); };
+    const speakBtn = document.getElementById('speakBtn');
+    if(speakBtn) speakBtn.onclick = (e)=>{
+      e.stopPropagation();
+      const pool = currentDeckPool(); const c = pool[STATE.deckIndex];
+      if(!c) return;
+      if(c.audio){ new Audio(c.audio).play().catch(()=>speak(c.word)); } else speak(c.word);
+    };
+    const favBtn = document.getElementById('favBtn');
+    if(favBtn) favBtn.onclick = (e)=>{
+      e.stopPropagation();
+      const pool = currentDeckPool(); const c = pool[STATE.deckIndex];
+      if(!c) return;
+      toggleFavorite(c.id);
+      const newPool = currentDeckPool();
+      if(STATE.deckIndex >= newPool.length) STATE.deckIndex = 0;
+      render();
+    };
+    const knowBtn = document.getElementById('knowBtn');
+    if(knowBtn) knowBtn.onclick = (e)=>{ e.stopPropagation(); answerCard(true); };
+    const reviewBtn = document.getElementById('reviewBtn');
+    if(reviewBtn) reviewBtn.onclick = (e)=>{ e.stopPropagation(); answerCard(false); };
+  }
+  if(STATE.tab==='quiz'){
+    document.querySelectorAll('[data-opt-index]').forEach(el=>{
+      el.onclick = ()=>{
+        if(STATE.quiz.answered) return;
+        const i = Number(el.dataset.optIndex);
+        STATE.quiz.answered = true; STATE.quiz.total++; STATE.quiz.picked = i;
+        const correct = i===STATE.quiz.question.correctIndex;
+        if(correct){ STATE.quiz.score++; el.classList.add('correct'); }
+        else el.classList.add('wrong');
+        STATE.progress.quiz.attempts++; if(correct) STATE.progress.quiz.correct++;
+        markActivityToday();
+        render();               // ← Feedback shows instantly
+        saveProgressBg();       // ← Background save
+      };
+    });
+    const nextBtn = document.getElementById('nextQuizBtn');
+    if(nextBtn) nextBtn.onclick = ()=>{ STATE.quiz.question = buildQuizQuestion(); STATE.quiz.answered=false; STATE.quiz.picked=null; render(); };
+    const checkBtn = document.getElementById('typeCheckBtn');
+    if(checkBtn) checkBtn.onclick = ()=>{
+      const val = normalizeArabic(document.getElementById('typeInput').value);
+      const correct = val === normalizeArabic(STATE.typing.question.word);
+      STATE.typing.feedback = correct ? 'correct' : 'wrong';
+      STATE.progress.quiz.attempts++; if(correct) STATE.progress.quiz.correct++;
+      markActivityToday();
+      render();
+      saveProgressBg();
+    };
+    const typeNext = document.getElementById('typeNextBtn');
+    if(typeNext) typeNext.onclick = ()=>{
+      STATE.typing.question = STATE.flashcards[Math.floor(Math.random()*STATE.flashcards.length)];
+      STATE.typing.feedback = null; render();
+    };
+  }
+  if(STATE.tab==='exam'){
+    document.querySelectorAll('[data-start-exam]').forEach(b=>{
+      b.onclick = ()=>{
+        const id = Number(b.dataset.startExam);
+        STATE.examSession = { examId:id, index:0, score:0, answered:false, picked:null };
+        render();
+      };
+    });
+    const sess = STATE.examSession;
+    if(sess){
+      const ex = STATE.exams.find(e=>e.id===sess.examId);
+      if(!ex){ STATE.examSession=null; }
+      else if(sess.index < ex.questions.length){
+        const q = ex.questions[sess.index];
+        if(q.type==='mcq'){
+          document.querySelectorAll('[data-exam-opt]').forEach(el=>{
+            el.onclick = ()=>{
+              if(sess.answered) return;
+              const i = Number(el.dataset.examOpt);
+              sess.answered = true; sess.picked = i;
+              if(i===q.correct) sess.score++;
+              render();
+            };
+          });
+        } else {
+          const checkBtn = document.getElementById('examCheckBtn');
+          if(checkBtn) checkBtn.onclick = ()=>{
+            const val = normalizeArabic(document.getElementById('examTypeInput').value);
+            const correct = val === normalizeArabic(q.correct);
+            if(correct) sess.score++;
+            sess.answered = true;
+            sess.wasCorrect = correct;
+            render();
+          };
+        }
+        const nextBtn = document.getElementById('examNextBtn');
+        if(nextBtn) nextBtn.onclick = ()=>{ sess.index++; sess.answered=false; sess.picked=null; render(); };
+      } else {
+        const backBtn = document.getElementById('examBackBtn');
+        if(backBtn) backBtn.onclick = ()=>{
+          const result = { score: sess.score, total: ex.questions.length, date: Date.now() };
+          STATE.progress.examResults[ex.id] = result;
+          markActivityToday();
+          saveProgressBg();
+          // Background save of exam result for teacher; roster update in bg
+          safeSetBg('examresult:'+ex.id+':'+STATE.name, { name:STATE.name, ...result }, true);
+          (async ()=>{
+            let list = (await safeGet('examtakers:'+ex.id, true)) || [];
+            if(!list.includes(STATE.name)){ list.push(STATE.name); safeSetBg('examtakers:'+ex.id, list, true); }
+          })();
+          STATE.examSession = null;
+          toast('Exam result saved');
+          render();
+        };
+      }
+    }
+  }
+  if(STATE.tab==='progress'){
+    document.getElementById('startListen').onclick = ()=>startTimer('listening');
+    document.getElementById('stopListen').onclick = ()=>{ stopTimer('listening'); render(); };
+    document.getElementById('startSpeak').onclick = ()=>startTimer('speaking');
+    document.getElementById('stopSpeak').onclick = ()=>{ stopTimer('speaking'); render(); };
+  }
+  if(STATE.tab==='ask'){
+    const inp = document.getElementById('qInput');
+    if(inp) inp.oninput = (e)=>{ STATE.qDraft = e.target.value; };
+    const sendBtn = document.getElementById('qSendBtn');
+    if(sendBtn) sendBtn.onclick = ()=>{
+      const body = (document.getElementById('qInput').value || '').trim();
+      if(!body){ toast('Please write your question first'); return; }
+      STATE.questions.push({
+        id: uid(),
+        name: STATE.name,
+        body,
+        createdAt: Date.now(),
+        reply: null,
+        repliedAt: null
+      });
+      STATE.qDraft = '';
+      safeSetBg('questions', STATE.questions, true);
+      toast('✅ Sent to your teacher'); render();
+    };
+    document.querySelectorAll('[data-student-del-q]').forEach(b=>{
+      b.onclick = ()=>{
+        if(!confirm('Delete this question?')) return;
+        const id = Number(b.dataset.studentDelQ);
+        STATE.questions = STATE.questions.filter(q=>q.id!==id);
+        safeSetBg('questions', STATE.questions, true);
+        render();
+      };
+    });
+    // Mark newly-received replies as read once the student opens this tab
+    const myReplyIds = STATE.questions
+      .filter(q => q.name===STATE.name && q.reply)
+      .map(q => String(q.id));
+    if(myReplyIds.length){
+      const already = new Set((STATE.progress.readReplies||[]).map(String));
+      const toAdd = myReplyIds.filter(id => !already.has(id));
+      if(toAdd.length){
+        STATE.progress.readReplies = [...(STATE.progress.readReplies||[]), ...toAdd];
+        saveProgress();
+      }
+    }
+  }
+}
+
+async function answerCard(knew){
+  const pool = currentDeckPool();
+  const c = pool[STATE.deckIndex];
+  if(!c) return;
+  const entry = STATE.progress.srs[c.id] || {srsLevel:0, due:0};
+  if(knew){
+    entry.srsLevel = Math.min(entry.srsLevel+1, SRS_INTERVALS.length-1);
+  } else {
+    entry.srsLevel = 0;
+  }
+  entry.due = Date.now() + SRS_INTERVALS[entry.srsLevel]*DAY_MS;
+  STATE.progress.srs[c.id] = entry;
+  markActivityToday();
+  STATE.flipped = false;
+  const newPool = currentDeckPool();
+  if(newPool.length===0) STATE.deckIndex = 0;
+  else STATE.deckIndex = STATE.deckIndex % newPool.length;
+  render();                 // ← Render instantly, no waiting on network
+  saveProgressBg();         // ← Save in background
+}
+
+function fmtClock(ms){
+  const total = Math.max(0, Math.floor(ms/1000));
+  const m = String(Math.floor(total/60)).padStart(2,'0');
+  const s = String(total%60).padStart(2,'0');
+  return m+':'+s;
+}
+function startTimer(kind){
+  if(STATE.timers[kind]) return;
+  STATE.timers[kind+'Start'] = Date.now();
+  const clockEl = document.getElementById(kind==='listening' ? 'listenClock' : 'speakClock');
+  STATE.timers[kind] = setInterval(()=>{
+    const el = document.getElementById(kind==='listening' ? 'listenClock' : 'speakClock');
+    if(el) el.textContent = fmtClock(Date.now()-STATE.timers[kind+'Start']);
+  }, 1000);
+  if(clockEl) clockEl.textContent = '00:00';
+  toast(kind==='listening' ? 'Listening timer started' : 'Speaking timer started');
+  render();
+}
+function stopTimer(kind){
+  if(!STATE.timers[kind]) return;
+  clearInterval(STATE.timers[kind]);
+  const elapsed = Math.round((Date.now()-STATE.timers[kind+'Start'])/1000);
+  STATE.timers[kind] = null;
+  if(kind==='listening') STATE.progress.listeningSec += elapsed; else STATE.progress.speakingSec += elapsed;
+  markActivityToday();
+  saveProgressBg();
+  toast('Logged about '+Math.max(1,Math.round(elapsed/60))+' minute(s)');
+}
+function stopAllTimers(){
+  ['listening','speaking'].forEach(k=>{
+    if(STATE.timers[k]){
+      clearInterval(STATE.timers[k]);
+      const elapsed = Math.round((Date.now()-STATE.timers[k+'Start'])/1000);
+      if(elapsed > 0){
+        if(k==='listening') STATE.progress.listeningSec += elapsed;
+        else STATE.progress.speakingSec += elapsed;
+        markActivityToday();
+        saveProgressBg();
+      }
+      STATE.timers[k]=null;
+    }
+  });
+}
+
+document.addEventListener('keydown', (e)=>{
+  if(STATE.role!=='student' || STATE.tab!=='deck') return;
+  if(e.code==='Space'){ e.preventDefault(); STATE.flipped=!STATE.flipped; render(); }
+  else if(e.code==='ArrowLeft'){ answerCard(true); }
+  else if(e.code==='ArrowRight'){ answerCard(false); }
+});
+
+let POLL_TIMER = null;
+function startPolling(){
+  if(POLL_TIMER) return;
+  POLL_TIMER = setInterval(async ()=>{
+    if(!STATE.role) return;
+    const before = JSON.stringify({
+      f:STATE.flashcards.length, r:STATE.resources.length, e:STATE.exams.length,
+      a:STATE.announcements.length, q:STATE.questions.length,
+      // Include reply state so students see when teacher replies
+      replies: STATE.questions.filter(x=>x.reply).length,
+    });
+    await loadShared();
+    const after = JSON.stringify({
+      f:STATE.flashcards.length, r:STATE.resources.length, e:STATE.exams.length,
+      a:STATE.announcements.length, q:STATE.questions.length,
+      replies: STATE.questions.filter(x=>x.reply).length,
+    });
+    if(before!==after){
+      // Notify appropriately based on what changed
+      if(STATE.role==='student'){
+        const myNewReply = STATE.questions.some(q =>
+          q.name===STATE.name && q.reply &&
+          !((STATE.progress.readReplies||[]).map(String).includes(String(q.id)))
+        );
+        if(myNewReply) notifyUser('📩 Your teacher replied', 'Open the "Ask Teacher" tab to read the reply.');
+        else toast('New content from your teacher');
+      } else if(STATE.role==='teacher'){
+        const openQ = unansweredQuestionsCount();
+        if(openQ>0) notifyUser('📩 New question from a student', openQ+' question'+(openQ>1?'s':'')+' waiting for you.');
+      }
+      // Refresh leaderboard if on relevant tab
+      const needsLeaderboard = (STATE.tab==='students' || STATE.tab==='leaderboard');
+      if(needsLeaderboard){
+        loadLeaderboard().then(()=>render()).catch(()=>{});
+      }
+      render();
+    }
+  }, 15000);
+}
+function stopPolling(){
+  if(POLL_TIMER){ clearInterval(POLL_TIMER); POLL_TIMER=null; }
+}
+
+/* ================= NOTIFICATIONS ================= */
+const NOTIF_CHECK_MS = 60000; // check every minute while app is open
+let NOTIF_TIMER = null;
+
+function notificationsSupported(){
+  return typeof window!=='undefined' && 'Notification' in window;
+}
+async function requestNotificationPermission(){
+  if(!notificationsSupported()) return 'unsupported';
+  if(Notification.permission === 'granted' || Notification.permission === 'denied') return Notification.permission;
+  try { return await Notification.requestPermission(); }
+  catch(e){ return Notification.permission; }
+}
+function notifyUser(title, body, tag){
+  if(!notificationsSupported() || Notification.permission!=='granted') return;
+  const opts = {
+    body: body || '',
+    tag: tag || 'minbar-'+Date.now(),
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    renotify: true
+  };
+  // Prefer service worker so notifications persist even after page navigation.
+  if(navigator.serviceWorker && navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({ type:'SHOW_NOTIFICATION', title, ...opts });
+    return;
+  }
+  try { new Notification(title, opts); } catch(_) {}
+}
+
+// One check tick: due cards, streak-at-risk, evening reminder
+async function notificationTick(){
+  if(!STATE.role || !notificationsSupported() || Notification.permission!=='granted') return;
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0,10);
+  const hour = today.getHours();
+  const shownKey = 'minbar_notif_'+STATE.role+'_'+STATE.name+'_'+todayStr;
+  let shown = {};
+  try{ shown = JSON.parse(localStorage.getItem(shownKey) || '{}'); }catch(_){}
+
+  if(STATE.role==='student'){
+    const dueNow = dueCards().length;
+    // 1. Due cards ready (only once per day, after 10am)
+    if(hour>=10 && dueNow>0 && !shown.due){
+      notifyUser('🃏 '+dueNow+' card'+(dueNow>1?'s':'')+' ready to review',
+                 'Keep your Arabic streak alive — a quick session takes just a few minutes.',
+                 'minbar-due');
+      shown.due = true;
+    }
+    // 2. Streak at risk (after 7 PM, if user hasn't studied today and had a streak yesterday)
+    const dates = new Set(STATE.progress.activityDates||[]);
+    const yesterdayStr = new Date(Date.now()-DAY_MS).toISOString().slice(0,10);
+    const hasYesterday = dates.has(yesterdayStr);
+    const hasToday = dates.has(todayStr);
+    if(hour>=19 && hasYesterday && !hasToday && !shown.streak){
+      const streak = computeStreak(STATE.progress);
+      if(streak>=1){
+        notifyUser('🔥 Your '+streak+'-day streak is about to break',
+                   'Study one card today to keep it alive!',
+                   'minbar-streak');
+        shown.streak = true;
+      }
+    }
+    // 3. Evening reminder (8 PM) even without a streak
+    if(hour>=20 && !hasToday && !shown.reminder){
+      notifyUser('📚 Study reminder',
+                 'A few minutes today builds fluency for life.',
+                 'minbar-reminder');
+      shown.reminder = true;
+    }
+  }
+  if(STATE.role==='teacher'){
+    const openQ = unansweredQuestionsCount();
+    if(openQ>0 && !shown.open_q){
+      notifyUser('📩 '+openQ+' student question'+(openQ>1?'s':'')+' awaiting reply',
+                 'Tap to answer them now.',
+                 'minbar-openq');
+      shown.open_q = true;
+    }
+  }
+  try{ localStorage.setItem(shownKey, JSON.stringify(shown)); }catch(_){}
+}
+function startNotificationLoop(){
+  if(NOTIF_TIMER) return;
+  notificationTick(); // immediate
+  NOTIF_TIMER = setInterval(notificationTick, NOTIF_CHECK_MS);
+}
+function stopNotificationLoop(){
+  if(NOTIF_TIMER){ clearInterval(NOTIF_TIMER); NOTIF_TIMER = null; }
+}
+
+/* ================= PWA — service worker + install prompt ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', async ()=>{
+    try{
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){
+        await reg.unregister();
+      }
+      await navigator.serviceWorker.register('/sw.js');
+    }catch(err){ console.warn('SW registration failed:', err); }
+  });
+}
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  STATE.installEvent = e;
+  render();
+});
+
+(async ()=>{
+  if(!storageAvailable()){
+    toast('⚠️ Unable to reach the server — check your connection');
+  }
+  await loadCodes(); render();
+})();
+</script>
+</body>
+</html>
