@@ -1813,7 +1813,7 @@ function attachTeacherHandlers(){
     document.querySelectorAll('[data-del-card]').forEach(b=>{
       b.onclick = ()=>{
         if(!confirm('Delete this flashcard?')) return;
-        STATE.flashcards = STATE.flashcards.filter(c=>c.id!==Number(b.dataset.delCard));
+        STATE.flashcards = STATE.flashcards.filter(c=>String(c.id)!==(b.dataset.delCard));
         safeSetBg('flashcards', STATE.flashcards, true); render();
       };
     });
@@ -1845,7 +1845,7 @@ function attachTeacherHandlers(){
     document.querySelectorAll('[data-del-res]').forEach(b=>{
       b.onclick = ()=>{
         if(!confirm('Delete this resource?')) return;
-        STATE.resources = STATE.resources.filter(r=>r.id!==Number(b.dataset.delRes)); safeSetBg('resources', STATE.resources, true); render();
+        STATE.resources = STATE.resources.filter(r=>String(r.id)!==(b.dataset.delRes)); safeSetBg('resources', STATE.resources, true); render();
       };
     });
   }
@@ -1899,7 +1899,7 @@ function attachTeacherHandlers(){
       toast('Question added'); render();
     };
     document.querySelectorAll('[data-del-q]').forEach(b=>{
-      b.onclick = ()=>{ STATE.examBuilder.questions = STATE.examBuilder.questions.filter(q=>q.id!==Number(b.dataset.delQ)); render(); };
+      b.onclick = ()=>{ STATE.examBuilder.questions = STATE.examBuilder.questions.filter(q=>String(q.id)!==(b.dataset.delQ)); render(); };
     });
     const pubBtn = document.getElementById('publishExamBtn');
     if(pubBtn) pubBtn.onclick = ()=>{
@@ -1913,7 +1913,7 @@ function attachTeacherHandlers(){
     document.querySelectorAll('[data-del-exam]').forEach(b=>{
       b.onclick = ()=>{
         if(!confirm('Delete this exam?')) return;
-        STATE.exams = STATE.exams.filter(e=>e.id!==Number(b.dataset.delExam)); safeSetBg('exams', STATE.exams, true); render();
+        STATE.exams = STATE.exams.filter(e=>String(e.id)!==(b.dataset.delExam)); safeSetBg('exams', STATE.exams, true); render();
       };
     });
     document.querySelectorAll('[data-view-results]').forEach(b=>{
@@ -1945,7 +1945,7 @@ function attachTeacherHandlers(){
     document.querySelectorAll('[data-del-ann]').forEach(b=>{
       b.onclick = ()=>{
         if(!confirm('Delete this announcement?')) return;
-        STATE.announcements = STATE.announcements.filter(a=>a.id!==Number(b.dataset.delAnn));
+        STATE.announcements = STATE.announcements.filter(a=>String(a.id)!==(b.dataset.delAnn));
         safeSetBg('announcements', STATE.announcements, true); render();
       };
     });
@@ -2027,7 +2027,7 @@ function attachManageDeleteHandlers(){
   document.querySelectorAll('#manageCardsList [data-del-card]').forEach(b=>{
     b.onclick = ()=>{
       if(!confirm('Delete this flashcard?')) return;
-      STATE.flashcards = STATE.flashcards.filter(c=>c.id!==Number(b.dataset.delCard)); safeSetBg('flashcards', STATE.flashcards, true); render();
+      STATE.flashcards = STATE.flashcards.filter(c=>String(c.id)!==(b.dataset.delCard)); safeSetBg('flashcards', STATE.flashcards, true); render();
     };
   });
 }
