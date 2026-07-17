@@ -1,5 +1,16 @@
 {
   "version": 2,
+  "builds": [
+    { "src": "api/kv.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/kv.js" },
+    { "src": "/(sw\\.js|manifest\\.json|robots\\.txt|icon.*)", "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      }
+    },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -7,21 +18,6 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, PUT, DELETE, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
-      ]
-    },
-    {
-      "source": "/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
-      ]
-    },
-    {
-      "source": "/manifest.json",
-      "headers": [
-        { "key": "Content-Type", "value": "application/manifest+json" },
-        { "key": "Cache-Control", "value": "public, max-age=0" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
   ]
