@@ -1,0 +1,8 @@
+frontend/
+backend/
+tests/
+memory/
+node_modules/
+.git/
+*.md
+TODO.md
