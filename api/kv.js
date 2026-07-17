@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+const { MongoClient } = require('mongodb');
 
 const MAX_BODY = 1048576;
 let clientPromise;
@@ -31,7 +31,7 @@ function regexEsc(s) {
   return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -43,7 +43,6 @@ export default async function handler(req, res) {
     const col = db.collection('kv_store');
     const key = req.query?.key || '';
 
-    /* ── LIST  /api/kv?prefix=xxx ── */
     if (!key) {
       if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return; }
       const prefix = req.query?.prefix || '';
@@ -53,7 +52,6 @@ export default async function handler(req, res) {
       return;
     }
 
-    /* ── GET /api/kv?key=xxx ── */
     if (req.method === 'GET') {
       const doc = await col.findOne({ key });
       if (!doc) { res.status(404).json({ error: 'Key not found' }); return; }
@@ -61,7 +59,6 @@ export default async function handler(req, res) {
       return;
     }
 
-    /* ── PUT /api/kv?key=xxx ── */
     if (req.method === 'PUT') {
       const body = await readBody(req);
       if (typeof body !== 'object' || !('value' in body)) {
@@ -77,7 +74,6 @@ export default async function handler(req, res) {
       return;
     }
 
-    /* ── DELETE /api/kv?key=xxx ── */
     if (req.method === 'DELETE') {
       const r = await col.deleteOne({ key });
       res.status(200).json({ key, deleted: r.deletedCount > 0 });
@@ -89,4 +85,4 @@ export default async function handler(req, res) {
     console.error('[KV]', req.method, err);
     res.status(500).json({ error: 'Internal error', detail: err.message });
   }
-}
+};
