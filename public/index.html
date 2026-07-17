@@ -251,6 +251,10 @@ body.dark .fav-star{background:rgba(30,30,46,.85);}
 .fav-star:hover{transform:scale(1.12);}
 .fav-star.active{background:#d4a853;color:#fff;}
 .deck-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.svg-icon{display:inline-flex;align-items:center;justify-content:center;line-height:0;flex-shrink:0;}
+.svg-icon svg{vertical-align:middle;}
+.icon-btn .svg-icon svg{width:17px;height:17px;}
+.role-card .svg-icon svg{width:28px;height:28px;}
 .deck-quickstats{margin-bottom:0;}
 .activity-chart{display:flex;justify-content:space-between;gap:6px;}
 .activity-day{display:flex;flex-direction:column;align-items:center;gap:7px;flex:1;min-width:0;}
@@ -561,6 +565,51 @@ body.dark .pref-pill.pref-pending{color:var(--gold);}
 <div class="toast" id="toast"></div>
 
 <script>
+/* ================= SVG ICON SYSTEM ================= */
+const ICONS={
+  speak:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
+  know:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  review:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+  trash:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  star:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  starEmpty:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  moon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  sun:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  teacher:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  student:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+  book:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  folder:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+  edit:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  users:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  award:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+  chart:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  play:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+  check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  x:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  clock:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  fire:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.771-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z"/></svg>',
+  trophy:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+  trashBin:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  alertCircle:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  settings:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  filter:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
+  seedling:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M12 12C12 8 9 5 5 5c0 4 3 7 7 7z"/><path d="M12 12c0-4 3-7 7-7-0 4-3 7-7 7z"/></svg>',
+  headphones:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+  mic:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>',
+  zap:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  target:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  download:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  upload:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  bell:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  send:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+  headphonesLg:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+  micLg:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>',
+  bookOpen:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+  eye:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+  eyeOff:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',
+  warning:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+};
+function ico(name,cls){return '<i class="svg-icon'+(cls?' '+cls:'')+'" aria-hidden="true">'+(ICONS[name]||'')+'</i>';}
 /* ================= SERVER-BACKED STORAGE SHIM =================
    Polyfills the same window.storage.get/set/delete/list contract that
    Claude artifacts provide, but backed by this project's own Express +
@@ -674,15 +723,15 @@ const DAY_MS = 86400000;
 function uid(){ return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8); }
 
 const ACHIEVEMENTS = [
-  {id:'first', icon:'🌱', name:'First Step', check:p=>masteredCount(p)>=1},
-  {id:'ten', icon:'📗', name:'Ten Words', check:p=>masteredCount(p)>=10},
-  {id:'fifty', icon:'📚', name:'Fifty Words', check:p=>masteredCount(p)>=50},
-  {id:'hundred', icon:'🏆', name:'One Hundred Words', check:p=>masteredCount(p)>=100},
-  {id:'streak3', icon:'🔥', name:'Three-Day Streak', check:p=>computeStreak(p)>=3},
-  {id:'streak7', icon:'⚡', name:'Full Week Streak', check:p=>computeStreak(p)>=7},
-  {id:'listen30', icon:'🎧', name:'30 Minutes of Listening', check:p=>p.listeningSec>=1800},
-  {id:'speak30', icon:'🗣️', name:'30 Minutes of Speaking', check:p=>p.speakingSec>=1800},
-  {id:'quiz20', icon:'🎯', name:'20 Correct Answers', check:p=>p.quiz.correct>=20},
+  {id:'first', icon:'seedling', name:'First Step', check:p=>masteredCount(p)>=1},
+  {id:'ten', icon:'book', name:'Ten Words', check:p=>masteredCount(p)>=10},
+  {id:'fifty', icon:'bookOpen', name:'Fifty Words', check:p=>masteredCount(p)>=50},
+  {id:'hundred', icon:'trophy', name:'One Hundred Words', check:p=>masteredCount(p)>=100},
+  {id:'streak3', icon:'fire', name:'Three-Day Streak', check:p=>computeStreak(p)>=3},
+  {id:'streak7', icon:'zap', name:'Full Week Streak', check:p=>computeStreak(p)>=7},
+  {id:'listen30', icon:'headphones', name:'30 Minutes of Listening', check:p=>p.listeningSec>=1800},
+  {id:'speak30', icon:'mic', name:'30 Minutes of Speaking', check:p=>p.speakingSec>=1800},
+  {id:'quiz20', icon:'target', name:'20 Correct Answers', check:p=>p.quiz.correct>=20},
 ];
 
 function toast(msg){
@@ -933,10 +982,10 @@ function renderHeader(){
       <div><h1>Minbar</h1><p>An advanced spaced-repetition platform for learning Arabic</p></div>
     </div>
     <div class="header-actions">
-      ${STATE.role==='student' && streak>0 ? `<div class="streak-chip">🔥 ${streak}-day streak</div>` : ''}
-      <div class="role-badge">${STATE.role==='teacher'?'👨‍🏫 <b>Teacher</b> mode':'🎓 Student <b>'+STATE.name+'</b>'} <button class="switch-btn" id="switchRole">Switch</button></div>
-      <button class="theme-toggle" id="refreshBtn" title="Refresh content">🔄</button>
-      <button class="theme-toggle" id="themeToggle">${STATE.dark?'☀️':'🌙'}</button>
+      ${STATE.role==='student' && streak>0 ? `<div class="streak-chip">${ico('fire')} ${streak}-day streak</div>` : ''}
+      <div class="role-badge">${STATE.role==='teacher'?ico('teacher')+' <b>Teacher</b> mode':ico('student')+' Student <b>'+STATE.name+'</b>'} <button class="switch-btn" id="switchRole">Switch</button></div>
+      <button class="theme-toggle" id="refreshBtn" title="Refresh content">${ico('review')}</button>
+      <button class="theme-toggle" id="themeToggle">${STATE.dark?ico('sun'):ico('moon')}</button>
     </div>
   </div>`;
 }
@@ -949,8 +998,8 @@ function renderGate(){
     <h2>Welcome to Minbar</h2>
     <p>An advanced flashcard platform built on spaced repetition (SRS), with quizzes, streak tracking, achievements, and a leaderboard.</p>
     <div class="role-cards">
-      <div class="role-card" data-role="teacher" id="cardTeacher" tabindex="0" role="button" aria-pressed="false"><div class="ic-wrap"><div class="ic">🗂️</div></div><h3>Teacher</h3><p>Add content one at a time or in bulk, and track every student</p></div>
-      <div class="role-card" data-role="student" id="cardStudent" tabindex="0" role="button" aria-pressed="false"><div class="ic-wrap"><div class="ic">📖</div></div><h3>Student</h3><p>Scheduled review, quizzes, achievements, and detailed progress</p></div>
+      <div class="role-card" data-role="teacher" id="cardTeacher" tabindex="0" role="button" aria-pressed="false"><div class="ic-wrap"><div class="ic">${ico('teacher')}</div></div><h3>Teacher</h3><p>Add content one at a time or in bulk, and track every student</p></div>
+      <div class="role-card" data-role="student" id="cardStudent" tabindex="0" role="button" aria-pressed="false"><div class="ic-wrap"><div class="ic">${ico('student')}</div></div><h3>Student</h3><p>Scheduled review, quizzes, achievements, and detailed progress</p></div>
     </div>
     <div class="gate-form">
       <div class="gate-field" id="nameWrap" style="display:none;">
@@ -961,9 +1010,9 @@ function renderGate(){
         <label for="codeInput">Access code</label>
         <div class="code-field" id="codeFieldWrap">
           <input class="name-input" id="codeInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" />
-          <button type="button" class="code-toggle" id="codeToggle" aria-label="Show access code">👁️</button>
+          <button type="button" class="code-toggle" id="codeToggle" aria-label="Show access code">${ico('eye')}</button>
         </div>
-        <div class="gate-hint">🔒 Provided by your instructor</div>
+        <div class="gate-hint">${ico('eyeOff')} Provided by your instructor</div>
       </div>
       <button class="enter-btn" id="enterBtn" disabled>Enter Minbar →</button>
     </div>
@@ -1008,7 +1057,7 @@ function attachGate(){
     const btn = document.getElementById('codeToggle');
     const showing = codeInput.type==='text';
     codeInput.type = showing ? 'password' : 'text';
-    btn.textContent = showing ? '👁️' : '🙈';
+    btn.innerHTML = showing ? ico('eye') : ico('eyeOff');
     btn.setAttribute('aria-label', showing ? 'Show access code' : 'Hide access code');
     codeInput.focus();
   };
@@ -1045,20 +1094,20 @@ function attachGate(){
 
 function renderTabs(){
   const tTeacher = [
-    {k:'addcard', l:'➕ Add Card'}, {k:'announcements', l:'📢 Announcements'}, {k:'bulk', l:'📥 Quick Import'},
-    {k:'addres', l:'📚 Add Resource'}, {k:'manage', l:'🗂️ Manage Content'},
-    {k:'exams', l:'📝 Exams'}, {k:'students', l:'👥 Student Dashboard'},
-    {k:'questions', l:'📩 Questions'},
-    {k:'trash', l:'🗑️ Trash' + (STATE.trash.length ? ' ('+STATE.trash.length+')' : '')},
-    {k:'settings', l:'⚙️ Settings'},
+    {k:'addcard', l:ico('edit')+' Add Card'}, {k:'announcements', l:ico('alertCircle')+' Announcements'}, {k:'bulk', l:ico('book')+' Quick Import'},
+    {k:'addres', l:ico('folder')+' Add Resource'}, {k:'manage', l:ico('folder')+' Manage Content'},
+    {k:'exams', l:ico('edit')+' Exams'}, {k:'students', l:ico('users')+' Student Dashboard'},
+    {k:'questions', l:ico('alertCircle')+' Questions'},
+    {k:'trash', l:ico('trashBin')+' Trash' + (STATE.trash.length ? ' ('+STATE.trash.length+')' : '')},
+    {k:'settings', l:ico('settings')+' Settings'},
   ];
   const tStudent = [
-    {k:'announcements', l:'📢 Announcements'},
-    {k:'deck', l:'🃏 Review'}, {k:'quiz', l:'🎯 Quiz'},
-    {k:'exam', l:'📝 Exam'},
-    {k:'ask', l:'📩 Ask Teacher'},
-    {k:'resources', l:'📚 Resources'}, {k:'progress', l:'📈 My Progress'},
-    {k:'leaderboard', l:'🏅 Leaderboard'},
+    {k:'announcements', l:ico('alertCircle')+' Announcements'},
+    {k:'deck', l:ico('book')+' Review'}, {k:'quiz', l:ico('edit')+' Quiz'},
+    {k:'exam', l:ico('edit')+' Exam'},
+    {k:'ask', l:ico('alertCircle')+' Ask Teacher'},
+    {k:'resources', l:ico('folder')+' Resources'}, {k:'progress', l:ico('chart')+' My Progress'},
+    {k:'leaderboard', l:ico('award')+' Leaderboard'},
   ];
   const tabs = STATE.role==='teacher' ? tTeacher : tStudent;
   const unread = STATE.role==='student' ? unreadAnnouncementsCount() : 0;
@@ -1131,12 +1180,12 @@ function renderAnnouncementsTeacher(){
     <div class="field"><label>Message *</label><textarea id="annBody" placeholder="Write your announcement here..." style="min-height:100px;" maxlength="600"></textarea></div>
     <div class="field"><label>Priority</label>
       <select id="annPriority">
-        <option value="normal">🟢 Normal</option>
-        <option value="important">🟡 Important</option>
-        <option value="urgent">🔴 Urgent</option>
+        <option value="normal">Normal</option>
+        <option value="important">Important</option>
+        <option value="urgent">Urgent</option>
       </select>
     </div>
-    <button class="primary-btn" id="postAnnBtn">📢 Post Announcement</button>
+    <button class="primary-btn" id="postAnnBtn">${ico('send')} Post Announcement</button>
   </div>
   <div class="panel"><h2>Posted Announcements <small>${STATE.announcements.length}</small></h2>
     ${STATE.announcements.length===0 ? '<div class="empty">No announcements posted yet</div>' :
@@ -1254,13 +1303,13 @@ function renderExamBuilder(){
         <select id="examCorrectOpt"><option value="0">Option 1</option><option value="1">Option 2</option><option value="2">Option 3</option><option value="3">Option 4</option></select>
       </div>` : `
       <div class="field"><label>Correct Answer</label><input id="examCorrectText" placeholder="Expected answer"/></div>`}
-      <button class="ghost-btn active-mode" id="addExamQBtn" type="button">➕ Add Question to Exam</button>
+      <button class="ghost-btn active-mode" id="addExamQBtn" type="button">${ico('edit')} Add Question to Exam</button>
     </div>
     ${b.questions.length ? `<div class="exam-qlist">
       ${b.questions.map((q,i)=>`<div class="row"><div class="info"><b>Q${i+1}.</b> ${escapeHtml(q.q)}<span>${q.type==='mcq' ? 'Multiple choice · correct: '+escapeHtml(q.options[q.correct]) : 'Short answer · correct: '+escapeHtml(q.correct)}</span></div>
       <button class="ghost-btn danger" data-del-q="${q.id}">Remove</button></div>`).join('')}
     </div>` : ''}
-    <button class="primary-btn" id="publishExamBtn" style="margin-top:14px;" ${canPublish?'':'disabled'}>📤 Publish Exam</button>
+    <button class="primary-btn" id="publishExamBtn" style="margin-top:14px;" ${canPublish?'':'disabled'}>${ico('upload')} Publish Exam</button>
   </div>`;
 }
 function renderPublishedExams(){
@@ -1271,7 +1320,7 @@ function renderPublishedExams(){
       <div class="exam-card-top">
         <div class="info"><b>${escapeHtml(ex.title)}</b><span>${ex.questions.length} question(s) · published ${new Date(ex.createdAt).toLocaleDateString()}</span></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="ghost-btn" data-view-results="${ex.id}">${STATE.examOpenResults[ex.id]?'Hide Results':'📊 View Results'}</button>
+          <button class="ghost-btn" data-view-results="${ex.id}">${STATE.examOpenResults[ex.id]?'Hide Results':ico('chart')+' View Results'}</button>
           <button class="ghost-btn danger" data-del-exam="${ex.id}">Delete</button>
         </div>
       </div>
@@ -1283,13 +1332,13 @@ function renderPublishedExams(){
 /* ---------- TEACHER: trash ---------- */
 function renderTrash(){
   return `
-  <div class="panel"><h2>🗑️ Trash <small>${STATE.trash.length} deleted cards</small></h2>
+  <div class="panel"><h2>${ico('trashBin')} Trash <small>${STATE.trash.length} deleted cards</small></h2>
     <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-4px;">Deleted flashcards are kept here. Restore them back to your deck or delete them permanently.</p>
     ${STATE.trash.length===0 ? '<div class="empty">Trash is empty</div>' :
       STATE.trash.slice().reverse().map(c=>`
       <div class="row"><div class="info"><b>${escapeHtml(c.word)}</b> — ${escapeHtml(c.meaning)}<span><span class="tag">${escapeHtml(c.category)}</span><span class="tag">${escapeHtml(c.level)}</span></span></div>
-      <button class="ghost-btn" data-restore-card="${c.id}" style="color:var(--teal);">♻️ Restore</button>
-      <button class="ghost-btn danger" data-perm-delete="${c.id}">🗑️ Permanent</button></div>`).join('')}
+      <button class="ghost-btn" data-restore-card="${c.id}" style="color:#0d9488;">${ico('review')} Restore</button>
+      <button class="ghost-btn danger" data-perm-delete="${c.id}">${ico('trash')} Permanent</button></div>`).join('')}
     ${STATE.trash.length > 0 ? `<button class="ghost-btn danger" id="emptyTrashBtn" style="margin-top:12px;">Empty Trash (${STATE.trash.length} cards)</button>` : ''}
   </div>`;
 }
@@ -1307,7 +1356,7 @@ function renderSettings(){
   </div>
   <div class="panel"><h2>Data Backup</h2>
     <p style="font-size:12.5px;color:var(--ink-soft);">Export all classroom data (flashcards, resources, announcements, exams) as a JSON file. Save this file safely — you can share it with another teacher or use it to restore data.</p>
-    <button class="primary-btn" id="exportBtn" style="width:auto;">📥 Export All Data (JSON)</button>
+    <button class="primary-btn" id="exportBtn" style="width:auto;">${ico('download')} Export All Data (JSON)</button>
   </div>
   ${renderPreferencesPanel()}`;
 }
@@ -1316,17 +1365,17 @@ function renderSettings(){
 function renderPreferencesPanel(){
   const notif = notificationsSupported() ? Notification.permission : 'unsupported';
   const notifStatus =
-    notif==='granted' ? '<span class="pref-pill pref-on">✅ Enabled</span>' :
-    notif==='denied' ? '<span class="pref-pill pref-off">🚫 Blocked in browser settings</span>' :
+        notif==='granted' ? '<span class="pref-pill pref-on">'+ico('check')+' Enabled</span>' :
+    notif==='denied' ? '<span class="pref-pill pref-off">'+ico('warning')+' Blocked in browser settings</span>' :
     notif==='unsupported' ? '<span class="pref-pill pref-off">Not supported on this browser</span>' :
-    '<span class="pref-pill pref-pending">🔔 Not enabled yet</span>';
+    '<span class="pref-pill pref-pending">'+ico('bell')+' Not enabled yet</span>';
   const canInstall = !!STATE.installEvent;
   const installedHint = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
   return `
   <div class="panel"><h2>App Preferences</h2>
     <div class="pref-row">
       <div class="pref-info">
-        <b>🔔 Study reminders</b>
+        <b>${ico('alertCircle')} Study reminders</b>
         <span>Get notified when cards are due, when your streak is at risk, or when a new ${STATE.role==='teacher'?'student question':'reply'} arrives.</span>
       </div>
       <div class="pref-actions">
@@ -1337,22 +1386,22 @@ function renderPreferencesPanel(){
     </div>
     <div class="pref-row">
       <div class="pref-info">
-        <b>📲 Install app to home screen</b>
+        <b>${ico('settings')} Install app to home screen</b>
         <span>${installedHint ? 'Already installed — opening in app mode.' : 'Install Minbar as a real app for instant launch and full-screen study.'}</span>
       </div>
       <div class="pref-actions">
-        ${installedHint ? '<span class="pref-pill pref-on">✅ Installed</span>' :
-          canInstall ? '<button class="primary-btn" id="installBtn" style="width:auto;padding:10px 18px;">📲 Install now</button>' :
+        ${installedHint ? '<span class="pref-pill pref-on">'+ico('check')+' Installed</span>' :
+          canInstall ? '<button class="primary-btn" id="installBtn" style="width:auto;padding:10px 18px;">Install now</button>' :
           '<span class="pref-pill pref-pending">Use browser menu → "Add to Home Screen"</span>'}
       </div>
     </div>
     <div class="pref-row">
       <div class="pref-info">
-        <b>📥 Export my progress</b>
+        <b>${ico('download')} Export my progress</b>
         <span>Download all your flashcards, exam results, study stats and achievements as a JSON file.</span>
       </div>
       <div class="pref-actions">
-        <button class="ghost-btn" id="exportStudentProgressBtn">📥 Export</button>
+        <button class="ghost-btn" id="exportStudentProgressBtn">${ico('download')} Export</button>
       </div>
     </div>
   </div>`;
@@ -1367,9 +1416,9 @@ function renderStudentsPanel(){
       lb.map((s,i)=>`
       <div class="lb-row"><div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
         <div class="lb-name">${s.name}</div>
-        <div class="lb-stat">🏆 ${s.mastered} mastered</div>
-        <div class="lb-stat">🔥 ${s.streak}-day streak</div>
-        <div class="lb-stat">⏱️ ${s.minutes} min</div>
+        <div class="lb-stat">${ico('trophy')} ${s.mastered} mastered</div>
+        <div class="lb-stat">${ico('fire')} ${s.streak}-day streak</div>
+        <div class="lb-stat">${ico('clock')} ${s.minutes} min</div>
       </div>`).join('')}
   </div>`;
 }
@@ -1386,22 +1435,22 @@ function renderQuestionsTeacher(){
     <div class="q-card ${isOpen?'q-open':'q-answered'}">
       <div class="q-head">
         <div class="q-who"><span class="q-avatar">${escapeHtml((q.name||'?').charAt(0).toUpperCase())}</span><b>${escapeHtml(q.name)}</b> <span class="q-time">· ${timeAgo(q.createdAt)}</span></div>
-        <span class="q-status ${isOpen?'pending':'done'}">${isOpen?'⏳ Open':'✅ Answered'}</span>
+        <span class="q-status ${isOpen?'pending':'done'}">${isOpen?'Pending':ico('check')+' Answered'}</span>
       </div>
       <p class="q-body">${escapeHtml(q.body)}</p>
       ${q.reply ? `
         <div class="q-reply">
-          <div class="q-reply-label">📩 Your reply · ${timeAgo(q.repliedAt)}</div>
+          <div class="q-reply-label">${ico('alertCircle')} Your reply · ${timeAgo(q.repliedAt)}</div>
           <p>${escapeHtml(q.reply)}</p>
         </div>` : ''}
       <div class="q-actions">
-        ${isOpen ? `<button class="ghost-btn q-reply-btn" data-q-toggle="${q.id}">${showReply?'✕ Cancel':'✍️ Reply'}</button>` : ''}
+        ${isOpen ? `<button class="ghost-btn q-reply-btn" data-q-toggle="${q.id}">${showReply?'✕ Cancel':'Reply'}</button>` : ''}
         <button class="ghost-btn danger" data-q-del="${q.id}">Delete</button>
       </div>
       ${(isOpen && showReply) ? `
         <div class="q-reply-form">
           <textarea class="q-reply-input" data-q-input="${q.id}" placeholder="Write a helpful reply to ${escapeHtml(q.name)}...">${escapeHtml(draft)}</textarea>
-          <button class="primary-btn" data-q-send="${q.id}">📤 Send Reply</button>
+          <button class="primary-btn" data-q-send="${q.id}">${ico('review')} Send Reply</button>
         </div>` : ''}
     </div>`;
   };
@@ -1409,7 +1458,7 @@ function renderQuestionsTeacher(){
   return `
   <div class="panel"><h2>Student Questions <small>${open.length} awaiting reply</small></h2>
     <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-4px;">Anything a student writes here shows up in real time so you can help fast.</p>
-    ${open.length===0 ? '<div class="empty">🎉 No open questions right now</div>' : open.map(q=>renderQ(q,true)).join('')}
+    ${open.length===0 ? '<div class="empty">No open questions right now</div>' : open.map(q=>renderQ(q,true)).join('')}
   </div>
   ${answered.length ? `
   <div class="panel"><h2>Answered <small>${answered.length}</small></h2>
@@ -1426,7 +1475,7 @@ function renderAskTeacher(){
     <div class="field"><label>Your Question / Study Problem</label>
       <textarea id="qInput" placeholder="e.g. I don't understand when to use ال before nouns..." style="min-height:110px;" maxlength="1000">${escapeHtml(STATE.qDraft||'')}</textarea>
     </div>
-    <button class="primary-btn" id="qSendBtn">📤 Send to Teacher</button>
+    <button class="primary-btn" id="qSendBtn">${ico('review')} Send to Teacher</button>
   </div>
   <div class="panel"><h2>My Questions <small>${mine.length}</small></h2>
     ${mine.length===0 ? '<div class="empty">You haven&#39;t asked anything yet</div>' :
@@ -1436,15 +1485,15 @@ function renderAskTeacher(){
         <div class="q-card ${q.reply?'q-answered':'q-open'} ${isNew?'q-new':''}">
           <div class="q-head">
             <div class="q-who"><b>You asked</b> <span class="q-time">· ${timeAgo(q.createdAt)}</span></div>
-            <span class="q-status ${q.reply?'done':'pending'}">${q.reply?'✅ Answered':'⏳ Waiting for teacher'}</span>
+            <span class="q-status ${q.reply?'done':'pending'}">${q.reply?ico('check')+' Answered':'Pending'}</span>
           </div>
           <p class="q-body">${escapeHtml(q.body)}</p>
           ${q.reply ? `
             <div class="q-reply">
-              <div class="q-reply-label">📩 Teacher's reply · ${timeAgo(q.repliedAt)}</div>
+              <div class="q-reply-label">${ico('alertCircle')} Teacher's reply · ${timeAgo(q.repliedAt)}</div>
               <p>${escapeHtml(q.reply)}</p>
             </div>` : ''}
-          ${!q.reply ? `<div class="q-actions"><button class="ghost-btn danger" data-student-del-q="${q.id}">🗑️ Delete</button></div>` : ''}
+          ${!q.reply ? `<div class="q-actions"><button class="ghost-btn danger" data-student-del-q="${q.id}">${ico('trash')} Delete</button></div>` : ''}
         </div>`;
       }).join('')}
   </div>`;
@@ -1485,7 +1534,7 @@ function toggleFavorite(cardId){
   const favs = (STATE.progress.favorites||[]).map(String);
   const idStr = String(cardId);
   const idx = favs.indexOf(idStr);
-  if(idx===-1){ favs.push(idStr); toast('⭐ Added to favorites'); }
+  if(idx===-1){ favs.push(idStr); toast(ico('star')+' Added to favorites'); }
   else { favs.splice(idx,1); toast('Removed from favorites'); }
   STATE.progress.favorites = favs;
   saveProgressBg();
@@ -1518,9 +1567,9 @@ function renderDeck(){
   </div>
   <div class="panel" style="padding:16px 20px;">
     <div class="mode-switch">
-      <button class="ghost-btn ${STATE.deckMode==='due'?'active-mode':''}" data-mode="due">📌 Due (${dueTotal})</button>
-      <button class="ghost-btn ${STATE.deckMode==='browse'?'active-mode':''}" data-mode="browse">📖 Browse</button>
-      <button class="ghost-btn ${STATE.deckMode==='favorites'?'active-mode':''}" data-mode="favorites">⭐ Favorites (${favTotal})</button>
+      <button class="ghost-btn ${STATE.deckMode==='due'?'active-mode':''}" data-mode="due">${ico('clock')} Due (${dueTotal})</button>
+      <button class="ghost-btn ${STATE.deckMode==='browse'?'active-mode':''}" data-mode="browse">${ico('book')} Browse</button>
+      <button class="ghost-btn ${STATE.deckMode==='favorites'?'active-mode':''}" data-mode="favorites">${ico('star')} Favorites (${favTotal})</button>
     </div>
     <div class="deck-controls">
       <select id="filterCat"><option>All</option>${CATS.map(c=>`<option ${STATE.filterCat===c?'selected':''}>${c}</option>`).join('')}</select>
@@ -1528,22 +1577,22 @@ function renderDeck(){
       ${pool.length ? `<span style="margin-inline-start:auto;font-size:13px;color:var(--ink-soft);font-weight:600;">${STATE.deckIndex+1} / ${pool.length}</span>` : ''}
     </div>
     ${pool.length ? `<div style="width:100%;height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px;"><div class="deck-progress-bar" style="height:100%;background:var(--teal);border-radius:3px;width:${pool.length?((STATE.deckIndex+1)/pool.length*100):0}%;transition:width .3s ease;"></div></div>` : ''}
-    ${!c ? `<div class="empty">${STATE.deckMode==='due' ? '🎉 No cards due right now — check back later or browse all cards' : STATE.deckMode==='favorites' ? 'No favorite cards yet — tap ⭐ on any tricky card to save it here' : 'No flashcards match this filter yet'}</div>` : `
+    ${!c ? `<div class="empty">${STATE.deckMode==='due' ? 'No cards due right now — check back later or browse all cards' : STATE.deckMode==='favorites' ? 'No favorite cards yet — tap the star on any tricky card to save it here' : 'No flashcards match this filter yet'}</div>` : `
     <div class="flash-stage">
-      <div class="swipe-label know" id="swipeKnow">✅ Know</div>
-      <div class="swipe-label review" id="swipeReview">🔁 Review</div>
-      <div class="swipe-label delete" id="swipeDelete">🗑 Delete</div>
+      <div class="swipe-label know" id="swipeKnow">${ico('know')} Know</div>
+      <div class="swipe-label review" id="swipeReview">${ico('review')} Review</div>
+      <div class="swipe-label delete" id="swipeDelete">${ico('trash')} Delete</div>
       <div class="flashcard ${STATE.flipped?'flipped':''}" id="flashcard">
-        <button class="fav-star ${isFav?'active':''}" id="favBtn">${isFav?'⭐':'☆'}</button>
+        <button class="fav-star ${isFav?'active':''}" id="favBtn">${isFav?ico('star'):ico('starEmpty')}</button>
         <div class="flashcard-inner">
           <div class="face front"><div class="word">${escapeHtml(c.word)}</div><div class="hint">Tap to reveal meaning</div></div>
           <div class="face back"><div class="meaning">${escapeHtml(c.meaning)}</div>${c.example? `<div class="example">${escapeHtml(c.example)}</div>` : ''}</div>
         </div>
       </div>
       <div class="deck-actions">
-        <button class="icon-btn speak" id="speakBtn">🔊 Listen</button>
-        <button class="icon-btn know" id="knowBtn">✅ I Know It</button>
-        <button class="icon-btn review" id="reviewBtn">🔁 Needs Review</button>
+        <button class="icon-btn speak" id="speakBtn">${ico('speak')} Listen</button>
+        <button class="icon-btn know" id="knowBtn">${ico('know')} I Know It</button>
+        <button class="icon-btn review" id="reviewBtn">${ico('review')} Needs Review</button>
       </div>
       <div class="kbd-hint">Swipe → Know · Swipe ← Review · Swipe ↓ Delete</div>
     </div>`}
@@ -1598,7 +1647,7 @@ function renderTypingBlock(){
     <input id="typeInput" placeholder="Type here..." ${STATE.typing.feedback?'disabled':''} value="${STATE.typing.feedback? escapeHtml(q.word):''}"/>
     ${STATE.typing.feedback ? `<button class="primary-btn" id="typeNextBtn">Next</button>` : `<button class="primary-btn" id="typeCheckBtn">Check</button>`}
   </div>
-  ${STATE.typing.feedback ? `<div style="text-align:center;margin-top:10px;font-weight:700;color:${STATE.typing.feedback==='correct'?'var(--green)':'var(--rose)'}">${STATE.typing.feedback==='correct'?'✅ Correct answer':'❌ Correct answer: '+escapeHtml(q.word)}</div>` : ''}
+  ${STATE.typing.feedback ? `<div style="text-align:center;margin-top:10px;font-weight:700;color:${STATE.typing.feedback==='correct'?'#16a34a':'#ef4444'}">${STATE.typing.feedback==='correct'?ico('check')+' Correct answer':ico('x')+' Correct answer: '+escapeHtml(q.word)}</div>` : ''}
   `;
 }
 
@@ -1612,9 +1661,9 @@ function renderExamStudentTab(){
       return `<div class="exam-card">
         <div class="exam-card-top">
           <div class="info"><b>${escapeHtml(ex.title)}</b><span>${ex.questions.length} question(s)</span></div>
-          ${res ? `<div class="score-badge">✅ ${res.score}/${res.total}</div>` : ''}
+          ${res ? `<div class="score-badge">${ico('check')} ${res.score}/${res.total}</div>` : ''}
         </div>
-        <button class="primary-btn" data-start-exam="${ex.id}" style="margin-top:12px;width:100%;">${res?'🔁 Retake Exam':'▶ Start Exam'}</button>
+        <button class="primary-btn" data-start-exam="${ex.id}" style="margin-top:12px;width:100%;">${res?ico('review')+' Retake Exam':ico('play')+' Start Exam'}</button>
       </div>`;
     }).join('')}
   </div>`;
@@ -1624,7 +1673,7 @@ function renderExamSession(){
   const ex = STATE.exams.find(e=>e.id===sess.examId);
   if(!ex){ return `<div class="panel"><div class="empty">This exam is no longer available</div></div>`; }
   if(sess.index >= ex.questions.length){
-    return `<div class="panel"><h2>Exam Complete 🎉</h2>
+    return `<div class="panel"><h2>Exam Complete</h2>
       <div style="text-align:center;padding:12px 0 20px;">
         <div class="stat-box" style="max-width:220px;margin:0 auto;"><div class="num">${sess.score}/${ex.questions.length}</div><div class="lab">Your Score</div></div>
       </div>
@@ -1645,7 +1694,7 @@ function renderExamSession(){
       <input id="examTypeInput" placeholder="Type your answer..." ${sess.answered?'disabled':''} value="${sess.answered?q.correct:''}"/>
       ${sess.answered ? '' : '<button class="primary-btn" id="examCheckBtn">Submit</button>'}
     </div>
-    ${sess.answered ? `<div style="text-align:center;margin-top:10px;font-weight:700;color:${sess.wasCorrect?'var(--green)':'var(--rose)'}">${sess.wasCorrect?'✅ Correct answer':'❌ Correct answer: '+escapeHtml(q.correct)}</div>` : ''}`}
+    ${sess.answered ? `<div style="text-align:center;margin-top:10px;font-weight:700;color:${sess.wasCorrect?'#16a34a':'#ef4444'}">${sess.wasCorrect?ico('check')+' Correct answer':ico('x')+' Correct answer: '+escapeHtml(q.correct)}</div>` : ''}`}
     ${sess.answered ? `<div style="text-align:center;margin-top:16px;"><button class="primary-btn" id="examNextBtn">${sess.index+1 < ex.questions.length ? 'Next Question' : 'Finish Exam'}</button></div>` : ''}
   </div>`;
 }
@@ -1663,7 +1712,7 @@ function renderAnnouncementsStudent(){
           <div class="announce-title-row"><span class="announce-prio-dot"></span><b>${escapeHtml(a.title)}</b>${isNew?'<span class="tag new">New</span>':''}</div>
         </div>
         <p class="announce-body">${escapeHtml(a.body)}</p>
-        <span class="announce-meta">${prio==='urgent'?'🔴 Urgent · ':prio==='important'?'🟡 Important · ':''}${timeAgo(a.createdAt)}</span>
+        <span class="announce-meta">${prio==='urgent'?'Urgent · ':prio==='important'?'Important · ':''}${timeAgo(a.createdAt)}</span>
       </div>`;
     }).join('')}
   </div>`;
@@ -1675,7 +1724,7 @@ function renderResourcesView(){
   const groups = {'Listening':[], 'Conversation':[], 'Reading':[]};
   STATE.resources.forEach(r=>{ (groups[r.type]||(groups[r.type]=[])).push(r); });
   return Object.keys(groups).filter(t=>groups[t].length).map(t=>`
-    <div class="panel"><h2>${t==='Listening'?'🎧':t==='Conversation'?'🗣️':'📘'} ${t} Resources</h2>
+    <div class="panel"><h2>${t==='Listening'?ico('headphonesLg'):t==='Conversation'?ico('micLg'):ico('bookOpen')} ${t} Resources</h2>
       ${groups[t].map(r=>`<div class="row res-row type-${r.type}"><div class="info"><a href="${safeUrl(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.title)}</a><span>${escapeHtml(r.desc||'')}</span></div></div>`).join('')}
     </div>`).join('');
 }
@@ -1715,7 +1764,7 @@ function renderProgress(){
     <div class="stats-row">
       <div class="stat-box"><div class="num">${lm}</div><div class="lab">Minutes Listening</div></div>
       <div class="stat-box"><div class="num">${sm}</div><div class="lab">Minutes Speaking</div></div>
-      <div class="stat-box"><div class="num">${streak}</div><div class="lab">Day Streak 🔥</div></div>
+      <div class="stat-box"><div class="num">${streak}</div><div class="lab">Day Streak ${ico('fire')}</div></div>
       <div class="stat-box"><div class="num">${STATE.progress.quiz.correct}/${STATE.progress.quiz.attempts}</div><div class="lab">Quiz Accuracy</div></div>
     </div>
   </div>
@@ -1725,7 +1774,7 @@ function renderProgress(){
   ${renderActivityChart()}
   <div class="panel"><h2>Achievements</h2>
     <div class="badges-grid">
-      ${ACHIEVEMENTS.map(a=>{const unlocked=a.check(STATE.progress);return `<div class="badge ${unlocked?'':'locked'}"><div class="bic">${a.icon}</div><div class="bname">${a.name}</div></div>`;}).join('')}
+      ${ACHIEVEMENTS.map(a=>{const unlocked=a.check(STATE.progress);return `<div class="badge ${unlocked?'':'locked'}"><div class="bic">${ico(a.icon)}</div><div class="bname">${a.name}</div></div>`;}).join('')}
     </div>
   </div>
   ${renderPreferencesPanel()}`;
@@ -1733,8 +1782,8 @@ function renderProgress(){
 function renderTimersCompact(){
   return `
   <div class="timer-compact-row">
-    ${renderTimerCompact('listening','🎧','Listening')}
-    ${renderTimerCompact('speaking','🗣️','Speaking')}
+    ${renderTimerCompact('listening','headphonesLg','Listening')}
+    ${renderTimerCompact('speaking','micLg','Speaking')}
   </div>`;
 }
 function renderTimerCompact(kind, icon, label){
@@ -1746,7 +1795,7 @@ function renderTimerCompact(kind, icon, label){
   <div class="timer-card">
     <div class="timer-ring ${running?'running':''}">
       <div class="timer-ring-inner">
-        <div class="timer-icon-lg">${icon}</div>
+        <div class="timer-icon-lg">${ico(icon)}</div>
         <div class="timer-time-lg" id="${clockId}">${time}</div>
       </div>
     </div>
@@ -1764,7 +1813,7 @@ function renderLeaderboardTab(){
     ${lb.length===0 ? '<div class="empty">Be the first to appear here by reviewing your cards!</div>' :
     lb.map((s,i)=>`<div class="lb-row"><div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
       <div class="lb-name">${s.name}${s.name===STATE.name?' (You)':''}</div>
-      <div class="lb-stat">🏆 ${s.mastered}</div><div class="lb-stat">🔥 ${s.streak}</div><div class="lb-stat">⏱️ ${s.minutes}m</div></div>`).join('')}
+      <div class="lb-stat">${ico('trophy')} ${s.mastered}</div><div class="lb-stat">${ico('fire')} ${s.streak}</div><div class="lb-stat">${ico('clock')} ${s.minutes}m</div></div>`).join('')}
   </div>`;
 }
 
@@ -1829,7 +1878,7 @@ function attachPreferencesHandlers(){
   if(enableBtn) enableBtn.onclick = async ()=>{
     const perm = await requestNotificationPermission();
     if(perm==='granted'){
-      notifyUser('🔔 Reminders enabled', "You'll get notifications for due cards and streaks.", 'minbar-welcome');
+      notifyUser('Reminders enabled', "You'll get notifications for due cards and streaks.", 'minbar-welcome');
       toast('Notifications enabled');
     } else if(perm==='denied'){
       toast('Notifications blocked — enable in your browser settings');
@@ -1838,7 +1887,7 @@ function attachPreferencesHandlers(){
   };
   const testBtn = document.getElementById('testNotifBtn');
   if(testBtn) testBtn.onclick = ()=>{
-    notifyUser('🌟 Minbar test notification', 'Great — reminders are working on this device.', 'minbar-test');
+    notifyUser('Minbar test notification', 'Great — reminders are working on this device.', 'minbar-test');
   };
   const installBtn = document.getElementById('installBtn');
   if(installBtn) installBtn.onclick = async ()=>{
@@ -1872,7 +1921,7 @@ function attachPreferencesHandlers(){
     const a = document.createElement('a');
     a.href = url; a.download = 'minbar-progress-'+STATE.name+'-'+new Date().toISOString().slice(0,10)+'.json';
     a.click(); URL.revokeObjectURL(url);
-    toast('📥 Progress exported');
+    toast(ico('download')+' Progress exported');
   };
 }
 
@@ -2007,7 +2056,7 @@ function attachTeacherHandlers(){
           const el = document.getElementById('examResults-'+id);
           if(el){
             el.innerHTML = results.length===0 ? '<div class="empty">No students have taken this exam yet</div>' :
-              results.map(r=>`<div class="lb-row"><div class="lb-name">${r.name}</div><div class="lb-stat">🏆 ${r.score}/${r.total}</div><div class="lb-stat">${new Date(r.date).toLocaleDateString()}</div></div>`).join('');
+              results.map(r=>`<div class="lb-row"><div class="lb-name">${r.name}</div><div class="lb-stat">${ico('trophy')} ${r.score}/${r.total}</div><div class="lb-stat">${new Date(r.date).toLocaleDateString()}</div></div>`).join('');
           }
         }
       };
@@ -2207,10 +2256,10 @@ function attachSwipeHandlers(){
       // NO full render() — just update state + DOM directly
       if(dir==='right'){
         advanceSRS(true);
-        toast('✅ عرفته');
+        toast(ico('know')+' عرفته');
       } else if(dir==='left'){
         advanceSRS(false);
-        toast('🔁 بيرجع تاني');
+        toast(ico('review')+' بيرجع تاني');
       } else {
         const pool = currentDeckPool();
         const c = pool[STATE.deckIndex];
@@ -2223,7 +2272,7 @@ function attachSwipeHandlers(){
           const newPool = currentDeckPool();
           if(newPool.length===0) STATE.deckIndex=0;
           else STATE.deckIndex = STATE.deckIndex % newPool.length;
-          toast('🗑 راح للسلة');
+          toast(ico('trash')+' راح للسلة');
         }
       }
       updateCardDOM();
@@ -2267,7 +2316,7 @@ function attachStudentHandlers(){
       if(!c) return;
       toggleFavorite(c.id);
       const isFav = (STATE.progress.favorites||[]).map(String).includes(String(c.id));
-      favBtn.textContent = isFav ? '⭐' : '☆';
+      favBtn.innerHTML = isFav ? ico('star') : ico('starEmpty');
       favBtn.classList.toggle('active', isFav);
     };
     const knowBtn = document.getElementById('knowBtn');
@@ -2388,7 +2437,7 @@ function attachStudentHandlers(){
       });
       STATE.qDraft = '';
       safeSetBg('questions', STATE.questions, true);
-      toast('✅ Sent to your teacher'); render();
+      toast(ico('know')+' Sent to your teacher'); render();
     };
     document.querySelectorAll('[data-student-del-q]').forEach(b=>{
       b.onclick = ()=>{
@@ -2453,7 +2502,7 @@ function updateCardDOM(){
   }
   if(favBtn){
     const isFav = (STATE.progress.favorites||[]).map(String).includes(String(c.id));
-    favBtn.textContent = isFav ? '⭐' : '☆';
+    favBtn.innerHTML = isFav ? ico('star') : ico('starEmpty');
     favBtn.classList.toggle('active', isFav);
   }
   // Update progress counter
@@ -2563,11 +2612,11 @@ function startPolling(){
           q.name===STATE.name && q.reply &&
           !((STATE.progress.readReplies||[]).map(String).includes(String(q.id)))
         );
-        if(myNewReply) notifyUser('📩 Your teacher replied', 'Open the "Ask Teacher" tab to read the reply.');
+        if(myNewReply) notifyUser('Your teacher replied', 'Open the "Ask Teacher" tab to read the reply.');
         else toast('New content from your teacher');
       } else if(STATE.role==='teacher'){
         const openQ = unansweredQuestionsCount();
-        if(openQ>0) notifyUser('📩 New question from a student', openQ+' question'+(openQ>1?'s':'')+' waiting for you.');
+        if(openQ>0) notifyUser('New question from a student', openQ+' question'+(openQ>1?'s':'')+' waiting for you.');
       }
       // Refresh leaderboard if on relevant tab
       const needsLeaderboard = (STATE.tab==='students' || STATE.tab==='leaderboard');
@@ -2626,7 +2675,7 @@ async function notificationTick(){
     const dueNow = dueCards().length;
     // 1. Due cards ready (only once per day, after 10am)
     if(hour>=10 && dueNow>0 && !shown.due){
-      notifyUser('🃏 '+dueNow+' card'+(dueNow>1?'s':'')+' ready to review',
+      notifyUser(dueNow+' card'+(dueNow>1?'s':'')+' ready to review',
                  'Keep your Arabic streak alive — a quick session takes just a few minutes.',
                  'minbar-due');
       shown.due = true;
@@ -2639,7 +2688,7 @@ async function notificationTick(){
     if(hour>=19 && hasYesterday && !hasToday && !shown.streak){
       const streak = computeStreak(STATE.progress);
       if(streak>=1){
-        notifyUser('🔥 Your '+streak+'-day streak is about to break',
+        notifyUser('Your '+streak+'-day streak is about to break',
                    'Study one card today to keep it alive!',
                    'minbar-streak');
         shown.streak = true;
@@ -2647,7 +2696,7 @@ async function notificationTick(){
     }
     // 3. Evening reminder (8 PM) even without a streak
     if(hour>=20 && !hasToday && !shown.reminder){
-      notifyUser('📚 Study reminder',
+      notifyUser('Study reminder',
                  'A few minutes today builds fluency for life.',
                  'minbar-reminder');
       shown.reminder = true;
@@ -2656,7 +2705,7 @@ async function notificationTick(){
   if(STATE.role==='teacher'){
     const openQ = unansweredQuestionsCount();
     if(openQ>0 && !shown.open_q){
-      notifyUser('📩 '+openQ+' student question'+(openQ>1?'s':'')+' awaiting reply',
+      notifyUser(openQ+' student question'+(openQ>1?'s':'')+' awaiting reply',
                  'Tap to answer them now.',
                  'minbar-openq');
       shown.open_q = true;
@@ -2693,7 +2742,7 @@ window.addEventListener('beforeinstallprompt', (e)=>{
 
 (async ()=>{
   if(!storageAvailable()){
-    toast('⚠️ Unable to reach the server — check your connection');
+    toast(ico('warning')+' Unable to reach the server — check your connection');
   }
   await loadCodes();
   const saved = JSON.parse(localStorage.getItem('minbar_session') || 'null');
