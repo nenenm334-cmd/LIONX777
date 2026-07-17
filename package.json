@@ -2,9 +2,6 @@
   "name": "lionx777-minbar",
   "private": true,
   "type": "module",
-  "scripts": {
-    "build": "mkdir -p public && cp -R frontend/public/* public/"
-  },
   "dependencies": {
     "mongodb": "^6.0.0"
   }
