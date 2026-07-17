@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "cp -r frontend/public public",
   "outputDirectory": "public",
 
   "headers": [
