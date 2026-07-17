@@ -1,8 +1,10 @@
-frontend/
-backend/
-tests/
-memory/
+_backend/
+_frontend/
+_tests/
+_memory/
 node_modules/
 .git/
+.env*
 *.md
-TODO.md
+.vercelignore
+.vercel/

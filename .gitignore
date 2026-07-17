@@ -2,5 +2,10 @@ node_modules/
 __pycache__/
 *.pyc
 .env
-.vercel
+.env*
+.vercel/
+.vercelignore
 *.log
+_frontend/
+_tests/
+_memory/
