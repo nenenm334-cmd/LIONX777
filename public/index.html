@@ -975,6 +975,7 @@ function attachGate(){
     }
     STATE.role = picked;
     if(picked==='student') STATE.name = nameInput.value.trim();
+    localStorage.setItem('minbar_session', JSON.stringify({role:STATE.role, name:STATE.name}));
     await loadShared();
     await loadProgress();
     if(picked==='teacher') await loadLeaderboard();
@@ -1702,6 +1703,7 @@ function attachHandlers(){
     STATE.typing={active:false,question:null,feedback:null};
     STATE.examBuilder={title:'',qType:'mcq',options:['','','',''],questions:[]};
     STATE.examSession=null; STATE.examOpenResults={};
+    localStorage.removeItem('minbar_session');
     render();
   };
   document.querySelectorAll('.tab').forEach(t=>{
@@ -2429,7 +2431,19 @@ window.addEventListener('beforeinstallprompt', (e)=>{
   if(!storageAvailable()){
     toast('⚠️ Unable to reach the server — check your connection');
   }
-  await loadCodes(); render();
+  await loadCodes();
+  const saved = JSON.parse(localStorage.getItem('minbar_session') || 'null');
+  if(saved && saved.role && STATE.codes[saved.role]){
+    STATE.role = saved.role;
+    STATE.name = saved.name || '';
+    STATE.tab = saved.role==='teacher' ? 'addcard' : 'deck';
+    await loadShared();
+    await loadProgress();
+    if(saved.role==='teacher') await loadLeaderboard();
+    startPolling();
+    startNotificationLoop();
+  }
+  render();
 })();
 </script>
 </body>
