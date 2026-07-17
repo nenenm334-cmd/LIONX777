@@ -1,16 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/kv.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/kv.js" },
-    { "src": "/(sw\\.js|manifest\\.json|robots\\.txt|icon.*)", "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate"
-      }
-    },
-    { "src": "/(.*)", "dest": "/public/$1" }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
