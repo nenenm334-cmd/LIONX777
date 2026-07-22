@@ -1,5 +1,5 @@
 const Stripe = require('stripe');
-const { sendJson, setCors, rateLimit, readBody, setSecurityHeaders } = require('./_helpers');
+const { sendJson, setCors, rateLimit, readBody, setSecurityHeaders, getStripeKey } = require('./_helpers');
 
 async function kvSet(key, value) {
   const { getDb } = require('./_helpers');
@@ -23,8 +23,8 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 429, { error: 'Too many requests' });
   }
 
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) return sendJson(res, 500, { error: 'Payments not configured' });
+  const secretKey = process.env.STRIPE_SECRET_KEY || (await getStripeKey('STRIPE_SECRET_KEY'));
+  if (!secretKey) return sendJson(res, 500, { error: 'Payments not configured', hint: 'set STRIPE_SECRET_KEY in Vercel env or use /setup-payments.html' });
 
   let body;
   try { body = await readBody(req); } catch (e) { return sendJson(res, 400, { error: 'Invalid JSON' }); }

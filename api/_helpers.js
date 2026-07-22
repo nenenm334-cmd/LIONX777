@@ -115,8 +115,20 @@ async function getDb() {
   return _cachedDbClient.db(process.env.DB_NAME || 'minbar');
 }
 
+// ── Stripe key resolver (env → KV fallback) ──
+async function getStripeKey(keyName) {
+  const envVal = process.env[keyName];
+  if (envVal) return envVal;
+  try {
+    const db = await getDb();
+    const doc = await db.collection('kv_store').findOne({ key: 'config:stripe:' + keyName });
+    if (doc && doc.value) return doc.value;
+  } catch (e) {}
+  return null;
+}
+
 module.exports = {
   sendJson, sendText, sendBuffer,
   setCors, setSecurityHeaders, checkAuth,
-  rateLimit, validVideoId, readBody, getDb, ORIGIN
+  rateLimit, validVideoId, readBody, getDb, getStripeKey, ORIGIN
 };

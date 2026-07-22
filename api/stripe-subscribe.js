@@ -1,10 +1,14 @@
 const Stripe = require('stripe');
-const { sendJson, setCors, rateLimit, readBody, setSecurityHeaders } = require('./_helpers');
+const { sendJson, setCors, rateLimit, readBody, setSecurityHeaders, getStripeKey } = require('./_helpers');
 
-const PLANS = {
-  pro: { priceId: process.env.STRIPE_PRO_PRICE_ID, name: 'Pro' },
-  premium: { priceId: process.env.STRIPE_PREMIUM_PRICE_ID, name: 'Premium' }
-};
+async function getPlan(planName) {
+  var priceId = process.env['STRIPE_PRO_PRICE_ID'] || (await getStripeKey('STRIPE_PRO_PRICE_ID'));
+  var premiumPriceId = process.env['STRIPE_PREMIUM_PRICE_ID'] || (await getStripeKey('STRIPE_PREMIUM_PRICE_ID'));
+  return {
+    pro: { priceId: priceId, name: 'Pro' },
+    premium: { priceId: premiumPriceId, name: 'Premium' }
+  }[planName] || null;
+}
 
 module.exports = async function handler(req, res) {
   setCors(res, req.headers?.origin);
@@ -17,15 +21,16 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 429, { error: 'Too many requests' });
   }
 
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) return sendJson(res, 500, { error: 'Payments not configured' });
+  const secretKey = process.env.STRIPE_SECRET_KEY || (await getStripeKey('STRIPE_SECRET_KEY'));
+  if (!secretKey) return sendJson(res, 500, { error: 'Payments not configured', hint: 'set STRIPE_SECRET_KEY in Vercel env or use /setup-payments.html' });
 
   let body;
   try { body = await readBody(req); } catch (e) { return sendJson(res, 400, { error: 'Invalid JSON' }); }
 
   const { plan, email, name, paymentMethodId } = body;
 
-  if (!plan || !PLANS[plan]) return sendJson(res, 400, { error: 'Invalid plan. Use: pro, premium' });
+  const selectedPlan = await getPlan(plan);
+  if (!plan || !selectedPlan) return sendJson(res, 400, { error: 'Invalid plan. Use: pro, premium' });
   if (!email) return sendJson(res, 400, { error: 'Email required' });
 
   const stripe = new Stripe(secretKey);
@@ -44,7 +49,7 @@ module.exports = async function handler(req, res) {
     // Create subscription
     var subscription = await stripe.subscriptions.create({
       customer: customer.id,
-      items: [{ price: PLANS[plan].priceId }],
+      items: [{ price: selectedPlan.priceId }],
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent'],

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup Payments - Minbar</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/common.css">
+<style>
+  .setup-body { max-width: 600px; margin: 48px auto; padding: 0 16px; }
+  .setup-card { background: var(--bg2); border-radius: 12px; padding: 32px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+  .setup-card h1 { margin-top: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 8px; }
+  .setup-card .hint { color: var(--text2); font-size: .875rem; margin-bottom: 24px; }
+  .setup-card label { display: block; margin-bottom: 4px; font-weight: 600; font-size: .875rem; }
+  .setup-card input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: .875rem; margin-bottom: 16px; box-sizing: border-box; }
+  .setup-card input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,144,226,.2); }
+  .setup-card button { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .setup-card button:disabled { opacity: .6; cursor: not-allowed; }
+  .setup-card .msg { margin-top: 16px; padding: 12px; border-radius: 8px; display: none; }
+  .setup-card .msg.success { display: block; background: #d4edda; color: #155724; }
+  .setup-card .msg.error { display: block; background: #f8d7da; color: #721c24; }
+  @media (max-width: 500px) { .setup-card { padding: 20px 16px; } }
+</style>
+</head>
+<body>
+<div class="setup-body">
+  <div class="setup-card">
+    <h1><i class="fas fa-credit-card"></i> Stripe Payment Setup</h1>
+    <p class="hint">Enter your Stripe test or live keys. These will be stored securely in the database.</p>
+    <form id="setupForm">
+      <label for="secretKey">Secret Key (<code>sk_test_...</code> or <code>sk_live_...</code>)</label>
+      <input type="password" id="secretKey" placeholder="sk_test_..." required>
+
+      <label for="proPriceId">Pro Plan Price ID</label>
+      <input type="text" id="proPriceId" placeholder="price_..." required>
+
+      <label for="premiumPriceId">Premium Plan Price ID</label>
+      <input type="text" id="premiumPriceId" placeholder="price_..." required>
+
+      <button type="submit" id="saveBtn"><i class="fas fa-save"></i> Save Configuration</button>
+    </form>
+    <div id="msg" class="msg"></div>
+  </div>
+</div>
+<script>
+document.getElementById('setupForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('saveBtn');
+  const msg = document.getElementById('msg');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  msg.className = 'msg';
+
+  try {
+    const r = await fetch('/api/setup-payments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secretKey: document.getElementById('secretKey').value.trim(),
+        proPriceId: document.getElementById('proPriceId').value.trim(),
+        premiumPriceId: document.getElementById('premiumPriceId').value.trim()
+      })
+    });
+    const data = await r.json();
+    if (data.ok) {
+      msg.className = 'msg success';
+      msg.textContent = 'Configuration saved successfully! You can now use payments.';
+    } else {
+      msg.className = 'msg error';
+      msg.textContent = data.error || 'Failed to save';
+    }
+  } catch (err) {
+    msg.className = 'msg error';
+    msg.textContent = 'Network error: ' + err.message;
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Configuration';
+  }
+};
+</script>
+</body>
+</html>
