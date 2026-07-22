@@ -110,7 +110,8 @@ body.dark .hero-btn-secondary:hover{border-color:#0d9488;color:#0d9488;}
 .hero-visual{display:flex;align-items:center;justify-content:center;}
 .hero-card{width:100%;max-width:480px;background:linear-gradient(135deg,#0d9488,#059669);border-radius:24px;padding:40px;color:#fff;position:relative;overflow:hidden;}
 .hero-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,.15),transparent 60%);pointer-events:none;}
-.hero-card-icon{font-size:48px;margin-bottom:16px;}
+.hero-card-icon{font-size:48px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;}
+.hero-card-icon .fi{width:48px;height:48px;filter:brightness(0) invert(1);}
 .hero-card h3{font-size:20px;font-weight:700;margin-bottom:8px;}
 .hero-card p{font-size:14px;color:rgba(255,255,255,.8);max-width:none;}
 .hero-stats{display:flex;gap:24px;margin-top:24px;}
@@ -127,7 +128,8 @@ body.dark .hero-btn-secondary:hover{border-color:#0d9488;color:#0d9488;}
 .feature-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.06);transform:translateY(-4px);border-color:#e5e7eb;}
 body.dark .feature-card{background:#1e293b;border-color:#334155;}
 body.dark .feature-card:hover{border-color:#475569;box-shadow:0 8px 32px rgba(0,0,0,.2);}
-.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;}
+.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.feature-icon .fi{width:26px;height:26px;}
 .feature-card h3{font-size:17px;font-weight:700;margin-bottom:8px;color:#111827;}
 body.dark .feature-card h3{color:#f1f5f9;}
 .feature-card p{font-size:14px;color:#6b7280;line-height:1.6;}
@@ -280,7 +282,7 @@ body.dark .pricing-btn-secondary:hover{border-color:#0d9488;color:#0d9488;}
     </div>
     <div class="hero-visual">
       <div class="hero-card">
-        <div class="hero-card-icon">📖</div>
+        <div class="hero-card-icon"><img src="/images/book.svg" alt="" class="fi"></div>
         <h3>Your Learning Journey</h3>
         <p>Complete 90-Day Arabic Mastery program with daily lessons, flashcards, and live practice.</p>
         <div class="hero-stats">
@@ -311,32 +313,32 @@ body.dark .pricing-btn-secondary:hover{border-color:#0d9488;color:#0d9488;}
   </div>
   <div class="features-grid">
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(13,148,136,.1);">🎯</div>
+      <div class="feature-icon" style="background:rgba(13,148,136,.1);"><img src="/images/book.svg" alt="" class="fi"></div>
       <h3>Spaced Repetition</h3>
       <p>Smart flashcards that adapt to your learning pace. Review words just before you forget them.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(245,158,11,.1);">📹</div>
+      <div class="feature-icon" style="background:rgba(245,158,11,.1);"><img src="/images/laptop.svg" alt="" class="fi"></div>
       <h3>Live Video Sessions</h3>
       <p>One-on-one video calls with expert teachers. Practice speaking in real-time from anywhere.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(59,130,246,.1);">📊</div>
+      <div class="feature-icon" style="background:rgba(59,130,246,.1);"><img src="/images/heart.svg" alt="" class="fi"></div>
       <h3>Progress Tracking</h3>
       <p>Detailed analytics on your learning journey. Track streaks, vocabulary mastery, and lesson completion.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(139,92,246,.1);">🎬</div>
+      <div class="feature-icon" style="background:rgba(139,92,246,.1);"><img src="/images/globe.svg" alt="" class="fi"></div>
       <h3>YouTube Integration</h3>
       <p>Import any Arabic YouTube video with subtitles. Turn your favorite content into interactive lessons.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(236,72,153,.1);">📝</div>
+      <div class="feature-icon" style="background:rgba(236,72,153,.1);"><img src="/images/arabic-book.svg" alt="" class="fi"></div>
       <h3>Interactive Quizzes</h3>
       <p>Typing quizzes, listening exercises, and exam-style tests to reinforce your learning.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(16,185,129,.1);">🔔</div>
+      <div class="feature-icon" style="background:rgba(16,185,129,.1);"><img src="/images/coffee.svg" alt="" class="fi"></div>
       <h3>Smart Reminders</h3>
       <p>Daily study reminders, booking notifications, and progress reports to keep you on track.</p>
     </div>
