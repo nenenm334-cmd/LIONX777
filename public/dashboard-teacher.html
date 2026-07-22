@@ -6,6 +6,7 @@
 <title>Teacher Dashboard — Minbar</title>
 <link rel="stylesheet" href="css/common.css">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
+<script src="js/shared.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;}
@@ -566,7 +567,7 @@ function toast(msg, type) {
   setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); }, 3000);
 }
 
-function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 async function kvGet(key) {
   try {

@@ -6,6 +6,7 @@
 <title>Student Dashboard — Minbar</title>
 <link rel="stylesheet" href="css/common.css">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
+<script src="js/shared.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg,#f8fafc);color:var(--ink,#111827);min-height:100vh;}
@@ -170,6 +171,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg,
 
 <script>
 var API = '/api/kv';
+KV_API = '/api/kv';
 var session = JSON.parse(localStorage.getItem('minbar_session') || '{}');
 var userName = session.name || 'Student';
 var userEmail = session.email || '';
@@ -186,59 +188,7 @@ function toast(msg, type) {
   setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); }, 3000);
 }
 
-function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-async function kvGet(key) {
-  try {
-    var r = await fetch(API + '?key=' + encodeURIComponent(key));
-    if (!r.ok) return null;
-    var data = await r.json();
-    if (data && typeof data.value === 'string') { try { data.value = JSON.parse(data.value); } catch(e) {} }
-    return data;
-  } catch(e) { return null; }
-}
-
-async function kvSet(key, value) {
-  await fetch(API + '?key=' + encodeURIComponent(key), {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key: key, value: value })
-  });
-}
-
-function timeAgo(ts) {
-  var diff = Date.now() - ts;
-  if (diff < 60000) return 'just now';
-  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
-  return Math.floor(diff/86400000) + 'd ago';
-}
-
-function getCountdown(scheduledAt) {
-  var diff = scheduledAt - Date.now();
-  if (diff <= 0) return { text: 'NOW', cls: 'live', isLive: true };
-  var h = Math.floor(diff / 3600000);
-  var m = Math.floor((diff % 3600000) / 60000);
-  var s = Math.floor((diff % 60000) / 1000);
-  if (h > 24) {
-    var d = Math.floor(h / 24);
-    return { text: 'in ' + d + ' day' + (d > 1 ? 's' : ''), cls: 'later' };
-  }
-  if (h > 0) return { text: 'in ' + h + 'h ' + m + 'm', cls: h <= 2 ? 'soon' : 'later' };
-  if (m > 0) return { text: 'in ' + m + 'm ' + s + 's', cls: 'soon' };
-  return { text: 'in ' + s + 's', cls: 'soon' };
-}
-
-function formatTime12(time24) {
-  if (!time24) return '--:--';
-  var parts = time24.replace(/[^0-9:]/g, '').split(':');
-  var h = parseInt(parts[0]) || 0;
-  var m = parts[1] || '00';
-  var ampm = h >= 12 ? 'PM' : 'AM';
-  if (h > 12) h -= 12;
-  if (h === 0) h = 12;
-  return { hour: h, min: m, ampm: ampm };
-}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function renderUpcoming() {
   var now = Date.now();

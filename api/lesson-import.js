@@ -1,8 +1,4 @@
-const { MongoClient } = require('mongodb');
-const { sendJson, setCors, checkAuth, rateLimit, validVideoId, readBody } = require('./_helpers');
-
-let _cachedClient = null;
-async function getDb() {
+const { sendJson, setCors, checkAuth, rateLimit, validVideoId, readBody, getDb } = require('./_helpers');
   if (_cachedClient) {
     try { await _cachedClient.db().command({ ping: 1 }); return _cachedClient.db(process.env.DB_NAME || 'minbar'); }
     catch (e) { try { await _cachedClient.close(); } catch (x) {} _cachedClient = null; }

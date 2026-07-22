@@ -29,7 +29,7 @@ function setCors(res, origin) {
   const allowed = (origin || '').replace(/\/+$/, '') === ORIGIN.replace(/\/+$/, '');
   res.setHeader('Access-Control-Allow-Origin', allowed ? ORIGIN : '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-openai-key');
   res.setHeader('Access-Control-Max-Age', '86400');
 }
 
@@ -43,7 +43,6 @@ function setSecurityHeaders(res) {
 }
 
 // ── Auth check ──
-// If API_SECRET is set, require Bearer token. If not set, allow all (dev mode).
 function checkAuth(req, res) {
   const secret = process.env.API_SECRET || '';
   if (!secret) return true;
@@ -103,8 +102,21 @@ function sendBuffer(res, status, buffer, contentType) {
   res.end(buffer);
 }
 
+// ── MongoDB shared connection ──
+const { MongoClient } = require('mongodb');
+let _cachedDbClient = null;
+
+async function getDb() {
+  if (_cachedDbClient) {
+    try { await _cachedDbClient.db().command({ ping: 1 }); return _cachedDbClient.db(process.env.DB_NAME || 'minbar'); }
+    catch (e) { try { await _cachedDbClient.close(); } catch (x) {} _cachedDbClient = null; }
+  }
+  _cachedDbClient = await new MongoClient(process.env.MONGO_URL).connect();
+  return _cachedDbClient.db(process.env.DB_NAME || 'minbar');
+}
+
 module.exports = {
   sendJson, sendText, sendBuffer,
   setCors, setSecurityHeaders, checkAuth,
-  rateLimit, validVideoId, readBody, ORIGIN
+  rateLimit, validVideoId, readBody, getDb, ORIGIN
 };

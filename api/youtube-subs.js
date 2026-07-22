@@ -1,13 +1,4 @@
-const { sendJson, setCors, checkAuth, rateLimit, validVideoId } = require('./_helpers');
-let _cachedClient = null;
-async function getDb() {
-  if (_cachedClient) {
-    try { await _cachedClient.db().command({ ping: 1 }); return _cachedClient.db(process.env.DB_NAME || 'minbar'); }
-    catch (e) { try { await _cachedClient.close(); } catch (x) {} _cachedClient = null; }
-  }
-  _cachedClient = await new (require('mongodb').MongoClient)(process.env.MONGO_URL).connect();
-  return _cachedClient.db(process.env.DB_NAME || 'minbar');
-}
+const { sendJson, setCors, checkAuth, rateLimit, validVideoId, getDb } = require('./_helpers');
 
 module.exports = async function handler(req, res) {
   setCors(res, req.headers?.origin);

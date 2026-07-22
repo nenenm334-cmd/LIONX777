@@ -1,17 +1,6 @@
-const { MongoClient } = require('mongodb');
-const { sendJson, setCors, checkAuth, rateLimit, readBody } = require('./_helpers');
+const { sendJson, setCors, checkAuth, rateLimit, readBody, getDb } = require('./_helpers');
 
 const MAX_VALUE_SIZE = 524288; // 512KB max value
-
-let _cachedClient = null;
-async function getDb() {
-  if (_cachedClient) {
-    try { await _cachedClient.db().command({ ping: 1 }); return _cachedClient.db(process.env.DB_NAME || 'minbar'); }
-    catch (e) { try { await _cachedClient.close(); } catch (x) {} _cachedClient = null; }
-  }
-  _cachedClient = await new MongoClient(process.env.MONGO_URL).connect();
-  return _cachedClient.db(process.env.DB_NAME || 'minbar');
-}
 
 function sanitizeKey(raw) {
   if (!raw || typeof raw !== 'string') return '';
