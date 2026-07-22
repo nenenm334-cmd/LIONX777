@@ -866,6 +866,7 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
 .lib-cat .cat-bg .circle2{position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.05);}
 .lib-cat .cat-bg .dots{position:absolute;top:12px;left:12px;width:30px;height:30px;background-image:radial-gradient(rgba(255,255,255,.12) 1px,transparent 1px);background-size:6px 6px;}
 .lib-cat .lci{width:30px;height:30px;margin-bottom:6px;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.1));}
+.lsvg,.lib-cat .lsvg,.tc-icon .lsvg{width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);}
 .lib-cat .lcn{font-size:14px;font-weight:700;margin-bottom:2px;letter-spacing:-.2px;text-shadow:0 1px 3px rgba(0,0,0,.1);}
 .lib-cat .lce{font-size:10px;opacity:.65;font-weight:500;margin-bottom:4px;text-shadow:0 1px 2px rgba(0,0,0,.08);}
 .lib-cat .lcc{font-size:10px;opacity:.75;line-height:1.35;margin-bottom:0;}
@@ -1135,6 +1136,23 @@ const LIB_CATEGORIES = [
   {id:'law', name:'القانون', nameEn:'Law', icon:'⚖️', color:'#78716c', desc:'مصطلحات قانونية وسياسية وحقوقية'},
   {id:'religion', name:'الدين', nameEn:'Religion', icon:'🕌', color:'#15803d', desc:'مفردات دينية وإسلامية'},
 ];
+const LIB_IMG={
+  language:'<img class="lsvg" src="/images/book.svg" alt="">',
+  work:'<img class="lsvg" src="/images/briefcase.svg" alt="">',
+  daily:'<img class="lsvg" src="/images/coffee.svg" alt="">',
+  travel:'<img class="lsvg" src="/images/airplane.svg" alt="">',
+  food:'<img class="lsvg" src="/images/food.svg" alt="">',
+  health:'<img class="lsvg" src="/images/heart.svg" alt="">',
+  tech:'<img class="lsvg" src="/images/laptop.svg" alt="">',
+  home:'<img class="lsvg" src="/images/house.svg" alt="">',
+  money:'<img class="lsvg" src="/images/wallet.svg" alt="">',
+  relationships:'<img class="lsvg" src="/images/people.svg" alt="">',
+  nature:'<img class="lsvg" src="/images/tree.svg" alt="">',
+  culture:'<img class="lsvg" src="/images/globe.svg" alt="">',
+  sports:'<img class="lsvg" src="/images/dumbbell.svg" alt="">',
+  law:'<img class="lsvg" src="/images/justice.svg" alt="">',
+  religion:'<img class="lsvg" src="/images/arabic-book.svg" alt="">'
+};
 const LIB_SVGS={
   language:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8h20a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V12"/><path d="M28 8v4a4 4 0 0 0 4 4h4"/><path d="M14 20h12M14 28h8M24 36h2"/><circle cx="18" cy="36" r="2"/></svg>',
   work:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="18" width="36" height="24" rx="3"/><path d="M16 18V12a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v6"/><path d="M24 28v4"/><circle cx="24" cy="30" r="2" fill="currentColor"/></svg>',
@@ -3053,7 +3071,7 @@ function renderLibrary(){
       <div class="cat-bg"><div class="circle1"></div><div class="circle2"></div><div class="dots"></div></div>
       <div class="cat-glow"></div>
       <div class="cat-inner">
-        <span class="lci">${LIB_SVGS[cat.id]||cat.icon}</span>
+        <span class="lci">${LIB_IMG[cat.id]||LIB_SVGS[cat.id]||cat.icon}</span>
         <div class="lcn">${cat.name}</div>
         <div class="lce">${cat.nameEn}</div>
         <div class="lcc">${cat.desc}</div>
@@ -3074,7 +3092,7 @@ function renderLibCategory(){
   let h=`<div class="lib-wrap">
     <button class="lib-back" id="libBackCat">← All Categories</button>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,${cat.color},${cat.color}99);display:flex;align-items:center;justify-content:center;color:#fff;padding:8px;">${LIB_SVGS[cat.id]||cat.icon}</div>
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,${cat.color},${cat.color}99);display:flex;align-items:center;justify-content:center;color:#fff;padding:8px;">${LIB_IMG[cat.id]||LIB_SVGS[cat.id]||cat.icon}</div>
       <div><h2 style="margin:0;font-size:17px;">${cat.name}</h2><p style="margin:1px 0 0;font-size:11px;color:var(--ink-soft);">${cat.nameEn} · ${cat.desc}</p></div>
     </div>
     <div class="lib-templates">`;
@@ -3088,7 +3106,7 @@ function renderLibCategory(){
     h+=`<div class="lib-tcard" data-lib-add="${tpl.id}">
       <div class="tc-accent" style="background:linear-gradient(90deg,${cat.color},${cat.color}66);"></div>
       <div class="tc-body">
-        <div class="tc-icon" style="background:linear-gradient(135deg,${cat.color},${cat.color}88);">${LIB_SVGS[cat.id]||cat.icon}</div>
+        <div class="tc-icon" style="background:linear-gradient(135deg,${cat.color},${cat.color}88);">${LIB_IMG[cat.id]||LIB_SVGS[cat.id]||cat.icon}</div>
         <div class="tc-name">${tpl.name}</div>
         <div class="tc-name-en">${tpl.nameEn}</div>
         <div class="tc-desc">${tpl.desc}</div>
