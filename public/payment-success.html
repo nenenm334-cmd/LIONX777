@@ -4,29 +4,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Payment Successful — Minbar</title>
 <link rel="stylesheet" href="css/common.css">
-<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#f8fafc,#ecfdf5);padding:24px;}body.dark{background:linear-gradient(135deg,#08080e,#0a0a12,#080c0a);color:#e2e8f0;}.card{background:rgba(255,255,255,.85);backdrop-filter:blur(24px);border-radius:24px;padding:48px;text-align:center;max-width:440px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.06);}body.dark .card{background:rgba(16,16,24,.85);box-shadow:0 24px 80px rgba(0,0,0,.3);}.icon{width:64px;height:64px;border-radius:50%;background:#0d9488;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;color:#fff;}h1{font-size:26px;color:#0f172a;margin-bottom:4px;}body.dark h1{color:#e2e8f0;}p{color:#64748b;font-size:14px;line-height:1.6;margin-bottom:8px;}body.dark p{color:#94a3b8;}.plan-badge{display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(13,148,136,.1);color:#0d9488;font-size:12px;font-weight:700;margin-bottom:16px;}.detail{font-size:13px;color:#64748b;margin-bottom:24px;}body.dark .detail{color:#94a3b8;}.detail strong{color:#0f172a;}body.dark .detail strong{color:#e2e8f0;}.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;font-weight:700;font-size:15px;text-decoration:none;transition:all .2s;}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.3);}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#f8fafc,#ecfdf5);padding:24px;}body.dark{background:linear-gradient(135deg,#08080e,#0a0a12,#080c0a);color:#e2e8f0;}.card{background:rgba(255,255,255,.85);backdrop-filter:blur(24px);border-radius:24px;padding:48px;text-align:center;max-width:440px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.06);}body.dark .card{background:rgba(16,16,24,.85);box-shadow:0 24px 80px rgba(0,0,0,.3);}.icon{width:64px;height:64px;border-radius:50%;background:#0d9488;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;color:#fff;}h1{font-size:26px;color:#0f172a;margin-bottom:4px;}body.dark h1{color:#e2e8f0;}p{color:#64748b;font-size:14px;line-height:1.6;margin-bottom:8px;}body.dark p{color:#94a3b8;}.plan-badge{display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(13,148,136,.1);color:#0d9488;font-size:12px;font-weight:700;margin-bottom:16px;}.detail{font-size:13px;color:#64748b;margin-bottom:24px;}body.dark .detail{color:#94a3b8;}.detail strong{color:#0f172a;}body.dark .detail strong{color:#e2e8f0;}.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;font-weight:700;font-size:15px;text-decoration:none;transition:all .2s;}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.3);}.btn-secondary{background:transparent;border:1.5px solid var(--border,#d4e2da);color:var(--ink-soft);padding:12px 28px;}.btn-secondary:hover{background:var(--teal-soft);border-color:var(--teal);color:var(--teal);transform:translateY(-1px);box-shadow:none;}</style>
 </head><body>
-<div class="card">
+<div class="card" id="successCard">
   <div class="icon">✓</div>
   <h1 id="successTitle">Payment Successful!</h1>
   <div class="plan-badge" id="planBadge">Pro Plan</div>
   <p id="successMsg">Your subscription is now active. You have full access to all premium features.</p>
   <div class="detail" id="detailLine"></div>
-  <a href="/index.html?app" class="btn">Go to Dashboard →</a>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <a id="mainCta" href="/index.html?app" class="btn">Go to Dashboard →</a>
+    <a id="altCta" href="/dashboard-student.html" class="btn btn-secondary" style="display:none;">Go to My Bookings →</a>
+  </div>
 </div>
 <script>
 var params = new URLSearchParams(location.search);
 var sessionId = params.get('session_id');
+var kvApi = '/api/kv';
+
+async function kvGet(key) {
+  try { var r = await fetch(kvApi + '?key=' + encodeURIComponent(key)); if (!r.ok) return null; var d = await r.json(); return d; } catch(e) { return null; }
+}
+async function kvSet(key, value) {
+  await fetch(kvApi + '?key=' + encodeURIComponent(key), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: key, value: value }) });
+}
+
+function generateRoomId() {
+  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  var id = 'minbar-call-';
+  for (var i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+  return id;
+}
+
 if (sessionId) {
-  fetch('/api/stripe-session?session_id=' + encodeURIComponent(sessionId))
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      if (d.planName) {
-        document.getElementById('planBadge').textContent = d.planName;
-        document.getElementById('successTitle').textContent = 'Welcome to ' + d.planName + '!';
-        document.getElementById('detailLine').innerHTML = '<strong>' + d.planPrice + '</strong> &middot; ' + d.email;
+  (async function() {
+    // Check if this is a booking payment
+    var pending = await kvGet('booking_pending:' + sessionId);
+    if (pending && pending.value && pending.value.status === 'pending_payment') {
+      var b = pending.value;
+      // Create the booking
+      var bookingId = 'bk_' + Date.now();
+      var roomId = generateRoomId();
+      var booking = {
+        id: bookingId,
+        teacherId: b.teacherId || '',
+        teacherName: b.teacherName || '',
+        teacherEmail: b.teacherEmail || '',
+        studentName: b.studentName || '',
+        studentEmail: b.studentEmail || '',
+        day: b.day || '',
+        time: b.time || '',
+        scheduledAt: Date.now() + 86400000,
+        roomId: roomId,
+        duration: b.duration || 60,
+        price: b.price || 0,
+        note: b.note || '',
+        status: 'pending',
+        paid: true,
+        paidAt: Date.now(),
+        sessionId: sessionId,
+        createdAt: Date.now()
+      };
+
+      // Save booking
+      await kvSet('booking:' + bookingId, booking);
+
+      // Add to student's bookings
+      if (b.studentEmail) {
+        var sRes = await kvGet('bookings:user:' + b.studentEmail);
+        var sList = (sRes && sRes.value) || [];
+        sList.push(booking);
+        await kvSet('bookings:user:' + b.studentEmail, sList);
       }
-    }).catch(function(){});
+
+      // Add to teacher's bookings + notify
+      if (b.teacherEmail) {
+        var tRes = await kvGet('bookings:user:' + b.teacherEmail);
+        var tList = (tRes && tRes.value) || [];
+        tList.push(booking);
+        await kvSet('bookings:user:' + b.teacherEmail, tList);
+
+        var nRes = await kvGet('notifications:' + b.teacherEmail);
+        var nList = (nRes && nRes.value) || [];
+        nList.unshift({
+          id: 'notif_' + Date.now(),
+          type: 'new_booking',
+          message: (b.studentName || 'A student') + ' booked a lesson on ' + (b.day || '') + ' at ' + (b.time || ''),
+          bookingId: bookingId,
+          studentName: b.studentName || '',
+          studentEmail: b.studentEmail || '',
+          day: b.day || '',
+          time: b.time || '',
+          read: false,
+          createdAt: Date.now()
+        });
+        await kvSet('notifications:' + b.teacherEmail, nList);
+      }
+
+      // Mark pending as completed
+      await kvSet('booking_pending:' + sessionId, { status: 'completed', bookingId: bookingId });
+
+      // Update UI
+      document.getElementById('successTitle').textContent = 'Lesson Booked!';
+      document.getElementById('planBadge').textContent = 'Booking Confirmed';
+      document.getElementById('successMsg').innerHTML = 'Your lesson with <strong>' + (b.teacherName || '') + '</strong> on ' + (b.day || '') + ' at ' + (b.time || '') + ' is confirmed.';
+      document.getElementById('detailLine').innerHTML = 'Paid <strong>$' + (b.price || 0) + '</strong> &middot; ' + (b.studentEmail || '');
+      document.getElementById('mainCta').href = '/dashboard-student.html';
+      document.getElementById('mainCta').textContent = 'View My Bookings →';
+      document.getElementById('mainCta').className = 'btn';
+      var altCta = document.getElementById('altCta');
+      altCta.style.display = '';
+      altCta.href = '/teacher-profile.html?id=' + encodeURIComponent(b.teacherId || b.teacherEmail);
+      altCta.textContent = 'Back to Teacher Profile';
+      return;
+    }
+
+    // Otherwise, it's a subscription/plan payment
+    fetch('/api/stripe-session?session_id=' + encodeURIComponent(sessionId))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.planName) {
+          document.getElementById('planBadge').textContent = d.planName;
+          document.getElementById('successTitle').textContent = 'Welcome to ' + d.planName + '!';
+          document.getElementById('detailLine').innerHTML = '<strong>' + d.planPrice + '</strong> &middot; ' + d.email;
+        }
+      }).catch(function(){});
+  })();
 }
 </script>
 </body></html>

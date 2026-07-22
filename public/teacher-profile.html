@@ -750,83 +750,42 @@ async function submitBooking() {
   var studentName = parsed?.name || 'Anonymous Student';
   var studentEmail = parsed?.email || '';
 
+  if (!studentEmail) {
+    toast('Please log in to book a lesson', 'error');
+    return;
+  }
+
+  // Disable button to prevent double-click
+  var submitBtn = document.querySelector('.modal-overlay .btn-primary');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Redirecting to payment...'; }
+
   try {
-    var bookingId = 'bk_' + Date.now();
-    var roomId = generateRoomId();
-    var scheduledAt = getNextOccurrence(selectedDay, selectedSlot);
-
-    var booking = {
-      id: bookingId,
-      teacherId: teacherData.id,
-      teacherName: teacherData.name,
-      teacherEmail: teacherData.email || '',
-      studentName: studentName,
-      studentEmail: studentEmail,
-      day: selectedDay,
-      time: selectedSlot,
-      scheduledAt: scheduledAt,
-      roomId: roomId,
-      duration: 60,
-      price: teacherData.price,
-      note: note,
-      status: 'pending',
-      createdAt: Date.now()
-    };
-
-    await fetch(API + '?key=' + encodeURIComponent('booking:' + bookingId), {
-      method: 'PUT',
+    var resp = await fetch('/api/booking-checkout', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: 'booking:' + bookingId, value: booking })
-    });
-
-    if (studentEmail) {
-      var studentBookings = await kvGet('bookings:user:' + studentEmail);
-      var sList = studentBookings?.value || [];
-      sList.push(booking);
-      await fetch(API + '?key=' + encodeURIComponent('bookings:user:' + studentEmail), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'bookings:user:' + studentEmail, value: sList })
-      });
-    }
-
-    if (teacherData.email) {
-      var teacherBookings = await kvGet('bookings:user:' + teacherData.email);
-      var tList = teacherBookings?.value || [];
-      tList.push(booking);
-      await fetch(API + '?key=' + encodeURIComponent('bookings:user:' + teacherData.email), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'bookings:user:' + teacherData.email, value: tList })
-      });
-
-      var teacherNotifs = await kvGet('notifications:' + teacherData.email);
-      var nList = teacherNotifs?.value || [];
-      nList.unshift({
-        id: 'notif_' + Date.now(),
-        type: 'new_booking',
-        message: studentName + ' booked a lesson on ' + selectedDay + ' at ' + selectedSlot,
-        bookingId: bookingId,
+      body: JSON.stringify({
+        teacherId: teacherData.id,
+        teacherName: teacherData.name,
+        teacherEmail: teacherData.email || '',
         studentName: studentName,
         studentEmail: studentEmail,
         day: selectedDay,
         time: selectedSlot,
-        read: false,
-        createdAt: Date.now()
-      });
-      await fetch(API + '?key=' + encodeURIComponent('notifications:' + teacherData.email), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'notifications:' + teacherData.email, value: nList })
-      });
+        price: teacherData.price || 25,
+        note: note,
+        duration: 60
+      })
+    });
+    var data = await resp.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      toast(data.error || 'Payment error. Please try again.', 'error');
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit Booking'; }
     }
-
-    document.querySelector('.modal-overlay')?.remove();
-    toast('Booking request sent! The teacher will be notified.');
-    selectedSlot = null;
-    document.querySelectorAll('.slot.selected').forEach(function(s) { s.classList.remove('selected'); });
   } catch (e) {
-    toast('Something went wrong, please try again', 'error');
+    toast('Something went wrong. Please try again.', 'error');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit Booking'; }
   }
 }
 
