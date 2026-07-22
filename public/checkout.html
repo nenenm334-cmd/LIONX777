@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upgrade — Minbar</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#f8fafc,#ecfdf5);padding:16px;}body.dark{background:linear-gradient(135deg,#08080e,#0a0a12,#080c0a);color:#e2e8f0;}.card{width:100%;max-width:460px;background:rgba(255,255,255,.85);backdrop-filter:blur(32px);border-radius:24px;padding:40px 36px;box-shadow:0 24px 80px rgba(0,0,0,.06);}body.dark .card{background:rgba(16,16,24,.85);box-shadow:0 24px 80px rgba(0,0,0,.3);}.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#0d9488;margin-bottom:4px;}body.dark .badge{color:#34d399;}h1{font-size:26px;margin-bottom:4px;}p{color:#64748b;font-size:14px;line-height:1.5;margin-bottom:24px;}body.dark p{color:#94a3b8;}.price{font-size:44px;font-weight:800;letter-spacing:-.04em;margin-bottom:4px;}.price span{font-size:16px;font-weight:500;color:#6b7280;}.field{margin-bottom:16px;}label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:5px;}body.dark label{color:#94a3b8;}input{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:15px;outline:none;background:#fff;color:#0f172a;}body.dark input{border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e2e8f0;}input:focus{border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.12);}.btn{width:100%;padding:14px 24px;border:none;border-radius:12px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;margin-top:8px;}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.3);}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}.sec{font-size:12px;color:#94a3b8;text-align:center;margin-top:16px;line-height:1.5;}.features{list-style:none;padding:0;margin:16px 0 24px;}.features li{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;color:#374151;}body.dark .features li{color:#e2e8f0;}.features li .c{color:#0d9488;font-weight:700;}body.dark .features li .c{color:#34d399;}.err{color:#dc2626;font-size:13px;text-align:center;margin-top:8px;display:none;}</style>
+</head><body>
+<div class="card">
+  <div class="badge" id="planBadge">Pro Plan</div>
+  <h1 id="planName">Minbar Pro</h1>
+  <div class="price" id="planPrice">$29<span>/mo</span></div>
+  <ul class="features" id="planFeatures">
+    <li><span class="c">✓</span> Unlimited flashcards & SRS</li>
+    <li><span class="c">✓</span> Live classes with teachers</li>
+    <li><span class="c">✓</span> Advanced exams & quizzes</li>
+    <li><span class="c">✓</span> Progress tracking & analytics</li>
+    <li><span class="c">✓</span> Priority support</li>
+  </ul>
+  <div class="field">
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+  </div>
+  <div class="field">
+    <label for="name">Name <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
+    <input id="name" type="text" placeholder="Your name">
+  </div>
+  <div class="err" id="error"></div>
+  <button class="btn" id="subscribeBtn">Subscribe Now</button>
+  <div class="sec">Secure payment via Stripe. Cancel anytime.</div>
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const plan = params.get('plan') || 'pro';
+const saved = JSON.parse(localStorage.getItem('minbar_session') || 'null');
+const plans = {pro:{name:'Minbar Pro',price:'$29/mo',badge:'Pro Plan',features:['Unlimited flashcards & SRS','Live classes with teachers','Advanced exams & quizzes','Progress tracking & analytics','Priority support']},premium:{name:'Minbar Premium',price:'$59/mo',badge:'Premium Plan',features:['Everything in Pro','1-on-1 tutoring sessions','Custom learning path','Priority support','Certificate of completion']}};
+const p = plans[plan] || plans.pro;
+document.getElementById('planBadge').textContent = p.badge;
+document.getElementById('planName').textContent = p.name;
+document.getElementById('planPrice').innerHTML = p.price.replace('/mo','<span>/mo</span>');
+document.getElementById('planFeatures').innerHTML = p.features.map(f => '<li><span class="c">✓</span> '+f+'</li>').join('');
+if(saved && saved.email) document.getElementById('email').value = saved.email;
+if(saved && saved.name) document.getElementById('name').value = saved.name;
+document.getElementById('subscribeBtn').onclick = async function(){
+  const btn = this; btn.disabled = true; btn.textContent = 'Processing…';
+  const email = document.getElementById('email').value.trim();
+  const name = document.getElementById('name').value.trim();
+  const err = document.getElementById('error');
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent = 'Please enter a valid email'; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Subscribe Now'; return; }
+  err.style.display = 'none';
+  try {
+    const r = await fetch('/api/stripe-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,email,name,successUrl:location.origin+'/payment-success.html?session_id={CHECKOUT_SESSION_ID}',cancelUrl:location.origin+'/payment-cancel.html'})});
+    const d = await r.json();
+    if(d.url) window.location.href = d.url;
+    else { err.textContent = d.error || 'Something went wrong'; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Subscribe Now'; }
+  } catch(e){ err.textContent = 'Network error. Please try again.'; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Subscribe Now'; }
+};
+</script>
+</body></html>

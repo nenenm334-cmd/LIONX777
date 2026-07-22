@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Session — Minbar</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#0a0a0a;color:#f0f0f0;overflow:hidden;height:100vh;width:100vw;}
+
+/* ===== Room Layout ===== */
+.room-wrap{display:grid;grid-template-columns:1fr 360px;grid-template-rows:1fr 72px;height:100vh;width:100vw;}
+@media(max-width:900px){.room-wrap{grid-template-columns:1fr;}}
+
+/* ===== Main Video Area ===== */
+.room-main{position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#jitsi-container{width:100%;height:100%;}
+#jitsi-container iframe{width:100%!important;height:100%!important;border:none;}
+#jitsi-container .watermark,
+#jitsi-container .jitsi-watermark,
+#jitsi-container .watermark-container,
+#jitsi-container .powered-by,
+#jitsi-container [class*="watermark"],
+#jitsi-container [class*="brand"],
+#jitsi-container [id*="watermark"]{display:none!important;}
+
+/* ===== Waiting Screen ===== */
+.waiting-screen{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1117,#0a0a0a);gap:24px;}
+.waiting-screen.hidden{display:none;}
+.wait-avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#0a7e6e);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;color:#fff;box-shadow:0 8px 32px rgba(13,148,136,.3);}
+.wait-name{font-size:24px;font-weight:700;color:#f0f0f0;}
+.wait-subtitle{font-size:14px;color:#999;margin-top:-8px;}
+.wait-countdown{display:flex;gap:16px;margin-top:8px;}
+.wait-countdown .wc-box{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:12px 16px;text-align:center;min-width:70px;}
+.wait-countdown .wc-num{font-size:28px;font-weight:800;color:#0d9488;font-variant-numeric:tabular-nums;}
+.wait-countdown .wc-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.wait-dots{display:flex;gap:6px;margin-top:12px;}
+.wait-dots span{width:8px;height:8px;border-radius:50%;background:#333;animation:dotPulse 1.4s ease-in-out infinite;}
+.wait-dots span:nth-child(2){animation-delay:.2s;}
+.wait-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.8);}40%{opacity:1;transform:scale(1.1);}}
+.wait-join{margin-top:16px;padding:14px 40px;border:none;border-radius:12px;background:linear-gradient(135deg,#0d9488,#0a7e6e);color:#fff;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(13,148,136,.35);transition:all .2s;}
+.wait-join:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(13,148,136,.45);}
+.wait-join:active{transform:scale(.97);}
+.wait-join:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* ===== Room Header ===== */
+.room-header{position:absolute;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;pointer-events:none;}
+.room-header>*{pointer-events:auto;}
+.rh-left{display:flex;align-items:center;gap:10px;}
+.live-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.5px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:livePulse 1.5s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.7);}}
+.rh-timer{padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);font-size:12px;font-weight:600;color:#ccc;font-variant-numeric:tabular-nums;backdrop-filter:blur(10px);}
+.rh-right{display:flex;align-items:center;gap:8px;}
+.rh-badge{padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);font-size:11px;font-weight:600;color:#999;backdrop-filter:blur(10px);}
+
+/* ===== Sidebar ===== */
+.room-sidebar{display:flex;flex-direction:column;background:#111;border-left:1px solid #222;overflow:hidden;transition:margin-right .3s ease;}
+.room-sidebar.hidden{margin-right:-360px;}
+@media(max-width:900px){.room-sidebar{position:fixed;top:0;right:0;bottom:0;width:320px;z-index:100;margin-right:-320px;transition:margin-right .3s ease;}.room-sidebar.mobile-open{margin-right:0;}}
+.rs-tabs{display:flex;border-bottom:1px solid #222;flex-shrink:0;}
+.rs-tab{flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:600;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.rs-tab:hover{color:#999;}
+.rs-tab.active{color:#0d9488;border-bottom-color:#0d9488;}
+.rs-panel{display:none;flex-direction:column;flex:1;overflow-y:auto;padding:12px;gap:10px;}
+.rs-panel.active{display:flex;}
+.chat-msg{display:flex;gap:10px;animation:fadeSlideIn .2s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.cm-avatar{width:32px;height:32px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#999;flex-shrink:0;}
+.cm-body{flex:1;min-width:0;}
+.cm-name{font-size:11px;font-weight:600;color:#888;margin-bottom:2px;}
+.cm-text{font-size:13px;color:#ddd;line-height:1.5;word-wrap:break-word;}
+.cm-time{font-size:10px;color:#555;margin-top:2px;}
+.chat-input-wrap{display:flex;gap:8px;padding:12px;border-top:1px solid #222;flex-shrink:0;background:#111;}
+.chat-input-wrap input{flex:1;padding:10px 14px;border:1px solid #333;border-radius:10px;background:#1a1a1a;color:#f0f0f0;font-size:13px;outline:none;transition:border-color .2s;}
+.chat-input-wrap input:focus{border-color:#0d9488;}
+.chat-input-wrap button{padding:10px 16px;border:none;border-radius:10px;background:#0d9488;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.chat-input-wrap button:hover{background:#0a7e6e;}
+.file-upload-zone{border:2px dashed #333;border-radius:12px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s;}
+.file-upload-zone:hover,.file-upload-zone.dragover{border-color:#0d9488;background:rgba(13,148,136,.05);}
+.file-upload-zone p{font-size:12px;color:#666;margin-top:6px;}
+.fi{display:flex;align-items:center;gap:10px;padding:10px;background:#1a1a1a;border-radius:10px;transition:background .2s;}
+.fi:hover{background:#222;}
+.fi-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.fi-info{flex:1;min-width:0;}
+.fi-name{font-size:12px;font-weight:600;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-size{font-size:10px;color:#666;}
+.fi-dl{padding:5px 10px;border:none;border-radius:6px;background:#0d9488;color:#fff;font-size:10px;font-weight:600;cursor:pointer;}
+.person-item{display:flex;align-items:center;gap:10px;padding:10px;background:#1a1a1a;border-radius:10px;}
+.person-avatar{width:32px;height:32px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#999;}
+.person-name{flex:1;font-size:13px;font-weight:500;color:#ddd;}
+.person-badge{padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;}
+.badge-online{background:rgba(34,197,94,.15);color:#22c55e;}
+.badge-you{background:rgba(13,148,136,.15);color:#0d9488;}
+
+/* ===== Controls Bar ===== */
+.room-controls{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#111;border-top:1px solid #222;z-index:30;}
+.rc-left{display:flex;align-items:center;gap:8px;}
+.rc-center{display:flex;align-items:center;gap:10px;}
+.rc-right{display:flex;align-items:center;gap:8px;}
+.rc-btn{width:48px;height:48px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;transition:all .2s;background:#222;color:#ddd;}
+.rc-btn:hover{background:#333;transform:scale(1.05);}
+.rc-btn:active{transform:scale(.95);}
+.rc-btn.active{background:rgba(13,148,136,.2);color:#0d9488;}
+.rc-btn.muted{background:rgba(239,68,68,.15);color:#ef4444;}
+.rc-btn.end{background:#ef4444;color:#fff;width:auto;border-radius:24px;padding:0 20px;gap:8px;font-size:13px;font-weight:600;}
+.rc-btn.end:hover{background:#dc2626;}
+.rc-btn.end svg{width:16px;height:16px;}
+.cq-bars{display:flex;align-items:flex-end;gap:3px;height:18px;}
+.cq-bar{width:4px;border-radius:2px;background:#22c55e;transition:height .3s;}
+.cq-bar:nth-child(1){height:6px;}
+.cq-bar:nth-child(2){height:10px;}
+.cq-bar:nth-child(3){height:14px;}
+.cq-bar:nth-child(4){height:18px;}
+.cq-label{font-size:10px;color:#666;margin-left:4px;}
+
+/* ===== Ended Screen ===== */
+.ended-screen{position:absolute;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.9);backdrop-filter:blur(20px);gap:16px;}
+.ended-screen.show{display:flex;}
+.ended-icon{width:64px;height:64px;border-radius:50%;background:rgba(239,68,68,.15);display:flex;align-items:center;justify-content:center;font-size:28px;}
+.ended-title{font-size:20px;font-weight:700;color:#f0f0f0;}
+.ended-subtitle{font-size:13px;color:#888;}
+.ended-btn{padding:12px 28px;border:none;border-radius:10px;background:#0d9488;color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;}
+
+/* ===== Toast ===== */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast-item{padding:12px 24px;border-radius:10px;background:#222;color:#f0f0f0;font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.4);animation:toastIn .3s ease;pointer-events:auto;white-space:nowrap;}
+.toast-item.success{background:#0d9488;color:#fff;}
+.toast-item.error{background:#ef4444;color:#fff;}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ===== Lesson Info Bar ===== */
+.lesson-info-bar{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);z-index:45;display:flex;align-items:center;gap:12px;padding:10px 20px;border-radius:14px;background:rgba(20,20,20,.9);border:1px solid #333;backdrop-filter:blur(12px);pointer-events:none;}
+.lesson-info-bar .lib-icon{width:36px;height:36px;border-radius:10px;background:rgba(13,148,136,.15);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.lesson-info-bar .lib-text{font-size:12px;color:#ccc;}
+.lesson-info-bar .lib-name{font-weight:700;color:#f0f0f0;}
+.lesson-info-bar.hidden{display:none;}
+
+/* ===== Whiteboard Overlay ===== */
+.wb-overlay{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.95);display:none;flex-direction:column;}
+.wb-overlay.open{display:flex;}
+.wb-toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#111;border-bottom:1px solid #222;flex-wrap:wrap;}
+.wb-tool{padding:6px 10px;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#999;font-size:12px;cursor:pointer;transition:all .15s;}
+.wb-tool:hover{border-color:#0d9488;color:#0d9488;}
+.wb-tool.active{background:#0d9488;color:#fff;border-color:#0d9488;}
+.wb-color{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s;}
+.wb-color.active{border-color:#fff;}
+.wb-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#wbCanvas{background:#fff;cursor:crosshair;}
+</style>
+</head>
+<body>
+<script>
+  if(localStorage.getItem('minbar_dark')==='true') document.body.classList.add('dark');
+</script>
+
+<script src="https://meet.jit.si/external_api.js"></script>
+
+<div class="room-wrap">
+  <!-- Main Video Area -->
+  <div class="room-main">
+    <!-- Jitsi Container (hidden until ready) -->
+    <div id="jitsi-container" style="display:none;"></div>
+
+    <!-- Waiting Screen -->
+    <div class="waiting-screen" id="waitingScreen">
+      <div class="wait-avatar" id="waitAvatar">?</div>
+      <div class="wait-name" id="waitName">Connecting...</div>
+      <div class="wait-subtitle" id="waitSubtitle">Preparing your session</div>
+      <div class="wait-countdown" id="waitCountdown" style="display:none;">
+        <div class="wc-box"><div class="wc-num" id="wcHours">00</div><div class="wc-label">Hours</div></div>
+        <div class="wc-box"><div class="wc-num" id="wcMins">00</div><div class="wc-label">Mins</div></div>
+        <div class="wc-box"><div class="wc-num" id="wcSecs">00</div><div class="wc-label">Secs</div></div>
+      </div>
+      <div class="wait-dots" id="waitDots"><span></span><span></span><span></span></div>
+      <button class="wait-join" id="joinBtn" style="display:none;" onclick="joinCall()">Join Call</button>
+    </div>
+
+    <!-- Ended Screen -->
+    <div class="ended-screen" id="endedScreen">
+      <div class="ended-icon">📞</div>
+      <div class="ended-title">Session Ended</div>
+      <div class="ended-subtitle" id="endedSub">The lesson has finished. Thank you!</div>
+      <button class="ended-btn" onclick="leaveRoom()">Back to Dashboard</button>
+    </div>
+
+    <!-- Lesson Info Bar -->
+    <div class="lesson-info-bar hidden" id="lessonInfoBar">
+      <div class="lib-icon">📚</div>
+      <div class="lib-text"><span class="lib-name" id="libTeacher">Teacher</span> — <span id="libSubject">Lesson</span></div>
+    </div>
+
+    <!-- Header Badges -->
+    <div class="room-header">
+      <div class="rh-left">
+        <div class="live-badge" id="liveBadge" style="display:none;"><div class="live-dot"></div>LIVE</div>
+        <div class="rh-timer" id="lessonTimer" style="display:none;">00:00:00</div>
+      </div>
+      <div class="rh-right">
+        <div class="rh-badge" id="participantBadge">0 connected</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="room-sidebar" id="roomSidebar">
+    <div class="rs-tabs">
+      <div class="rs-tab active" data-panel="chatPanel">💬 Chat</div>
+      <div class="rs-tab" data-panel="filesPanel">📁 Files</div>
+      <div class="rs-tab" data-panel="peoplePanel">👥 People</div>
+    </div>
+    <div class="rs-panel active" id="chatPanel">
+      <div id="chatMessages"></div>
+    </div>
+    <div class="rs-panel" id="filesPanel">
+      <div class="file-upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size:24px;">📎</div>
+        <p>Drop files here or click to upload</p>
+        <input type="file" id="fileInput" style="display:none;" multiple onchange="handleFiles(this.files)">
+      </div>
+      <div id="filesList"></div>
+    </div>
+    <div class="rs-panel" id="peoplePanel">
+      <div id="peopleList"></div>
+    </div>
+    <div class="chat-input-wrap" id="chatInputWrap">
+      <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+  <!-- Controls Bar -->
+  <div class="room-controls">
+    <div class="rc-left">
+      <div class="cq-bars">
+        <div class="cq-bar"></div>
+        <div class="cq-bar"></div>
+        <div class="cq-bar"></div>
+        <div class="cq-bar"></div>
+      </div>
+      <div class="cq-label">Good</div>
+    </div>
+    <div class="rc-center">
+      <button class="rc-btn active" id="micBtn" onclick="toggleMic()" title="Toggle Microphone">🎤</button>
+      <button class="rc-btn active" id="camBtn" onclick="toggleCam()" title="Toggle Camera">📷</button>
+      <button class="rc-btn" id="screenBtn" onclick="toggleScreen()" title="Share Screen">🖥️</button>
+      <button class="rc-btn" id="wbBtn" onclick="toggleWhiteboard()" title="Whiteboard">🎨</button>
+      <button class="rc-btn end" onclick="leaveRoom()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="23" y1="1" x2="1" y2="23"/></svg>
+        Leave
+      </button>
+    </div>
+    <div class="rc-right">
+      <button class="rc-btn" onclick="toggleSidebar()" title="Toggle Sidebar">📋</button>
+      <button class="rc-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+    </div>
+  </div>
+</div>
+
+<!-- Whiteboard Overlay -->
+<div class="wb-overlay" id="wbOverlay">
+  <div class="wb-toolbar">
+    <button class="wb-tool active" data-tool="pen">✏️ Pen</button>
+    <button class="wb-tool" data-tool="line">📏 Line</button>
+    <button class="wb-tool" data-tool="rect">⬜ Rect</button>
+    <button class="wb-tool" data-tool="circle">⭕ Circle</button>
+    <button class="wb-tool" data-tool="text">🔤 Text</button>
+    <button class="wb-tool" data-tool="eraser">🧹 Eraser</button>
+    <div style="width:1px;height:24px;background:#333;margin:0 4px;"></div>
+    <div class="wb-color active" data-color="#0d9488" style="background:#0d9488;"></div>
+    <div class="wb-color" data-color="#ef4444" style="background:#ef4444;"></div>
+    <div class="wb-color" data-color="#3b82f6" style="background:#3b82f6;"></div>
+    <div class="wb-color" data-color="#f59e0b" style="background:#f59e0b;"></div>
+    <div class="wb-color" data-color="#111" style="background:#111;"></div>
+    <div class="wb-color" data-color="#fff" style="background:#fff;border:1px solid #333;"></div>
+    <div style="flex:1;"></div>
+    <button class="wb-tool" onclick="wbUndo()">↩️ Undo</button>
+    <button class="wb-tool" onclick="wbRedo()">↪️ Redo</button>
+    <button class="wb-tool" onclick="wbClear()">🗑️ Clear</button>
+    <button class="wb-tool" onclick="toggleWhiteboard()">✕ Close</button>
+  </div>
+  <div class="wb-canvas-wrap">
+    <canvas id="wbCanvas" width="1200" height="700"></canvas>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+var ROOM_API = '/api/kv';
+var params = new URLSearchParams(window.location.search);
+var ROOM_ID = params.get('room') || '';
+var USER_ROLE = params.get('role') || 'student';
+var USER_NAME = params.get('name') || 'Guest';
+var BOOKING_ID = params.get('booking') || '';
+var BOOKING_DATA = null;
+
+var jitsiApi = null;
+var callActive = false;
+var lessonSeconds = 0;
+var timerInterval = null;
+var countdownInterval = null;
+var chatMessages = [];
+var uploadedFiles = [];
+
+function toast(msg, type) {
+  type = type || 'success';
+  var w = document.getElementById('toastWrap');
+  var t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(function() { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(function() { t.remove(); }, 300); }, 3000);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function kvGet(key) {
+  try {
+    var r = await fetch(ROOM_API + '?key=' + encodeURIComponent(key));
+    if (!r.ok) return null;
+    var data = await r.json();
+    if (data && typeof data.value === 'string') { try { data.value = JSON.parse(data.value); } catch(e) {} }
+    return data;
+  } catch (e) { return null; }
+}
+
+function showWaitingScreen(teacherName, scheduledAt) {
+  var ws = document.getElementById('waitingScreen');
+  var wd = document.getElementById('waitDots');
+  var joinBtn = document.getElementById('joinBtn');
+  var nameEl = document.getElementById('waitName');
+  var subEl = document.getElementById('waitSubtitle');
+  var avatarEl = document.getElementById('waitAvatar');
+
+  avatarEl.textContent = (teacherName || '?')[0].toUpperCase();
+  nameEl.textContent = 'Waiting for ' + teacherName + '...';
+  subEl.textContent = 'Your session will begin shortly';
+
+  if (scheduledAt && scheduledAt > Date.now()) {
+    wd.style.display = 'none';
+    var cd = document.getElementById('waitCountdown');
+    cd.style.display = 'flex';
+
+    countdownInterval = setInterval(function() {
+      var diff = scheduledAt - Date.now();
+      if (diff <= 0) {
+        clearInterval(countdownInterval);
+        cd.style.display = 'none';
+        wd.style.display = 'flex';
+        joinBtn.style.display = 'block';
+        nameEl.textContent = 'Ready to start!';
+        subEl.textContent = 'Click below to join your session';
+        return;
+      }
+      var h = Math.floor(diff / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      document.getElementById('wcHours').textContent = h < 10 ? '0' + h : '' + h;
+      document.getElementById('wcMins').textContent = m < 10 ? '0' + m : '' + m;
+      document.getElementById('wcSecs').textContent = s < 10 ? '0' + s : '' + s;
+
+      if (diff <= 300000) {
+        joinBtn.style.display = 'block';
+        nameEl.textContent = 'Almost time!';
+        subIcon = '🟢';
+      }
+    }, 1000);
+  } else {
+    joinBtn.style.display = 'block';
+    nameEl.textContent = 'Ready to join';
+    subEl.textContent = 'Click below to enter your session';
+  }
+}
+
+function joinCall() {
+  if (!ROOM_ID) {
+    toast('No room ID found', 'error');
+    return;
+  }
+  document.getElementById('waitingScreen').classList.add('hidden');
+  document.getElementById('jitsi-container').style.display = 'block';
+  initJitsi();
+}
+
+function hideJitsiBranding() {
+  var sel = '.watermark,.jitsi-watermark,.watermark-container,.powered-by,[class*="watermark"],[class*="brand"],[id*="watermark"]';
+  document.querySelectorAll(sel).forEach(function(el){ el.style.display='none!important'; });
+  var container = document.getElementById('jitsi-container');
+  if(container && container.querySelector('iframe') && container.querySelector('iframe').contentDocument) {
+    try {
+      container.querySelector('iframe').contentDocument.querySelectorAll(sel).forEach(function(el){ el.style.display='none!important'; });
+    } catch(e) {}
+  }
+}
+
+function initJitsi() {
+  if (jitsiApi) { jitsiApi.dispose(); }
+  try {
+    jitsiApi = new JitsiMeetExternalAPI('meet.jit.si', {
+      roomName: ROOM_ID,
+      parentNode: document.getElementById('jitsi-container'),
+      configOverwrite: {
+        startWithAudioMuted: false,
+        startWithVideoMuted: false,
+        prejoinPageEnabled: false,
+        disableDeepLinking: true,
+        renderName: true,
+        toolbarButtons: [],
+        Notifications: { disabled: true },
+        Settings: { disabled: true },
+        Profile: { disabled: true },
+        Help: { disabled: true },
+        ConferenceInfo: { disabled: true },
+        useDynamicBranding: false
+      },
+      interfaceConfigOverwrite: {
+        SHOW_JITSI_WATERMARK: false,
+        SHOW_WATERMARK_FOR_GUESTS: false,
+        SHOW_BRAND_WATERMARK: false,
+        SHOW_BRAND_ELEMENT: false,
+        SHOW_POWERED_BY: false,
+        TOOLBAR_ALWAYS_VISIBLE: false,
+        DEFAULT_BACKGROUND: '#000',
+        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+        SHOW_TIMESTAMPS: false,
+        FILM_STRIP_MAX_HEIGHT: 120,
+        TILE_VIEW_MAX_COLUMNS: 3
+      }
+    });
+
+    jitsiApi.addEventListener('readyToClose', function() {
+      endCall();
+    });
+
+    jitsiApi.addEventListener('participantJoined', function() {
+      updateParticipantCount();
+    });
+
+    jitsiApi.addEventListener('participantLeft', function() {
+      updateParticipantCount();
+    });
+
+    jitsiApi.addEventListener('videoConferenceJoined', function() {
+      callActive = true;
+      document.getElementById('liveBadge').style.display = 'flex';
+      document.getElementById('lessonTimer').style.display = 'block';
+      document.getElementById('lessonInfoBar').classList.remove('hidden');
+      startTimer();
+      hideJitsiBranding();
+      setInterval(hideJitsiBranding, 3000);
+      updateParticipantCount();
+      addSystemMessage('You joined the session');
+    });
+
+    jitsiApi.addEventListener('videoConferenceLeft', function() {
+      endCall();
+    });
+
+    toast('Connected to session');
+  } catch (e) {
+    toast('Failed to connect. Please refresh.', 'error');
+    document.getElementById('waitName').textContent = 'Connection failed';
+    document.getElementById('waitSubtitle').textContent = 'Please refresh the page and try again';
+    document.getElementById('waitingScreen').classList.remove('hidden');
+    document.getElementById('jitsi-container').style.display = 'none';
+  }
+}
+
+function updateParticipantCount() {
+  if (!jitsiApi) return;
+  jitsiApi.getParticipantsInfo(function(participants) {
+    var count = participants ? participants.length : 1;
+    document.getElementById('participantBadge').textContent = count + ' connected';
+  });
+}
+
+function startTimer() {
+  lessonSeconds = 0;
+  timerInterval = setInterval(function() {
+    lessonSeconds++;
+    var h = Math.floor(lessonSeconds / 3600);
+    var m = Math.floor((lessonSeconds % 3600) / 60);
+    var s = lessonSeconds % 60;
+    document.getElementById('lessonTimer').textContent =
+      (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+  }, 1000);
+}
+
+function endCall() {
+  callActive = false;
+  clearInterval(timerInterval);
+  clearInterval(countdownInterval);
+  document.getElementById('liveBadge').style.display = 'none';
+  document.getElementById('lessonTimer').style.display = 'none';
+  document.getElementById('lessonInfoBar').classList.add('hidden');
+  document.getElementById('endedScreen').classList.add('show');
+  if (jitsiApi) {
+    jitsiApi.dispose();
+    jitsiApi = null;
+  }
+}
+
+function toggleMic() {
+  var btn = document.getElementById('micBtn');
+  if (!jitsiApi) return;
+  jitsiApi.executeCommand('toggleAudio');
+  btn.classList.toggle('muted');
+  btn.textContent = btn.classList.contains('muted') ? '🔇' : '🎤';
+}
+
+function toggleCam() {
+  var btn = document.getElementById('camBtn');
+  if (!jitsiApi) return;
+  jitsiApi.executeCommand('toggleVideo');
+  btn.classList.toggle('muted');
+  btn.textContent = btn.classList.contains('muted') ? '📷' : '📷';
+}
+
+function toggleScreen() {
+  var btn = document.getElementById('screenBtn');
+  if (!jitsiApi) return;
+  jitsiApi.executeCommand('toggleShareScreen');
+  btn.classList.toggle('active');
+}
+
+function toggleWhiteboard() {
+  var ov = document.getElementById('wbOverlay');
+  ov.classList.toggle('open');
+}
+
+function toggleSidebar() {
+  var sb = document.getElementById('roomSidebar');
+  sb.classList.toggle('hidden');
+  sb.classList.toggle('mobile-open');
+}
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    document.documentElement.requestFullscreen();
+  }
+}
+
+function leaveRoom() {
+  if (callActive && !confirm('Are you sure you want to leave?')) return;
+  if (jitsiApi) { jitsiApi.dispose(); jitsiApi = null; }
+  clearInterval(timerInterval);
+  clearInterval(countdownInterval);
+  var sess = JSON.parse(localStorage.getItem('minbar_session') || '{}');
+  if (sess.role === 'teacher') {
+    window.location.href = 'dashboard-teacher.html';
+  } else {
+    window.location.href = 'dashboard-student.html';
+  }
+}
+
+/* ===== Chat ===== */
+function sendChat() {
+  var inp = document.getElementById('chatInput');
+  var text = inp.value.trim();
+  if (!text) return;
+  addChatMessage(USER_NAME, text, true);
+  inp.value = '';
+}
+
+function addChatMessage(name, text, isMe) {
+  var container = document.getElementById('chatMessages');
+  var msg = document.createElement('div');
+  msg.className = 'chat-msg';
+  var now = new Date();
+  var time = (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+  msg.innerHTML = '<div class="cm-avatar">' + escapeHtml(name.charAt(0).toUpperCase()) + '</div>' +
+    '<div class="cm-body"><div class="cm-name">' + escapeHtml(name) + (isMe ? ' (You)' : '') + '</div>' +
+    '<div class="cm-text">' + escapeHtml(text) + '</div>' +
+    '<div class="cm-time">' + time + '</div></div>';
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+  chatMessages.push({ name: name, text: text, time: time });
+}
+
+function addSystemMessage(text) {
+  var container = document.getElementById('chatMessages');
+  var msg = document.createElement('div');
+  msg.style.cssText = 'text-align:center;padding:8px;font-size:11px;color:#666;';
+  msg.textContent = text;
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+}
+
+/* ===== Files ===== */
+function handleFiles(files) {
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    var ext = f.name.split('.').pop().toLowerCase();
+    var icon = '📄', color = '#3b82f6';
+    if (['pdf'].indexOf(ext) !== -1) { icon = '📕'; color = '#ef4444'; }
+    else if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) { icon = '🖼️'; color = '#8b5cf6'; }
+    else if (['mp4','webm'].indexOf(ext) !== -1) { icon = '🎬'; color = '#f59e0b'; }
+    else if (['ppt','pptx'].indexOf(ext) !== -1) { icon = '📊'; color = '#f59e0b'; }
+    else if (['doc','docx'].indexOf(ext) !== -1) { icon = '📘'; color = '#3b82f6'; }
+    else if (['xls','xlsx'].indexOf(ext) !== -1) { icon = '📗'; color = '#22c55e'; }
+
+    uploadedFiles.push({ name: f.name, size: formatSize(f.size), icon: icon, color: color });
+    addSystemMessage('File shared: ' + f.name);
+  }
+  renderFiles();
+  document.getElementById('fileInput').value = '';
+}
+
+function renderFiles() {
+  var list = document.getElementById('filesList');
+  var demo = [
+    { name: 'Lesson Notes.pdf', size: '245 KB', icon: '📕', color: '#ef4444' },
+    { name: 'Vocabulary List.docx', size: '89 KB', icon: '📘', color: '#3b82f6' }
+  ];
+  var all = demo.concat(uploadedFiles);
+  list.innerHTML = all.map(function(f) {
+    return '<div class="fi"><div class="fi-icon" style="background:' + f.color + '20;color:' + f.color + ';">' + f.icon + '</div>' +
+      '<div class="fi-info"><div class="fi-name">' + escapeHtml(f.name) + '</div><div class="fi-size">' + f.size + '</div></div>' +
+      '<button class="fi-dl">Download</button></div>';
+  }).join('');
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+/* ===== People ===== */
+function renderPeople() {
+  var list = document.getElementById('peopleList');
+  var people = [
+    { name: USER_NAME, badge: 'You', badgeClass: 'badge-you' }
+  ];
+  if (BOOKING_DATA) {
+    if (USER_ROLE === 'student') {
+      people.unshift({ name: BOOKING_DATA.teacherName || 'Teacher', badge: 'Online', badgeClass: 'badge-online' });
+    } else {
+      people.unshift({ name: BOOKING_DATA.studentName || 'Student', badge: 'Online', badgeClass: 'badge-online' });
+    }
+  }
+  list.innerHTML = people.map(function(p) {
+    return '<div class="person-item"><div class="person-avatar">' + escapeHtml(p.name.charAt(0).toUpperCase()) + '</div>' +
+      '<div class="person-name">' + escapeHtml(p.name) + '</div>' +
+      '<span class="person-badge ' + p.badgeClass + '">' + p.badge + '</span></div>';
+  }).join('');
+}
+
+/* ===== Sidebar Tabs ===== */
+document.querySelectorAll('.rs-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.rs-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.rs-panel').forEach(function(p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    var panel = document.getElementById(tab.getAttribute('data-panel'));
+    if (panel) panel.classList.add('active');
+  });
+});
+
+/* ===== Whiteboard ===== */
+var wbCanvas = document.getElementById('wbCanvas');
+var wbCtx = wbCanvas.getContext('2d');
+var wbTool = 'pen';
+var wbColor = '#0d9488';
+var wbDrawing = false;
+var wbPaths = [];
+var wbRedoStack = [];
+var wbStartX = 0, wbStartY = 0;
+var wbSnapshot = null;
+
+document.querySelectorAll('.wb-tool[data-tool]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.wb-tool[data-tool]').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    wbTool = btn.getAttribute('data-tool');
+  });
+});
+
+document.querySelectorAll('.wb-color').forEach(function(c) {
+  c.addEventListener('click', function() {
+    document.querySelectorAll('.wb-color').forEach(function(x) { x.classList.remove('active'); });
+    c.classList.add('active');
+    wbColor = c.getAttribute('data-color');
+  });
+});
+
+wbCanvas.addEventListener('mousedown', function(e) {
+  wbDrawing = true;
+  var rect = wbCanvas.getBoundingClientRect();
+  wbStartX = e.clientX - rect.left;
+  wbStartY = e.clientY - rect.top;
+  wbRedoStack = [];
+  if (wbTool === 'pen' || wbTool === 'eraser') {
+    wbPaths.push({ tool: wbTool, color: wbTool === 'eraser' ? '#ffffff' : wbColor, points: [{ x: wbStartX, y: wbStartY }] });
+  } else {
+    wbSnapshot = wbCtx.getImageData(0, 0, wbCanvas.width, wbCanvas.height);
+  }
+});
+
+wbCanvas.addEventListener('mousemove', function(e) {
+  if (!wbDrawing) return;
+  var rect = wbCanvas.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  if (wbTool === 'pen' || wbTool === 'eraser') {
+    var path = wbPaths[wbPaths.length - 1];
+    path.points.push({ x: x, y: y });
+    redrawWB();
+  } else if (wbSnapshot) {
+    wbCtx.putImageData(wbSnapshot, 0, 0);
+    drawShape(wbTool, wbStartX, wbStartY, x, y);
+  }
+});
+
+wbCanvas.addEventListener('mouseup', function(e) {
+  if (!wbDrawing) return;
+  wbDrawing = false;
+  var rect = wbCanvas.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  if (wbTool !== 'pen' && wbTool !== 'eraser') {
+    wbPaths.push({ tool: wbTool, color: wbColor, x1: wbStartX, y1: wbStartY, x2: x, y2: y });
+    wbSnapshot = null;
+  }
+  redrawWB();
+});
+
+function drawShape(tool, x1, y1, x2, y2) {
+  wbCtx.strokeStyle = wbColor;
+  wbCtx.lineWidth = 2;
+  wbCtx.lineCap = 'round';
+  if (tool === 'line') {
+    wbCtx.beginPath(); wbCtx.moveTo(x1, y1); wbCtx.lineTo(x2, y2); wbCtx.stroke();
+  } else if (tool === 'rect') {
+    wbCtx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+  } else if (tool === 'circle') {
+    var rx = Math.abs(x2 - x1) / 2, ry = Math.abs(y2 - y1) / 2;
+    var cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+    wbCtx.beginPath(); wbCtx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); wbCtx.stroke();
+  }
+}
+
+function redrawWB() {
+  wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
+  wbPaths.forEach(function(p) {
+    wbCtx.strokeStyle = p.color;
+    wbCtx.lineWidth = p.tool === 'eraser' ? 8 : 2;
+    wbCtx.lineCap = 'round';
+    if (p.points) {
+      wbCtx.beginPath();
+      p.points.forEach(function(pt, i) {
+        if (i === 0) wbCtx.moveTo(pt.x, pt.y);
+        else wbCtx.lineTo(pt.x, pt.y);
+      });
+      wbCtx.stroke();
+    } else {
+      drawShape(p.tool, p.x1, p.y1, p.x2, p.y2);
+    }
+  });
+}
+
+function wbUndo() {
+  if (wbPaths.length === 0) return;
+  wbRedoStack.push(wbPaths.pop());
+  redrawWB();
+}
+
+function wbRedo() {
+  if (wbRedoStack.length === 0) return;
+  wbPaths.push(wbRedoStack.pop());
+  redrawWB();
+}
+
+function wbClear() {
+  if (!confirm('Clear the whiteboard?')) return;
+  wbPaths = [];
+  wbRedoStack = [];
+  wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
+}
+
+/* ===== File Drop Zone ===== */
+var uz = document.getElementById('uploadZone');
+uz.addEventListener('dragover', function(e) { e.preventDefault(); uz.classList.add('dragover'); });
+uz.addEventListener('dragleave', function() { uz.classList.remove('dragover'); });
+uz.addEventListener('drop', function(e) { e.preventDefault(); uz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+
+/* ===== Init ===== */
+async function init() {
+  if (!ROOM_ID) {
+    document.getElementById('waitName').textContent = 'No room specified';
+    document.getElementById('waitSubtitle').textContent = 'Please access this room from your dashboard';
+    document.getElementById('joinBtn').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('waitAvatar').textContent = USER_NAME.charAt(0).toUpperCase();
+  document.getElementById('waitName').textContent = 'Welcome, ' + USER_NAME;
+  document.getElementById('waitSubtitle').textContent = 'Connecting to your session...';
+  renderPeople();
+  renderFiles();
+  addSystemMessage('Welcome to your session');
+
+  if (BOOKING_ID) {
+    var res = await kvGet('booking:' + BOOKING_ID);
+    if (res && res.value) {
+      BOOKING_DATA = res.value;
+      document.getElementById('libTeacher').textContent = BOOKING_DATA.teacherName || 'Teacher';
+      document.getElementById('libSubject').textContent = 'Live Lesson';
+
+      var otherName = USER_ROLE === 'student' ? BOOKING_DATA.teacherName : BOOKING_DATA.studentName;
+      if (BOOKING_DATA.scheduledAt && BOOKING_DATA.scheduledAt > Date.now() + 300000) {
+        showWaitingScreen(otherName, BOOKING_DATA.scheduledAt);
+      } else {
+        showWaitingScreen(otherName, null);
+      }
+    } else {
+      showWaitingScreen(otherName || 'Partner', null);
+    }
+  } else {
+    showWaitingScreen('Partner', null);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

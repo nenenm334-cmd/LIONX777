@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>My Profile — Minbar</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+/* ===== Hero Banner ===== */
+.p-hero{position:relative;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:28px;background:linear-gradient(135deg,var(--teal-dark),var(--teal),var(--accent));}
+.p-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='1'/%3E%3C/svg%3E");background-size:30px 30px;}
+.p-hero::after{content:'';position:absolute;top:-80px;right:-80px;width:260px;height:260px;background:rgba(255,255,255,.06);border-radius:50%;}
+.p-hero-inner{position:relative;z-index:1;display:flex;align-items:center;gap:28px;padding:36px 32px;flex-wrap:wrap;}
+.p-hero-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.p-hero-right{flex:1;min-width:200px;}
+.p-hero-name{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;}
+.p-hero-email{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:8px;}
+.p-hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.p-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(255,255,255,.15);color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.p-tag svg{width:14px;height:14px;}
+
+/* ===== Completion Bar ===== */
+.p-completion{width:100%;max-width:280px;}
+.p-completion-label{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.75);margin-bottom:6px;font-weight:500;}
+.p-completion-bar{width:100%;height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden;}
+.p-completion-fill{height:100%;background:#fff;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(255,255,255,.3);}
+
+/* ===== Avatar ===== */
+.p-avatar{position:relative;width:120px;height:120px;cursor:pointer;}
+.p-avatar-ring{width:120px;height:120px;border-radius:50%;border:4px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.25);transition:transform .25s,box-shadow .25s;}
+.p-avatar:hover .p-avatar-ring{transform:scale(1.04);box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.p-avatar-ring img{width:100%;height:100%;object-fit:cover;}
+.p-avatar-ring .ph{font-size:48px;font-weight:800;color:#fff;user-select:none;}
+.p-avatar-edit{position:absolute;bottom:2px;right:2px;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:all .2s;z-index:2;}
+.p-avatar:hover .p-avatar-edit{transform:scale(1.1);}
+.p-avatar-del{position:absolute;top:0;right:0;width:26px;height:26px;border-radius:50%;background:#DC2626;color:#fff;display:none;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);z-index:2;transition:all .15s;}
+.p-avatar-del:hover{transform:scale(1.15);background:#B91C1C;}
+.p-avatar-del.show{display:flex;}
+.p-avatar input[type="file"]{display:none;}
+
+/* ===== Layout ===== */
+.p-body{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:768px){.p-body{grid-template-columns:1fr;}}
+
+/* ===== Cards ===== */
+.p-card{background:var(--card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);transition:box-shadow .2s;}
+.p-card:hover{box-shadow:var(--shadow);}
+.p-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.p-card-head h3{font-size:15px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;letter-spacing:-.01em;margin:0;}
+.p-card-head h3 svg{width:18px;height:18px;color:var(--teal);}
+
+/* ===== Form ===== */
+.p-field{margin-bottom:16px;}
+.p-field:last-child{margin-bottom:0;}
+.p-field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft);margin-bottom:6px;}
+.p-field input,.p-field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;color:var(--ink);background:var(--card);transition:border-color .2s,box-shadow .2s;box-sizing:border-box;}
+.p-field input:focus,.p-field textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1);}
+.p-field input:disabled{opacity:.5;cursor:not-allowed;background:var(--bg);}
+.p-field textarea{resize:vertical;min-height:72px;}
+.p-field .p-hint{font-size:11px;color:var(--ink-muted);margin-top:4px;}
+.p-char-count{font-size:11px;color:var(--ink-muted);text-align:right;margin-top:4px;}
+.p-char-count.warn{color:var(--amber);}
+.p-char-count.over{color:var(--rose);font-weight:600;}
+.p-actions{display:flex;gap:10px;margin-top:20px;}
+.p-save{flex:1;padding:12px;border:none;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--teal),var(--accent));color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;box-shadow:0 2px 8px rgba(13,148,136,.25);position:relative;}
+.p-save:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,148,136,.35);}
+.p-save:active{transform:translateY(0) scale(.98);}
+.p-save.saving{opacity:.6;pointer-events:none;}
+.p-save .unsaved-dot{position:absolute;top:6px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--amber);display:none;box-shadow:0 0 6px rgba(245,158,11,.5);}
+.p-save .unsaved-dot.show{display:block;}
+.p-cancel{padding:12px 20px;border:1.5px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--ink-soft);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.p-cancel:hover{border-color:var(--rose);color:var(--rose);}
+
+/* ===== Stats ===== */
+.p-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.p-stat{padding:16px;border-radius:var(--radius-md);background:var(--bg);border:1px solid var(--border-subtle);text-align:center;transition:all .2s;position:relative;overflow:hidden;}
+.p-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;opacity:.7;transition:opacity .2s;}
+.p-stat:nth-child(1)::before{background:var(--teal);}
+.p-stat:nth-child(2)::before{background:var(--blue);}
+.p-stat:nth-child(3)::before{background:var(--amber);}
+.p-stat:nth-child(4)::before{background:var(--rose);}
+.p-stat:nth-child(5)::before{background:var(--green);}
+.p-stat:nth-child(6)::before{background:var(--accent);}
+.p-stat:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--teal);}
+.p-stat-icon{font-size:20px;margin-bottom:6px;}
+.p-stat-num{font-size:26px;font-weight:800;color:var(--teal-dark);line-height:1.1;font-variant-numeric:tabular-nums;}
+body.dark .p-stat-num{color:var(--accent);}
+.p-stat-label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;font-weight:600;}
+
+/* ===== Activity Heatmap ===== */
+.p-heat-header{display:flex;align-items:center;justify-content:space-between;}
+.p-heatmap-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.p-heat-day{font-size:9px;color:var(--ink-muted);text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding-bottom:2px;}
+.p-heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:2px;}
+.p-heat-cell{aspect-ratio:1;border-radius:4px;background:var(--border-subtle);transition:all .15s;position:relative;}
+.p-heat-cell:hover{transform:scale(1.25);z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.p-heat-cell.l1{background:rgba(13,148,136,.15);}
+.p-heat-cell.l2{background:rgba(13,148,136,.3);}
+.p-heat-cell.l3{background:rgba(13,148,136,.5);}
+.p-heat-cell.l4{background:var(--teal);}
+.p-heat-cell[title]{cursor:help;}
+.p-heat-legend{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:10px;color:var(--ink-soft);}
+.p-heat-legend span{display:inline-block;width:12px;height:12px;border-radius:3px;}
+
+/* ===== Danger Zone ===== */
+.p-danger{border:1.5px solid rgba(220,38,38,.2);}
+.p-danger .p-card-head h3{color:var(--rose);}
+.p-danger .p-card-head h3 svg{color:var(--rose);}
+.p-danger-actions{display:flex;flex-direction:column;gap:10px;}
+.p-logout{width:100%;padding:12px;border:none;border-radius:var(--radius-md);background:var(--rose);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;box-shadow:0 2px 8px rgba(220,38,38,.2);}
+.p-logout:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(220,38,38,.3);}
+.p-logout:active{transform:translateY(0) scale(.98);}
+.p-delete{width:100%;padding:12px;border:1.5px solid var(--rose);border-radius:var(--radius-md);background:transparent;color:var(--rose);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.p-delete:hover{background:var(--rose);color:#fff;}
+
+/* ===== Password ===== */
+.p-pw-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:480px){.p-pw-row{grid-template-columns:1fr;}}
+.p-pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--ink-muted);font-size:14px;padding:4px;transition:color .15s;}
+.p-pw-toggle:hover{color:var(--teal);}
+.p-pw-strength{display:flex;gap:4px;margin-top:6px;}
+.p-pw-strength span{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s;}
+.p-pw-strength.s1 span:nth-child(1){background:var(--rose);}
+.p-pw-strength.s2 span:nth-child(-n+2){background:var(--amber);}
+.p-pw-strength.s3 span:nth-child(-n+3){background:var(--green);}
+.p-pw-strength.s4 span{background:var(--green);}
+
+/* ===== Device Info ===== */
+.p-device{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--radius-md);margin-bottom:10px;}
+.p-device:last-child{margin-bottom:0;}
+.p-device-icon{width:40px;height:40px;border-radius:var(--radius-sm);background:var(--teal-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.p-device-info{flex:1;min-width:0;}
+.p-device-name{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-device-detail{font-size:11px;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-device-badge{padding:3px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:600;flex-shrink:0;}
+.p-device-badge.current{background:var(--green-soft);color:var(--green);}
+
+/* ===== Appearance Toggle ===== */
+.p-appear-row{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg);border-radius:var(--radius-md);margin-bottom:10px;}
+.p-appear-row:last-child{margin-bottom:0;}
+.p-appear-label{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--ink);}
+.p-appear-label span{font-size:18px;}
+.p-toggle{position:relative;width:48px;height:26px;cursor:pointer;display:inline-block;}
+.p-toggle input{position:absolute;opacity:0;width:0;height:0;}
+.p-toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:13px;transition:background .25s;}
+.p-toggle-slider::before{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .25s;}
+.p-toggle input:checked+.p-toggle-slider{background:var(--teal);}
+.p-toggle input:checked+.p-toggle-slider::before{transform:translateX(22px);}
+
+/* ===== Skeleton ===== */
+.p-skel{border-radius:var(--radius-sm);animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.p-skel-hero{height:180px;border-radius:var(--radius-lg);margin-bottom:28px;}
+.p-skel-card{height:320px;border-radius:var(--radius-lg);margin-bottom:20px;}
+.p-skel-stat{height:100px;border-radius:var(--radius-md);}
+
+/* ===== Back Link ===== */
+.p-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--teal);margin-bottom:20px;font-weight:500;text-decoration:none;transition:color .15s;}
+.p-back:hover{color:var(--teal-dark);text-decoration:none;}
+
+/* ===== Toast ===== */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast-item{padding:12px 24px;border-radius:var(--radius-md);background:var(--ink);color:var(--bg);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);animation:toastSlide .3s ease;pointer-events:auto;white-space:nowrap;}
+.toast-item.success{background:var(--teal);color:#fff;}
+.toast-item.error{background:var(--rose);color:#fff;}
+@keyframes toastSlide{from{opacity:0;transform:translateY(16px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ===== Avatar Crop Modal ===== */
+.crop-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s;}
+.crop-modal{background:var(--card);border-radius:var(--radius-xl);padding:28px;width:100%;max-width:400px;box-shadow:var(--shadow-xl);animation:modalIn .3s cubic-bezier(.175,.885,.32,1.1);}
+.crop-modal h3{font-size:18px;font-weight:700;margin-bottom:16px;color:var(--ink);}
+.crop-preview{width:200px;height:200px;border-radius:50%;overflow:hidden;margin:0 auto 20px;border:3px solid var(--border);position:relative;background:var(--bg);}
+.crop-preview img{width:100%;height:100%;object-fit:cover;}
+.crop-actions{display:flex;gap:10px;}
+.crop-actions button{flex:1;padding:11px;border-radius:var(--radius-md);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.crop-apply{border:none;background:linear-gradient(135deg,var(--teal),var(--accent));color:#fff;box-shadow:0 2px 8px rgba(13,148,136,.25);}
+.crop-apply:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,148,136,.35);}
+.crop-cancel{border:1.5px solid var(--border);background:var(--card);color:var(--ink-soft);}
+.crop-cancel:hover{border-color:var(--rose);color:var(--rose);}
+
+/* ===== Delete Confirm Modal ===== */
+.del-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s;}
+.del-modal{background:var(--card);border-radius:var(--radius-xl);padding:28px;width:100%;max-width:420px;box-shadow:var(--shadow-xl);animation:modalIn .3s cubic-bezier(.175,.885,.32,1.1);}
+.del-modal h3{font-size:18px;font-weight:700;margin-bottom:12px;color:var(--rose);display:flex;align-items:center;gap:8px;}
+.del-modal p{font-size:14px;color:var(--ink-soft);line-height:1.6;margin-bottom:20px;}
+.del-modal .del-warning{padding:12px 14px;background:var(--rose-soft);border-radius:var(--radius-sm);font-size:12px;color:var(--rose);font-weight:500;margin-bottom:20px;line-height:1.5;}
+.del-actions{display:flex;gap:10px;}
+.del-actions button{flex:1;padding:11px;border-radius:var(--radius-md);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.del-confirm{border:none;background:var(--rose);color:#fff;}
+.del-confirm:hover{opacity:.9;}
+.del-cancel{border:1.5px solid var(--border);background:var(--card);color:var(--ink-soft);}
+.del-cancel:hover{border-color:var(--ink-soft);}
+
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+
+/* ===== Responsive ===== */
+@media(max-width:640px){
+  .p-hero-inner{padding:28px 20px;gap:20px;flex-direction:column;text-align:center;}
+  .p-hero-tags{justify-content:center;}
+  .p-completion{margin:0 auto;}
+  .p-body{gap:16px;}
+  .p-card{padding:20px;}
+  .p-stats{grid-template-columns:1fr 1fr;}
+  .p-actions{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<script>
+  if(localStorage.getItem('minbar_dark')==='true') document.body.classList.add('dark');
+</script>
+
+<nav class="top-nav">
+  <a href="index.html" class="logo">
+    <div class="brand-mark" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(13,148,136,.25);">M</div>
+    Minbar
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Cards</a>
+    <a href="teachers.html" class="nav-link">Teachers</a>
+    <a href="lessons.html" class="nav-link">Lessons</a>
+    <a href="dashboard-student.html" class="nav-link">Dashboard</a>
+  </div>
+  <div class="user-area">
+    <div class="avatar-sm" id="navAvatar">?</div>
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<div class="container">
+  <a href="index.html" class="p-back">&#8592; Back to Minbar</a>
+
+  <!-- Skeleton Hero (shown while loading) -->
+  <div id="skelHero" class="p-skel p-skel-hero"></div>
+
+  <!-- Real Hero (hidden until loaded) -->
+  <div class="p-hero" id="heroWrap" style="display:none;">
+    <div class="p-hero-inner">
+      <div class="p-hero-left">
+        <div class="p-avatar" id="avatarWrap">
+          <div class="p-avatar-ring" id="avatarRing">
+            <span class="ph" id="avatarPlaceholder">?</span>
+            <img id="avatarImg" style="display:none;" />
+          </div>
+          <label class="p-avatar-edit" for="avatarFileInput" title="Upload photo">&#128247;</label>
+          <input type="file" id="avatarFileInput" accept="image/*" />
+          <div class="p-avatar-del" id="avatarRemove">&#10005;</div>
+        </div>
+      </div>
+      <div class="p-hero-right">
+        <div class="p-hero-name" id="displayName">Loading...</div>
+        <div class="p-hero-email" id="displayEmail"></div>
+        <div class="p-hero-tags" id="heroTags"></div>
+        <div class="p-completion">
+          <div class="p-completion-label">
+            <span>Profile Completion</span>
+            <span id="completionPct">0%</span>
+          </div>
+          <div class="p-completion-bar">
+            <div class="p-completion-fill" id="completionFill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton Cards (shown while loading) -->
+  <div id="skelBody" style="display:none;">
+    <div class="p-body">
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="p-skel p-skel-card"></div>
+        <div class="p-skel" style="height:140px;border-radius:var(--radius-lg);"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="p-skel p-skel-card"></div>
+        <div class="p-skel" style="height:200px;border-radius:var(--radius-lg);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real Body (hidden until loaded) -->
+  <div class="p-body" id="bodyWrap" style="display:none;">
+    <!-- Left Column -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Personal Info -->
+      <div class="p-card">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Personal Info
+          </h3>
+        </div>
+        <div class="p-field">
+          <label>Display Name</label>
+          <input id="nameInput" type="text" placeholder="Your name" maxlength="40" />
+        </div>
+        <div class="p-field">
+          <label>Email</label>
+          <input id="emailInput" type="email" disabled />
+          <div class="p-hint">Email is linked to your account and cannot be changed.</div>
+        </div>
+        <div class="p-field">
+          <label>Bio</label>
+          <textarea id="bioInput" placeholder="Tell us about yourself..." maxlength="200"></textarea>
+          <div class="p-char-count" id="bioCount">0 / 200</div>
+        </div>
+        <div class="p-actions">
+          <button class="p-cancel" id="cancelBtn">Cancel</button>
+          <button class="p-save" id="saveBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Save Profile
+            <span class="unsaved-dot" id="unsavedDot"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="p-card">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Change Password
+          </h3>
+        </div>
+        <div class="p-field">
+          <label>Current Password</label>
+          <div style="position:relative;">
+            <input id="pwCurrent" type="password" placeholder="Enter current password" />
+            <button class="p-pw-toggle" onclick="togglePw('pwCurrent',this)" type="button">&#128065;</button>
+          </div>
+        </div>
+        <div class="p-pw-row">
+          <div class="p-field">
+            <label>New Password</label>
+            <div style="position:relative;">
+              <input id="pwNew" type="password" placeholder="New password" />
+              <button class="p-pw-toggle" onclick="togglePw('pwNew',this)" type="button">&#128065;</button>
+            </div>
+            <div class="p-pw-strength" id="pwStrength"><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="p-field">
+            <label>Confirm New</label>
+            <div style="position:relative;">
+              <input id="pwConfirm" type="password" placeholder="Confirm password" />
+              <button class="p-pw-toggle" onclick="togglePw('pwConfirm',this)" type="button">&#128065;</button>
+            </div>
+          </div>
+        </div>
+        <div class="p-actions">
+          <button class="p-save" id="pwSaveBtn" style="flex:1;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Update Password
+          </button>
+        </div>
+      </div>
+
+      <!-- Appearance -->
+      <div class="p-card">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            Appearance
+          </h3>
+        </div>
+        <div class="p-appear-row">
+          <div class="p-appear-label"><span>&#127761;</span> Dark Mode</div>
+          <label class="p-toggle">
+            <input type="checkbox" id="darkToggle" />
+            <span class="p-toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="p-card p-danger">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Account
+          </h3>
+        </div>
+        <div class="p-danger-actions">
+          <button class="p-logout" id="logoutBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log Out
+          </button>
+          <button class="p-delete" id="deleteBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Stats -->
+      <div class="p-card">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Your Stats
+          </h3>
+        </div>
+        <div class="p-stats">
+          <div class="p-stat">
+            <div class="p-stat-icon">&#128218;</div>
+            <div class="p-stat-num" id="statTotal">0</div>
+            <div class="p-stat-label">Total Cards</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-icon">&#128260;</div>
+            <div class="p-stat-num" id="statSrs">0</div>
+            <div class="p-stat-label">SRS Review</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-icon">&#11088;</div>
+            <div class="p-stat-num" id="statMastered">0</div>
+            <div class="p-stat-label">Mastered</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-icon">&#128293;</div>
+            <div class="p-stat-num" id="statStreak">0</div>
+            <div class="p-stat-label">Day Streak</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-icon">&#9201;</div>
+            <div class="p-stat-num" id="statMinutes">0</div>
+            <div class="p-stat-label">Minutes</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-icon">&#127919;</div>
+            <div class="p-stat-num" id="statQuiz">0%</div>
+            <div class="p-stat-label">Quiz Score</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Heatmap -->
+      <div class="p-card">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Activity — Last 28 Days
+          </h3>
+        </div>
+        <div class="p-heatmap-days" id="heatDays"></div>
+        <div class="p-heatmap" id="heatmap"></div>
+        <div class="p-heat-legend">
+          <span style="background:var(--border-subtle);"></span> None
+          <span style="background:rgba(13,148,136,.15);"></span> Light
+          <span style="background:rgba(13,148,136,.3);"></span> Medium
+          <span style="background:rgba(13,148,136,.5);"></span> High
+          <span style="background:var(--teal);"></span> Max
+        </div>
+      </div>
+
+      <!-- Device / Session Info -->
+      <div class="p-card">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Device Info
+          </h3>
+        </div>
+        <div id="deviceList">
+          <div class="p-device">
+            <div class="p-device-icon">&#128187;</div>
+            <div class="p-device-info">
+              <div class="p-device-name" id="deviceName">Detecting...</div>
+              <div class="p-device-detail" id="deviceBrowser">Loading...</div>
+            </div>
+            <span class="p-device-badge current">This Device</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Avatar Crop Modal (hidden) -->
+<div class="crop-overlay" id="cropOverlay" style="display:none;">
+  <div class="crop-modal">
+    <h3>&#128247; Update Profile Photo</h3>
+    <div class="crop-preview">
+      <img id="cropImg" />
+    </div>
+    <div class="crop-actions">
+      <button class="crop-cancel" id="cropCancel">Cancel</button>
+      <button class="crop-apply" id="cropApply">Apply Photo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal (hidden) -->
+<div class="del-overlay" id="delOverlay" style="display:none;">
+  <div class="del-modal">
+    <h3>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Delete Your Account?
+    </h3>
+    <p>This will permanently delete your account, learning progress, saved cards, and all associated data. This action cannot be undone.</p>
+    <div class="del-warning">&#9888; Type <strong>DELETE</strong> below to confirm account deletion.</div>
+    <div class="p-field">
+      <input id="delConfirmInput" type="text" placeholder='Type "DELETE" to confirm' style="text-align:center;font-weight:600;" />
+    </div>
+    <div class="del-actions" style="margin-top:16px;">
+      <button class="del-cancel" id="delCancel">Cancel</button>
+      <button class="del-confirm" id="delConfirm" disabled>Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api/kv';
+let session = null, userRecord = null, avatarData = null, originalData = {};
+let pendingCropData = null;
+
+function toast(msg, type='success') {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+async function kvGet(key) {
+  try {
+    const r = await fetch(API + '?key=' + encodeURIComponent(key));
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (data && typeof data.value === 'string') { try { data.value = JSON.parse(data.value); } catch(e) {} }
+    return data;
+  } catch (e) { return null; }
+}
+
+async function kvSet(key, value) {
+  await fetch(API + '?key=' + encodeURIComponent(key), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ value })
+  });
+}
+
+async function kvDel(key) {
+  await fetch(API + '?key=' + encodeURIComponent(key), { method: 'DELETE' });
+}
+
+function computeStreak(p) {
+  const dates = new Set(p.activityDates || []);
+  let streak = 0, d = new Date();
+  const today = d.toISOString().slice(0, 10);
+  if (!dates.has(today)) d.setDate(d.getDate() - 1);
+  while (dates.has(d.toISOString().slice(0, 10))) { streak++; d.setDate(d.getDate() - 1); }
+  return streak;
+}
+
+function updateNav(name, email, avatar) {
+  const navAv = document.getElementById('navAvatar');
+  if (avatar) navAv.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+  else navAv.textContent = (name || '?')[0].toUpperCase();
+}
+
+function formatDate(ts) {
+  if (!ts) return 'Unknown';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function animateCount(el, target, suffix) {
+  suffix = suffix || '';
+  const duration = 600;
+  const start = performance.now();
+  const from = 0;
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + (target - from) * eased);
+    el.textContent = current + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function getCompletion(record, progress) {
+  let filled = 0, total = 4;
+  if (record.name && record.name.length > 1) filled++;
+  if (record.avatar) filled++;
+  if (record.bio && record.bio.length > 5) filled++;
+  if (progress.srs && Object.keys(progress.srs).length > 0) filled++;
+  return Math.round((filled / total) * 100);
+}
+
+function renderHeatmap(activityDates) {
+  const daysRow = document.getElementById('heatDays');
+  const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  daysRow.innerHTML = dayNames.map(d => '<div class="p-heat-day">' + d + '</div>').join('');
+
+  const grid = document.getElementById('heatmap');
+  grid.innerHTML = '';
+  const counts = {};
+  (activityDates || []).forEach(d => { counts[d] = (counts[d] || 0) + 1; });
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const count = counts[key] || 0;
+    let level = '';
+    if (count >= 8) level = 'l4';
+    else if (count >= 4) level = 'l3';
+    else if (count >= 2) level = 'l2';
+    else if (count >= 1) level = 'l1';
+    const cell = document.createElement('div');
+    cell.className = 'p-heat-cell ' + level;
+    cell.title = key + ': ' + count + ' activities';
+    grid.appendChild(cell);
+  }
+}
+
+function setHeroTags(record) {
+  const tags = document.getElementById('heroTags');
+  const html = [];
+  html.push('<span class="p-tag">Student</span>');
+  if (record.createdAt) {
+    html.push('<span class="p-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Joined ' + formatDate(record.createdAt) + '</span>');
+  }
+  if (record.socialProvider) {
+    const icon = record.socialProvider === 'google' ? '&#128225;' : '&#127822;';
+    html.push('<span class="p-tag">' + icon + ' ' + record.socialProvider.charAt(0).toUpperCase() + record.socialProvider.slice(1) + '</span>');
+  }
+  tags.innerHTML = html.join('');
+}
+
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
+  let os = 'Unknown OS', browser = 'Unknown Browser', icon = '&#128187;';
+  if (ua.includes('Windows')) { os = 'Windows'; icon = '&#128187;'; }
+  else if (ua.includes('Mac OS')) { os = 'macOS'; icon = '&#128187;'; }
+  else if (ua.includes('Linux')) { os = 'Linux'; icon = '&#128187;'; }
+  else if (ua.includes('Android')) { os = 'Android'; icon = '&#128241;'; }
+  else if (ua.includes('iPhone') || ua.includes('iPad')) { os = 'iOS'; icon = '&#128241;'; }
+
+  if (ua.includes('Firefox/')) browser = 'Firefox';
+  else if (ua.includes('Edg/')) browser = 'Edge';
+  else if (ua.includes('Chrome/')) browser = 'Chrome';
+  else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari';
+  else if (ua.includes('Opera') || ua.includes('OPR/')) browser = 'Opera';
+
+  return { os, browser, icon };
+}
+
+function renderDevice() {
+  const info = getDeviceInfo();
+  const el = document.getElementById('deviceList');
+  el.innerHTML = '<div class="p-device">' +
+    '<div class="p-device-icon">' + info.icon + '</div>' +
+    '<div class="p-device-info">' +
+      '<div class="p-device-name">' + info.browser + ' on ' + info.os + '</div>' +
+      '<div class="p-device-detail">' + navigator.platform + ' &middot; ' + (navigator.language || 'en') + '</div>' +
+    '</div>' +
+    '<span class="p-device-badge current">This Device</span>' +
+  '</div>';
+}
+
+function hasChanges() {
+  return document.getElementById('nameInput').value.trim() !== (originalData.name || '')
+    || document.getElementById('bioInput').value.trim() !== (originalData.bio || '')
+    || avatarData !== originalData.avatar;
+}
+
+function updateUnsavedDot() {
+  const dot = document.getElementById('unsavedDot');
+  if (hasChanges()) dot.classList.add('show');
+  else dot.classList.remove('show');
+}
+
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.innerHTML = '&#128064;'; }
+  else { inp.type = 'password'; btn.innerHTML = '&#128065;'; }
+}
+
+function getPwStrength(pw) {
+  let s = 0;
+  if (pw.length >= 6) s++;
+  if (pw.length >= 10) s++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++;
+  if (/[0-9]/.test(pw) || /[^A-Za-z0-9]/.test(pw)) s++;
+  return s;
+}
+
+/* Dark mode */
+function applyDark(dark) {
+  document.body.classList.toggle('dark', dark);
+  const t = document.getElementById('darkToggle');
+  if (t) t.checked = dark;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0C1410' : '#0F5C34');
+}
+function initDarkMode() {
+  const dark = localStorage.getItem('minbar_dark') === 'true';
+  applyDark(dark);
+}
+document.getElementById('darkToggle').addEventListener('change', function() {
+  const dark = this.checked;
+  applyDark(dark);
+  localStorage.setItem('minbar_dark', dark);
+  /* sync to main site */
+  try { localStorage.setItem('minbar_dark_sync', Date.now().toString()); } catch(e) {}
+});
+
+/* Avatar upload */
+document.getElementById('avatarFileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { toast('Image too large - max 2MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const c = document.createElement('canvas'), s = 256;
+      const mx = Math.max(img.width, img.height);
+      c.width = s; c.height = s;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, (s - img.width * (s / mx)) / 2, (s - img.height * (s / mx)) / 2, s, s);
+      pendingCropData = c.toDataURL('image/jpeg', 0.8);
+      document.getElementById('cropImg').src = pendingCropData;
+      document.getElementById('cropOverlay').style.display = 'flex';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+document.getElementById('cropApply').addEventListener('click', function() {
+  avatarData = pendingCropData;
+  document.getElementById('avatarImg').src = avatarData;
+  document.getElementById('avatarImg').style.display = 'block';
+  document.getElementById('avatarPlaceholder').style.display = 'none';
+  document.getElementById('avatarRemove').classList.add('show');
+  document.getElementById('cropOverlay').style.display = 'none';
+  pendingCropData = null;
+  updateUnsavedDot();
+  toast('Photo updated - save to confirm');
+});
+
+document.getElementById('cropCancel').addEventListener('click', function() {
+  document.getElementById('cropOverlay').style.display = 'none';
+  pendingCropData = null;
+});
+
+document.getElementById('avatarRemove').addEventListener('click', function(e) {
+  e.stopPropagation();
+  avatarData = null;
+  document.getElementById('avatarImg').style.display = 'none';
+  document.getElementById('avatarImg').src = '';
+  document.getElementById('avatarPlaceholder').style.display = 'flex';
+  document.getElementById('avatarRemove').classList.remove('show');
+  updateUnsavedDot();
+  toast('Photo removed');
+});
+
+/* Bio counter */
+document.getElementById('bioInput').addEventListener('input', function() {
+  const len = this.value.length;
+  const counter = document.getElementById('bioCount');
+  counter.textContent = len + ' / 200';
+  counter.className = 'p-char-count' + (len > 180 ? (len > 200 ? ' over' : ' warn') : '');
+  updateUnsavedDot();
+});
+
+/* Name input unsaved tracking */
+document.getElementById('nameInput').addEventListener('input', updateUnsavedDot);
+
+/* Save */
+document.getElementById('saveBtn').addEventListener('click', async function() {
+  const btn = this;
+  const newName = document.getElementById('nameInput').value.trim();
+  const newBio = document.getElementById('bioInput').value.trim();
+  if (!newName) { toast('Name is required', 'error'); document.getElementById('nameInput').focus(); return; }
+
+  btn.classList.add('saving');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Saving...';
+
+  userRecord.name = newName;
+  userRecord.bio = newBio;
+  userRecord.avatar = avatarData;
+
+  try { await kvSet('user:' + userRecord.email, userRecord); } catch (e) {}
+
+  const saved = JSON.parse(localStorage.getItem('minbar_session') || '{}');
+  saved.name = newName;
+  localStorage.setItem('minbar_session', JSON.stringify(saved));
+
+  originalData = { name: newName, bio: newBio, avatar: avatarData };
+
+  document.getElementById('displayName').textContent = newName;
+  document.getElementById('displayEmail').textContent = userRecord.email;
+  updateNav(newName, userRecord.email, avatarData);
+  setHeroTags(userRecord);
+
+  btn.classList.remove('saving');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Save Profile<span class="unsaved-dot" id="unsavedDot"></span>';
+  toast('Profile saved!');
+});
+
+/* Cancel */
+document.getElementById('cancelBtn').addEventListener('click', function() {
+  document.getElementById('nameInput').value = originalData.name || '';
+  document.getElementById('bioInput').value = originalData.bio || '';
+  document.getElementById('bioInput').dispatchEvent(new Event('input'));
+  if (originalData.avatar) {
+    avatarData = originalData.avatar;
+    document.getElementById('avatarImg').src = avatarData;
+    document.getElementById('avatarImg').style.display = 'block';
+    document.getElementById('avatarPlaceholder').style.display = 'none';
+    document.getElementById('avatarRemove').classList.add('show');
+  } else {
+    avatarData = null;
+    document.getElementById('avatarImg').style.display = 'none';
+    document.getElementById('avatarImg').src = '';
+    document.getElementById('avatarPlaceholder').style.display = 'flex';
+    document.getElementById('avatarRemove').classList.remove('show');
+  }
+  updateUnsavedDot();
+  toast('Changes discarded');
+});
+
+/* Password */
+document.getElementById('pwNew').addEventListener('input', function() {
+  const s = getPwStrength(this.value);
+  const el = document.getElementById('pwStrength');
+  el.className = 'p-pw-strength' + (s > 0 ? ' s' + s : '');
+});
+
+document.getElementById('pwSaveBtn').addEventListener('click', async function() {
+  const btn = this;
+  const cur = document.getElementById('pwCurrent').value;
+  const nw = document.getElementById('pwNew').value;
+  const cf = document.getElementById('pwConfirm').value;
+  if (!cur) { toast('Enter current password', 'error'); return; }
+  if (nw.length < 6) { toast('New password must be 6+ characters', 'error'); return; }
+  if (nw !== cf) { toast('Passwords do not match', 'error'); return; }
+
+  btn.classList.add('saving');
+  try {
+    const doc = await kvGet('user:' + userRecord.email);
+    if (doc && doc.value && doc.value.password === cur) {
+      userRecord.password = nw;
+      await kvSet('user:' + userRecord.email, userRecord);
+      toast('Password updated!');
+      document.getElementById('pwCurrent').value = '';
+      document.getElementById('pwNew').value = '';
+      document.getElementById('pwConfirm').value = '';
+      document.getElementById('pwStrength').className = 'p-pw-strength';
+    } else {
+      toast('Current password is incorrect', 'error');
+    }
+  } catch (e) { toast('Failed to update password', 'error'); }
+  btn.classList.remove('saving');
+});
+
+/* Logout */
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  localStorage.removeItem('minbar_session');
+  localStorage.removeItem('minbar_tab');
+  toast('Logged out');
+  setTimeout(() => { window.location.href = 'index.html'; }, 800);
+});
+
+/* Delete Account */
+document.getElementById('deleteBtn').addEventListener('click', function() {
+  document.getElementById('delOverlay').style.display = 'flex';
+  document.getElementById('delConfirmInput').value = '';
+  document.getElementById('delConfirm').disabled = true;
+});
+
+document.getElementById('delCancel').addEventListener('click', function() {
+  document.getElementById('delOverlay').style.display = 'none';
+});
+
+document.getElementById('delConfirmInput').addEventListener('input', function() {
+  document.getElementById('delConfirm').disabled = this.value !== 'DELETE';
+});
+
+document.getElementById('delConfirm').addEventListener('click', async function() {
+  if (!userRecord || !userRecord.email) return;
+  try {
+    await kvDel('user:' + userRecord.email);
+    await kvDel('progress:' + userRecord.name);
+  } catch (e) {}
+  localStorage.removeItem('minbar_session');
+  localStorage.removeItem('minbar_tab');
+  toast('Account deleted');
+  setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+});
+
+/* Warn on unsaved changes */
+window.addEventListener('beforeunload', function(e) {
+  if (hasChanges()) { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* Close modals on overlay click */
+document.getElementById('cropOverlay').addEventListener('click', function(e) {
+  if (e.target === this) { this.style.display = 'none'; pendingCropData = null; }
+});
+document.getElementById('delOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
+
+/* Load */
+async function loadProfile() {
+  initDarkMode();
+  renderDevice();
+
+  session = JSON.parse(localStorage.getItem('minbar_session') || 'null');
+  if (!session || !session.email) {
+    toast('Please log in first', 'error');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+    return;
+  }
+
+  const email = session.email;
+  const name = session.name || 'Student';
+  updateNav(name, email, null);
+
+  try {
+    const doc = await kvGet('user:' + email);
+    if (doc && doc.value) userRecord = doc.value;
+  } catch (e) {}
+
+  if (!userRecord) {
+    userRecord = { email, name, avatar: null, bio: '', socialProvider: '', createdAt: Date.now() };
+  }
+
+  avatarData = userRecord.avatar || null;
+  originalData = { name: userRecord.name, bio: userRecord.bio || '', avatar: avatarData };
+
+  document.getElementById('nameInput').value = userRecord.name || '';
+  document.getElementById('emailInput').value = email;
+  document.getElementById('bioInput').value = userRecord.bio || '';
+  document.getElementById('bioInput').dispatchEvent(new Event('input'));
+  document.getElementById('displayName').textContent = userRecord.name || 'Student';
+  document.getElementById('displayEmail').textContent = email;
+
+  const initials = (userRecord.name || '?')[0].toUpperCase();
+  if (avatarData) {
+    document.getElementById('avatarImg').src = avatarData;
+    document.getElementById('avatarImg').style.display = 'block';
+    document.getElementById('avatarPlaceholder').style.display = 'none';
+    document.getElementById('avatarRemove').classList.add('show');
+    updateNav(userRecord.name, email, avatarData);
+  } else {
+    document.getElementById('avatarPlaceholder').textContent = initials;
+    document.getElementById('avatarPlaceholder').style.display = 'flex';
+    document.getElementById('avatarImg').style.display = 'none';
+    document.getElementById('avatarRemove').classList.remove('show');
+  }
+
+  setHeroTags(userRecord);
+
+  let progress = {};
+  try {
+    const pDoc = await kvGet('progress:' + userRecord.name);
+    if (pDoc && pDoc.value) progress = pDoc.value;
+  } catch (e) {}
+
+  const totalCards = progress.srs ? Object.keys(progress.srs).length : 0;
+  const mastered = Object.values(progress.srs || {}).filter(e => e.srsLevel >= 3).length;
+  const streak = computeStreak(progress);
+  const minutes = progress.listeningSec ? Math.round(progress.listeningSec / 60) : 0;
+  const quizAttempts = progress.quiz ? progress.quiz.attempts || 0 : 0;
+  const quizCorrect = progress.quiz ? progress.quiz.correct || 0 : 0;
+  const quizPct = quizAttempts > 0 ? Math.round(quizCorrect / quizAttempts * 100) : 0;
+
+  /* Animate stats */
+  animateCount(document.getElementById('statTotal'), totalCards);
+  animateCount(document.getElementById('statSrs'), totalCards);
+  animateCount(document.getElementById('statMastered'), mastered);
+  animateCount(document.getElementById('statStreak'), streak);
+  animateCount(document.getElementById('statMinutes'), minutes);
+  animateCount(document.getElementById('statQuiz'), quizPct, '%');
+
+  /* Completion */
+  const pct = getCompletion(userRecord, progress);
+  document.getElementById('completionPct').textContent = pct + '%';
+  setTimeout(() => { document.getElementById('completionFill').style.width = pct + '%'; }, 200);
+
+  renderHeatmap(progress.activityDates);
+
+  /* Show real content */
+  document.getElementById('skelHero').style.display = 'none';
+  document.getElementById('heroWrap').style.display = '';
+  document.getElementById('skelBody').style.display = 'none';
+  document.getElementById('bodyWrap').style.display = '';
+}
+
+loadProfile();
+</script>
+
+<style>
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+
+<script>
+function toggleMenu() {
+  var m = document.getElementById('mobileMenu');
+  var o = document.getElementById('mobileOverlay');
+  if (m) m.classList.toggle('open');
+  if (o) o.classList.toggle('open');
+}
+</script>
+
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMenu()">✕</button>
+  <a href="dashboard-student.html" onclick="toggleMenu()">📊 Dashboard</a>
+  <a href="teachers.html" onclick="toggleMenu()">👨‍🏫 Teachers</a>
+  <a href="lessons.html" onclick="toggleMenu()">📚 Lessons</a>
+  <a href="profile.html" onclick="toggleMenu()">👤 Profile</a>
+  <a href="index.html" onclick="toggleMenu()">🃏 Cards</a>
+</div>
+</body>
+</html>

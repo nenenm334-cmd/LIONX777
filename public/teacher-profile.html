@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Minbar - Teacher Profile</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  .profile-hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--teal), #0ea5e9);
+    border-radius: var(--radius-lg, 16px);
+    padding: 48px 24px 36px;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .profile-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .profile-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 700;
+    margin: 0 auto 16px;
+    border: 3px solid rgba(255,255,255,0.4);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .profile-hero h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+  }
+  .profile-sub {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 6px;
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .profile-grid { grid-template-columns: 1fr; }
+  }
+
+  .lp {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: var(--radius-md, 12px);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .lp h2 {
+    margin: 0 0 16px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink, #111827);
+  }
+
+  .dash-stat {
+    text-align: center;
+    padding: 16px 8px;
+    background: var(--bg, #f9fafb);
+    border-radius: var(--radius-md, 12px);
+  }
+  .ds-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-size: 18px;
+  }
+  .ds-num {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink, #111827);
+  }
+  .ds-label {
+    font-size: 12px;
+    color: var(--ink-soft, #6b7280);
+    margin-top: 2px;
+  }
+
+  .day-picker {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .day-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg, #f3f4f6);
+    color: var(--ink-soft, #6b7280);
+    border: 1px solid var(--border, #e5e7eb);
+    transition: all 0.15s ease;
+  }
+  .day-btn:hover {
+    background: var(--teal-soft, #e6f7ef);
+    color: var(--teal, #10b981);
+  }
+  .day-btn.active {
+    background: var(--teal, #10b981);
+    color: #fff;
+    border-color: var(--teal, #10b981);
+  }
+
+  .slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 8px;
+  }
+  .slot {
+    padding: 8px 4px;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg, #f9fafb);
+    border: 1px solid var(--border, #e5e7eb);
+    color: var(--ink, #111827);
+    transition: all 0.15s ease;
+  }
+  .slot:hover:not(.unavailable) {
+    border-color: var(--teal, #10b981);
+    background: var(--teal-soft, #e6f7ef);
+  }
+  .slot.selected {
+    background: var(--teal, #10b981);
+    color: #fff;
+    border-color: var(--teal, #10b981);
+  }
+  .slot.unavailable {
+    opacity: 0.4;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  .stars { display: inline-flex; gap: 1px; }
+  .star { color: #d1d5db; transition: color 0.1s; }
+  .star.filled { color: #f59e0b; }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal {
+    background: var(--card-bg, #fff);
+    border-radius: var(--radius-lg, 16px);
+    padding: 28px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .modal h3 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink, #111827);
+  }
+  .modal textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 12px;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 13px;
+    resize: vertical;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+  .modal textarea:focus {
+    outline: 2px solid var(--teal, #10b981);
+    border-color: var(--teal, #10b981);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+  }
+  .btn-primary {
+    background: var(--teal, #10b981);
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft, #6b7280);
+    border: 1px solid var(--border, #e5e7eb);
+  }
+  .btn-ghost:hover { background: var(--bg, #f3f4f6); }
+  .btn-lg { padding: 14px 24px; font-size: 15px; }
+
+  .toast-wrap {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toast-item {
+    padding: 12px 20px;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--teal, #10b981);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transition: opacity 0.3s ease;
+  }
+  .toast-item.error { background: #ef4444; }
+
+  .review-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+  .review-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border, #e5e7eb);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .review-bar-fill {
+    height: 100%;
+    background: var(--teal, #10b981);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .review-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+  }
+  .review-item:last-child { border-bottom: none; }
+  .review-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--teal-soft, #e6f7ef);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--teal, #10b981);
+    flex-shrink: 0;
+  }
+
+  .cert-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    font-size: 13px;
+    color: var(--ink-soft, #6b7280);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cert-item:last-child { border-bottom: none; }
+  .cert-check {
+    color: var(--teal, #10b981);
+    font-weight: 700;
+  }
+
+  .specialty-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  .price-block {
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    margin-bottom: 16px;
+  }
+  .price-amount {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--teal, #10b981);
+  }
+  .price-label {
+    font-size: 12px;
+    color: var(--ink-soft, #6b7280);
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="logo">
+    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(13,148,136,.25);">M</div>
+    Minbar
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="teachers.html" class="nav-link active">Teachers</a>
+    <a href="lessons.html" class="nav-link">My Lessons</a>
+  </div>
+  <div class="user-area">
+    <div class="avatar-sm" id="userAvatar">M</div>
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<div class="container" id="profileContainer">
+  <div id="loadingState">
+    <div class="skeleton skeleton-card" style="height:240px;margin-bottom:24px;"></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+      <div><div class="skeleton skeleton-card" style="height:300px;"></div></div>
+      <div><div class="skeleton skeleton-card" style="height:300px;"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const API = '/api/kv';
+
+function toast(msg, type='success') {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+function escapeHtml(s) {
+  return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
+}
+
+function getHeaders() {
+  return { 'Content-Type': 'application/json' };
+}
+
+function starsHTML(rating, size) {
+  let h = '<span class="stars">';
+  for (let i = 1; i <= 5; i++) {
+    h += '<span class="star ' + (i <= Math.round(rating) ? 'filled' : '') + '" style="font-size:' + (size || 16) + 'px">&#9733;</span>';
+  }
+  return h + '</span>';
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' min ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  const days = Math.floor(diff / 86400000);
+  if (days === 1) return '1 day ago';
+  return days + ' days ago';
+}
+
+function getTeacherId() {
+  const p = new URLSearchParams(window.location.search);
+  return p.get('id') || 'teacher_1';
+}
+
+async function kvGet(key) {
+  const r = await fetch(API + '?key=' + encodeURIComponent(key), { headers: getHeaders() });
+  const data = await r.json();
+  if (data && typeof data.value === 'string') { try { data.value = JSON.parse(data.value); } catch(e) {} }
+  return data;
+}
+
+const demoReviews = [
+  { name: 'Sarah M.', rating: 5, comment: 'Outstanding teacher, very patient and clear explanations. My Arabic improved dramatically in just a few weeks!', date: Date.now() - 86400000 * 3 },
+  { name: 'James L.', rating: 5, comment: 'Learned so much in a short time. Highly recommend the conversation sessions — they really build confidence.', date: Date.now() - 86400000 * 7 },
+  { name: 'Emily R.', rating: 4, comment: 'Excellent overall. Occasionally goes a bit fast, but always happy to slow down when asked.', date: Date.now() - 86400000 * 14 },
+  { name: 'Omar K.', rating: 5, comment: 'The best Arabic tutor I have ever worked with. His Quranic recitation guidance is truly special.', date: Date.now() - 86400000 * 21 },
+];
+
+const demoSchedule = (() => {
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const slots = [];
+  days.forEach(day => {
+    for (let h = 9; h <= 17; h += 2) {
+      slots.push({ day, time: (h < 10 ? '0' : '') + h + ':00', available: Math.random() > 0.3 });
+    }
+  });
+  return slots;
+})();
+
+function renderProfile(teacher) {
+  const container = document.getElementById('profileContainer');
+  const reviews = teacher.reviews || demoReviews;
+  const avgRating = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : (teacher.rating || 0);
+  const schedule = (teacher.schedule && teacher.schedule.length) ? teacher.schedule : demoSchedule;
+  const days = {};
+  schedule.forEach(s => { if (!days[s.day]) days[s.day] = []; days[s.day].push(s); });
+
+  container.innerHTML = `
+  <div class="profile-hero">
+    <div class="profile-avatar">${teacher.image ? '<img src="' + escapeHtml(teacher.image) + '" alt="">' : escapeHtml(teacher.name.charAt(0))}</div>
+    <h1>${escapeHtml(teacher.name)}</h1>
+    <div class="profile-sub">${escapeHtml(teacher.bio || '')}</div>
+    <div style="margin-top:14px;position:relative;z-index:1;">
+      ${starsHTML(avgRating, 20)}
+      <span style="font-size:14px;margin-left:8px;opacity:0.9;">${avgRating.toFixed(1)} (${reviews.length} reviews)</span>
+    </div>
+    <div style="margin-top:14px;position:relative;z-index:1;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      ${(teacher.specialties || ['arabic']).map(s => '<span class="specialty-badge">' + specialtyLabel(s) + '</span>').join('')}
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <div class="profile-main">
+      <div class="lp">
+        <h2>About the Teacher</h2>
+        <p style="color:var(--ink-soft,#6b7280);line-height:1.8;margin:0;">${escapeHtml(teacher.bio || 'No bio available.')}</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px;">
+          <div class="dash-stat">
+            <div class="ds-icon" style="background:var(--teal-soft,#e6f7ef);color:var(--teal,#10b981);">&#128197;</div>
+            <div class="ds-num">${teacher.yearsExp || 0}</div>
+            <div class="ds-label">Years Experience</div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-icon" style="background:var(--green-soft,#dcfce7);color:var(--green,#22c55e);">&#128100;</div>
+            <div class="ds-num">${teacher.studentsCount || 0}</div>
+            <div class="ds-label">Students</div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-icon" style="background:var(--blue-soft,#dbeafe);color:var(--blue,#3b82f6);">&#128218;</div>
+            <div class="ds-num">${teacher.lessonsCount || 0}</div>
+            <div class="ds-label">Lessons</div>
+          </div>
+        </div>
+      </div>
+
+      ${teacher.videoUrl ? `
+      <div class="lp">
+        <h2>Intro Video</h2>
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-md,12px);">
+          <iframe src="${escapeHtml(teacher.videoUrl)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
+        </div>
+      </div>` : ''}
+
+      <div class="lp">
+        <h2>Reviews &amp; Ratings</h2>
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px;padding:20px;background:var(--teal-soft,#e6f7ef);border-radius:var(--radius-md,12px);">
+          <div style="text-align:center;min-width:80px;">
+            <div style="font-size:38px;font-weight:800;color:var(--teal-dark,#047857);">${avgRating.toFixed(1)}</div>
+            ${starsHTML(avgRating, 18)}
+            <div style="font-size:12px;color:var(--ink-soft,#6b7280);margin-top:4px;">${reviews.length} reviews</div>
+          </div>
+          <div style="flex:1;">
+            ${[5,4,3,2,1].map(n => {
+              const count = reviews.filter(r => r.rating === n).length;
+              const pct = reviews.length ? (count / reviews.length * 100) : 0;
+              return `<div class="review-bar-wrap">
+                <span style="min-width:10px;font-weight:600;">${n}</span>
+                <span class="review-bar-track"><span class="review-bar-fill" style="width:${pct}%;"></span></span>
+                <span style="min-width:20px;text-align:left;color:var(--ink-soft,#6b7280);">${count}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+        ${reviews.map(r => `
+        <div class="review-item">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div class="review-avatar">${escapeHtml(r.name.charAt(0))}</div>
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:14px;">${escapeHtml(r.name)}</div>
+              <div style="font-size:11px;color:var(--ink-soft,#6b7280);">${timeAgo(r.date)}</div>
+            </div>
+            <div>${starsHTML(r.rating, 14)}</div>
+          </div>
+          <p style="font-size:13px;color:var(--ink-soft,#6b7280);line-height:1.7;margin:0;">${escapeHtml(r.comment)}</p>
+        </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="profile-sidebar">
+      <div class="lp">
+        <div class="price-block">
+          <div class="price-amount">$${teacher.price || 0}</div>
+          <div class="price-label">per lesson</div>
+        </div>
+        <div id="bookingHint" style="font-size:12px;color:var(--ink-soft,#6b7280);margin-bottom:8px;text-align:center;">Select a time slot below to book</div>
+        <button id="bookBtn" class="btn btn-primary btn-lg" style="width:100%;" onclick="openBookingModal()">
+          Book a Lesson
+        </button>
+        <button class="btn btn-lg" style="width:100%;margin-top:8px;background:#059669;color:#fff;border:none;border-radius:var(--radius,10px);padding:12px;font-size:15px;font-weight:600;cursor:pointer;" onclick="startTrialCall()">
+          📞 Trial Call Now
+        </button>
+      </div>
+
+      <div class="lp">
+        <h2>Schedule</h2>
+        <div style="font-size:12px;color:var(--ink-soft,#6b7280);margin-bottom:12px;">Pick a day, then choose a time slot</div>
+        <div class="day-picker" id="dayPicker"></div>
+        <div class="slot-grid" id="slotGrid"></div>
+      </div>
+
+      <div class="lp">
+        <h2>Certifications</h2>
+        ${(teacher.certifications || ['BA in Arabic Language', 'TESOL International Teaching Certificate', 'Quran Recitation Ijazah']).map(c =>
+          '<div class="cert-item"><span class="cert-check">&#10003;</span>' + escapeHtml(c) + '</div>'
+        ).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function specialtyLabel(s) {
+  const map = {
+    arabic: 'General Arabic',
+    quran: 'Quran & Tajweed',
+    kids: 'Kids & Beginners',
+    conversation: 'Conversation',
+    grammar: 'Grammar & Syntax',
+    business: 'Business Arabic'
+  };
+  return map[s] || s;
+}
+
+let selectedDay = null;
+let selectedSlot = null;
+let teacherData = null;
+
+function renderDayPicker(schedule) {
+  const days = {};
+  schedule.forEach(s => { if (!days[s.day]) days[s.day] = []; days[s.day].push(s); });
+  const picker = document.getElementById('dayPicker');
+  picker.innerHTML = Object.keys(days).map((d, i) =>
+    '<div class="day-btn' + (i === 0 ? ' active' : '') + '" data-day="' + d + '">' + d + '</div>'
+  ).join('');
+  selectedDay = Object.keys(days)[0];
+  renderSlots(days[selectedDay]);
+}
+
+if (!window._dayPickerHandlerAttached) {
+  window._dayPickerHandlerAttached = true;
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('#dayPicker .day-btn');
+    if (!btn || btn.classList.contains('disabled')) return;
+    var picker = document.getElementById('dayPicker');
+    picker.querySelectorAll('.day-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    selectedDay = btn.dataset.day;
+    selectedSlot = null;
+    var days = {};
+    var schedule = (window._currentSchedule && window._currentSchedule.length) ? window._currentSchedule : demoSchedule;
+    schedule.forEach(function(s) { if (!days[s.day]) days[s.day] = []; days[s.day].push(s); });
+    renderSlots(days[selectedDay]);
+    updateBookingHint();
+  });
+}
+
+function updateBookingHint() {
+  var hint = document.getElementById('bookingHint');
+  var btn = document.getElementById('bookBtn');
+  if (selectedDay && selectedSlot) {
+    if (hint) hint.innerHTML = '<span style="color:var(--teal,#10b981);font-weight:600;">' + selectedDay + ' at ' + selectedSlot + '</span>';
+    if (btn) btn.textContent = 'Book ' + selectedDay + ' ' + selectedSlot;
+  } else if (selectedDay) {
+    if (hint) hint.textContent = 'Pick a time slot for ' + selectedDay;
+    if (btn) btn.textContent = 'Book a Lesson';
+  } else {
+    if (hint) hint.textContent = 'Select a day and time slot to book';
+    if (btn) btn.textContent = 'Book a Lesson';
+  }
+}
+
+function renderSlots(slots) {
+  const grid = document.getElementById('slotGrid');
+  if (!slots || slots.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--ink-soft,#6b7280);font-size:13px;padding:16px;">No available slots for this day</div>';
+    selectedSlot = null;
+    updateBookingHint();
+    return;
+  }
+  grid.innerHTML = slots.map(s =>
+    '<div class="slot' + (s.available ? '' : ' unavailable') + '" data-time="' + s.time + '">' + s.time + '</div>'
+  ).join('');
+
+  var firstAvailable = slots.find(function(s) { return s.available; });
+  if (firstAvailable) {
+    selectedSlot = firstAvailable.time;
+    var firstEl = grid.querySelector('.slot[data-time="' + firstAvailable.time + '"]');
+    if (firstEl) firstEl.classList.add('selected');
+  } else {
+    selectedSlot = null;
+  }
+  updateBookingHint();
+}
+
+if (!window._slotGridHandlerAttached) {
+  window._slotGridHandlerAttached = true;
+  document.addEventListener('click', function(e) {
+    var slot = e.target.closest('#slotGrid .slot');
+    if (!slot || slot.classList.contains('unavailable')) return;
+    var grid = document.getElementById('slotGrid');
+    grid.querySelectorAll('.slot').forEach(function(s) { s.classList.remove('selected'); });
+    slot.classList.add('selected');
+    selectedSlot = slot.dataset.time;
+    updateBookingHint();
+  });
+}
+
+function startTrialCall() {
+  var session = JSON.parse(localStorage.getItem('minbar_session') || '{}');
+  var studentName = session.name || 'Student';
+  var studentEmail = session.email || '';
+  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  var roomId = 'minbar-trial-';
+  for (var i = 0; i < 8; i++) roomId += chars.charAt(Math.floor(Math.random() * chars.length));
+  if (!teacherData || !teacherData.email) { toast('Teacher not loaded', 'error'); return; }
+  var callData = {
+    id: 'call_' + Date.now(),
+    type: 'incoming_call',
+    roomId: roomId,
+    studentName: studentName,
+    studentEmail: studentEmail,
+    teacherEmail: teacherData.email,
+    createdAt: Date.now(),
+    status: 'ringing'
+  };
+  fetch('/api/kv?key=' + encodeURIComponent('call_requests:' + teacherData.email), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: 'call_requests:' + teacherData.email, value: callData })
+  }).then(function() {
+    window.location.href = 'live-room.html?room=' + encodeURIComponent(roomId) + '&role=student&name=' + encodeURIComponent(studentName) + '&teacher=' + encodeURIComponent(teacherData.email);
+  }).catch(function() {
+    window.location.href = 'live-room.html?room=' + encodeURIComponent(roomId) + '&role=student&name=' + encodeURIComponent(studentName) + '&teacher=' + encodeURIComponent(teacherData.email);
+  });
+}
+
+function openBookingModal() {
+  if (!selectedDay || !selectedSlot) {
+    toast('Please select a day and time first', 'error');
+    return;
+  }
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>Confirm Booking</h3>
+      <div style="padding:16px;background:var(--teal-soft,#e6f7ef);border-radius:var(--radius-md,12px);margin-bottom:16px;text-align:center;">
+        <div style="font-weight:700;font-size:15px;">${escapeHtml(teacherData.name)}</div>
+        <div style="font-size:14px;color:var(--teal,#10b981);margin-top:4px;">${escapeHtml(selectedDay)} &mdash; ${escapeHtml(selectedSlot)}</div>
+        <div style="font-size:22px;font-weight:800;color:var(--teal-dark,#047857);margin-top:8px;">$${teacherData.price}</div>
+      </div>
+      <div style="margin-bottom:4px;">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--ink,#111827);">Note (optional)</label>
+        <textarea id="bookingNote" placeholder="Any message you'd like to send to the teacher..."></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="submitBooking()">Submit Booking</button>
+        <button class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+}
+
+function getNextOccurrence(dayName, timeStr) {
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var targetDay = days.indexOf(dayName);
+  if (targetDay < 0) return Date.now() + 3600000;
+  var now = new Date();
+  var parts = timeStr.replace(/[^0-9:]/g, '').split(':');
+  var h = parseInt(parts[0]) || 10;
+  var m = parseInt(parts[1]) || 0;
+  if (timeStr.toLowerCase().indexOf('pm') !== -1 && h < 12) h += 12;
+  if (timeStr.toLowerCase().indexOf('am') !== -1 && h === 12) h = 0;
+  var target = new Date(now);
+  target.setDate(now.getDate() + ((targetDay - now.getDay() + 7) % 7));
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 7);
+  return target.getTime();
+}
+
+function generateRoomId() {
+  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  var id = 'minbar-call-';
+  for (var i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+  return id;
+}
+
+async function submitBooking() {
+  var note = document.getElementById('bookingNote')?.value || '';
+  var sess = localStorage.getItem('minbar_session');
+  var parsed = sess ? JSON.parse(sess) : null;
+  var studentName = parsed?.name || 'Anonymous Student';
+  var studentEmail = parsed?.email || '';
+
+  try {
+    var bookingId = 'bk_' + Date.now();
+    var roomId = generateRoomId();
+    var scheduledAt = getNextOccurrence(selectedDay, selectedSlot);
+
+    var booking = {
+      id: bookingId,
+      teacherId: teacherData.id,
+      teacherName: teacherData.name,
+      teacherEmail: teacherData.email || '',
+      studentName: studentName,
+      studentEmail: studentEmail,
+      day: selectedDay,
+      time: selectedSlot,
+      scheduledAt: scheduledAt,
+      roomId: roomId,
+      duration: 60,
+      price: teacherData.price,
+      note: note,
+      status: 'pending',
+      createdAt: Date.now()
+    };
+
+    await fetch(API + '?key=' + encodeURIComponent('booking:' + bookingId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'booking:' + bookingId, value: booking })
+    });
+
+    if (studentEmail) {
+      var studentBookings = await kvGet('bookings:user:' + studentEmail);
+      var sList = studentBookings?.value || [];
+      sList.push(booking);
+      await fetch(API + '?key=' + encodeURIComponent('bookings:user:' + studentEmail), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'bookings:user:' + studentEmail, value: sList })
+      });
+    }
+
+    if (teacherData.email) {
+      var teacherBookings = await kvGet('bookings:user:' + teacherData.email);
+      var tList = teacherBookings?.value || [];
+      tList.push(booking);
+      await fetch(API + '?key=' + encodeURIComponent('bookings:user:' + teacherData.email), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'bookings:user:' + teacherData.email, value: tList })
+      });
+
+      var teacherNotifs = await kvGet('notifications:' + teacherData.email);
+      var nList = teacherNotifs?.value || [];
+      nList.unshift({
+        id: 'notif_' + Date.now(),
+        type: 'new_booking',
+        message: studentName + ' booked a lesson on ' + selectedDay + ' at ' + selectedSlot,
+        bookingId: bookingId,
+        studentName: studentName,
+        studentEmail: studentEmail,
+        day: selectedDay,
+        time: selectedSlot,
+        read: false,
+        createdAt: Date.now()
+      });
+      await fetch(API + '?key=' + encodeURIComponent('notifications:' + teacherData.email), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'notifications:' + teacherData.email, value: nList })
+      });
+    }
+
+    document.querySelector('.modal-overlay')?.remove();
+    toast('Booking request sent! The teacher will be notified.');
+    selectedSlot = null;
+    document.querySelectorAll('.slot.selected').forEach(function(s) { s.classList.remove('selected'); });
+  } catch (e) {
+    toast('Something went wrong, please try again', 'error');
+  }
+}
+
+async function loadProfile() {
+  const id = getTeacherId();
+  try {
+    const res = await kvGet('teacher:' + id);
+    if (res.value) {
+      teacherData = res.value;
+    } else {
+      teacherData = null;
+    }
+  } catch (e) {
+    teacherData = null;
+  }
+  if (!teacherData) {
+    document.getElementById('profileWrap').innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:48px;margin-bottom:12px;">👤</div><h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">Teacher Not Found</h2><p style="color:var(--ink-soft);font-size:14px;">This teacher profile does not exist or has been removed.</p><a href="teachers.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#0d9488;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">Browse Teachers</a></div>';
+    return;
+  }
+  renderProfile(teacherData);
+  var schedule = teacherData.schedule || null;
+  if(schedule && schedule.length && schedule[0].from && schedule[0].to){
+    var slots = [];
+    schedule.forEach(function(entry){
+      var fromH = parseInt(entry.from.split(':')[0],10);
+      var fromM = parseInt(entry.from.split(':')[1]||'0',10);
+      var toH = parseInt(entry.to.split(':')[0],10);
+      for(var h = fromH; h <= toH; h++){
+        var timeStr = (h<10?'0':'')+h+':00';
+        if(timeStr >= entry.from && timeStr <= entry.to){
+          slots.push({day:entry.day, time:timeStr, available:true});
+        }
+      }
+    });
+    schedule = slots;
+  }
+  renderDayPicker((schedule && schedule.length) ? schedule : demoSchedule);
+  window._currentSchedule = (schedule && schedule.length) ? schedule : demoSchedule;
+  updateBookingHint();
+}
+
+function generateDemoTeacher(id) {
+  return null;
+}
+
+loadProfile();
+</script>
+
+<script>
+function toggleMenu() {
+  var m = document.getElementById('mobileMenu');
+  var o = document.getElementById('mobileOverlay');
+  if (m) m.classList.toggle('open');
+  if (o) o.classList.toggle('open');
+}
+</script>
+
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMenu()">✕</button>
+  <a href="dashboard-student.html" onclick="toggleMenu()">📊 Dashboard</a>
+  <a href="teachers.html" onclick="toggleMenu()">👨‍🏫 Teachers</a>
+  <a href="lessons.html" onclick="toggleMenu()">📚 Lessons</a>
+  <a href="profile.html" onclick="toggleMenu()">👤 Profile</a>
+  <a href="index.html" onclick="toggleMenu()">🃏 Cards</a>
+</div>
+</body>
+</html>

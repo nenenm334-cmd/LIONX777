@@ -1,5 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /api/
-
-Sitemap: https://minbar.vercel.app/sitemap.xml
+Sitemap: https://lionx777.vercel.app/sitemap.xml

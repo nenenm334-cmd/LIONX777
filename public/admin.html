@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  .admin-nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .admin-tab {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    transition: all .2s;
+  }
+  .admin-tab:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .admin-tab.active {
+    background: var(--teal);
+    color: #fff;
+    border-color: var(--teal);
+  }
+  .admin-section {
+    display: none;
+  }
+  .admin-section.active {
+    display: block;
+  }
+  .action-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .action-btn.edit {
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+  .action-btn.delete {
+    background: var(--rose-soft);
+    color: var(--rose);
+  }
+  .action-btn.view {
+    background: var(--teal-soft);
+    color: var(--teal);
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .section-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="logo">
+    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(13,148,136,.25);">M</div>
+    Minbar
+  </a>
+  <div class="nav-links">
+    <a href="admin.html" class="nav-link active">Admin Panel</a>
+    <a href="teachers.html" class="nav-link">Teachers</a>
+    <a href="index.html" class="nav-link">Platform</a>
+  </div>
+  <div class="user-area">
+    <span class="user-badge" style="background:var(--rose-soft);color:var(--rose);">Admin</span>
+    <div class="avatar-sm" style="background:var(--rose-soft);color:var(--rose);">A</div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="lp">
+    <h2>&#128736; Admin Panel</h2>
+
+    <div class="dash-stats">
+      <div class="dash-stat"><div class="ds-icon" style="background:var(--teal-soft);color:var(--teal);">&#128100;</div><div class="ds-num">6</div><div class="ds-label">Teachers</div></div>
+      <div class="dash-stat"><div class="ds-icon" style="background:var(--blue-soft);color:var(--blue);">&#128101;</div><div class="ds-num">48</div><div class="ds-label">Students</div></div>
+      <div class="dash-stat"><div class="ds-icon" style="background:var(--green-soft);color:var(--green);">&#128197;</div><div class="ds-num">156</div><div class="ds-label">Bookings</div></div>
+      <div class="dash-stat"><div class="ds-icon" style="background:var(--orange-soft);color:var(--orange);">&#128176;</div><div class="ds-num">$8,400</div><div class="ds-label">Total Revenue</div></div>
+      <div class="dash-stat"><div class="ds-icon" style="background:var(--rose-soft);color:var(--rose);">&#128218;</div><div class="ds-num">892</div><div class="ds-label">Total Lessons</div></div>
+      <div class="dash-stat"><div class="ds-icon" style="background:var(--teal-soft);color:var(--teal);">&#11088;</div><div class="ds-num">4.8</div><div class="ds-label">Avg Rating</div></div>
+    </div>
+
+    <div class="admin-nav" id="adminNav">
+      <div class="admin-tab active" data-section="teachers-admin">&#128100; Teachers</div>
+      <div class="admin-tab" data-section="students-admin">&#128101; Students</div>
+      <div class="admin-tab" data-section="bookings-admin">&#128197; Bookings</div>
+      <div class="admin-tab" data-section="sessions-admin">&#127909; Active Sessions</div>
+      <div class="admin-tab" data-section="reviews-admin">&#11088; Reviews</div>
+      <div class="admin-tab" data-section="files-admin">&#128196; Files</div>
+      <div class="admin-tab" data-section="notifications-admin">&#128276; Notifications</div>
+      <div class="admin-tab" data-section="stats-admin">&#128200; Analytics</div>
+    </div>
+
+    <div class="admin-section active" id="teachers-adminSection">
+      <div class="section-header">
+        <h3>Teacher Management</h3>
+        <button class="btn btn-primary btn-sm" onclick="toast('Add teacher form opened')">+ Add Teacher</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead><tr><th>Name</th><th>Specialty</th><th>Students</th><th>Lessons</th><th>Rating</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${[
+              { name:'Ahmed Al-Harbi', spec:'Quran + Arabic', students:156, lessons:892, rating:4.9, price:'$25', status:'Active' },
+              { name:'Fatima Al-Zahra', spec:'Kids + Conversation', students:89, lessons:445, rating:4.8, price:'$20', status:'Active' },
+              { name:'Mohammed Al-Ali', spec:'Grammar + Morphology', students:134, lessons:678, rating:4.7, price:'$35', status:'Active' },
+              { name:'Noura Al-Salem', spec:'Conversation + Business', students:67, lessons:334, rating:4.9, price:'$22', status:'Active' },
+              { name:'Abdulrahman Al-Shamri', spec:'Business + General', students:45, lessons:223, rating:4.6, price:'$30', status:'Suspended' },
+              { name:'Reem Al-Dosari', spec:'Quran + Kids', students:78, lessons:389, rating:4.8, price:'$28', status:'Active' },
+            ].map(t => `<tr>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="bk-avatar" style="width:32px;height:32px;font-size:12px;">${t.name.charAt(0)}</div><b>${t.name}</b></div></td>
+              <td><span class="badge-pill badge-level">${t.spec}</span></td>
+              <td>${t.students}</td><td>${t.lessons}</td>
+              <td style="color:var(--orange);">${'&#9733;'.repeat(Math.round(t.rating))} ${t.rating}</td>
+              <td style="font-weight:600;">${t.price}</td>
+              <td><span class="lesson-status ${t.status==='Active'?'ls-completed':'ls-cancelled'}">${t.status}</span></td>
+              <td><button class="action-btn edit" onclick="toast('Edit page opened')">Edit</button> <button class="action-btn delete" onclick="toast('Teacher suspended','error')">Disable</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-section" id="students-adminSection">
+      <h3 style="margin-bottom:12px;">Student Management</h3>
+      <div class="search-wrap"><input type="text" placeholder="Search students..."><span class="search-icon">&#128269;</span></div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead><tr><th>Name</th><th>Joined</th><th>Lessons</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${['Sara Ahmed','Mohammed Khalid','Layla Omar','Omar Hassan','Noura Saeed'].map((n,i) => `<tr>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="bk-avatar" style="width:32px;height:32px;font-size:12px;">${n.charAt(0)}</div><b>${n}</b></div></td>
+              <td style="color:var(--ink-soft);">${[3,1,0.5,6,2][i]} ${['months','month','weeks','months','months'][i]} ago</td>
+              <td>${[12,4,2,24,8][i]}</td>
+              <td><span class="lesson-status ls-completed">Active</span></td>
+              <td><button class="action-btn view" onclick="toast('Viewing profile')">View</button> <button class="action-btn delete" onclick="toast('Student blocked','error')">Block</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-section" id="bookings-adminSection">
+      <h3 style="margin-bottom:12px;">Booking Management</h3>
+      <div class="filter-bar">
+        <span class="filter-pill active">All</span>
+        <span class="filter-pill">Pending</span>
+        <span class="filter-pill">Confirmed</span>
+        <span class="filter-pill">Cancelled</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead><tr><th>Student</th><th>Teacher</th><th>Day</th><th>Time</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${[
+              {s:'Sara',t:'Ahmed',day:'Sunday',time:'10:00',price:'$25',status:'pending'},
+              {s:'Mohammed',t:'Fatima',day:'Monday',time:'14:00',price:'$20',status:'confirmed'},
+              {s:'Layla',t:'Mohammed',day:'Wednesday',time:'09:00',price:'$35',status:'confirmed'},
+              {s:'Omar',t:'Noura',day:'Thursday',time:'16:00',price:'$22',status:'cancelled'},
+            ].map(b => `<tr>
+              <td>${b.s}</td><td>${b.t}</td><td>${b.day}</td><td>${b.time}</td><td style="font-weight:600;">${b.price}</td>
+              <td><span class="lesson-status ${b.status==='confirmed'?'ls-completed':b.status==='pending'?'ls-upcoming':'ls-cancelled'}">${b.status==='confirmed'?'Confirmed':b.status==='pending'?'Pending':'Cancelled'}</span></td>
+              <td><button class="action-btn view" onclick="toast('Viewing details')">View</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-section" id="sessions-adminSection">
+      <h3 style="margin-bottom:12px;">Active Sessions</h3>
+      <div id="sessionsList"></div>
+    </div>
+
+    <div class="admin-section" id="reviews-adminSection">
+      <h3 style="margin-bottom:12px;">Reviews</h3>
+      <div id="reviewsList"></div>
+    </div>
+
+    <div class="admin-section" id="files-adminSection">
+      <h3 style="margin-bottom:12px;">Uploaded Files</h3>
+      <div id="filesList"></div>
+    </div>
+
+    <div class="admin-section" id="notifications-adminSection">
+      <h3 style="margin-bottom:12px;">Notifications</h3>
+      <button class="btn btn-primary btn-sm" onclick="toast('Send notification form opened')">+ Send Broadcast</button>
+      <div id="notifList" style="margin-top:16px;"></div>
+    </div>
+
+    <div class="admin-section" id="stats-adminSection">
+      <h3 style="margin-bottom:12px;">Analytics</h3>
+      <div id="statsContent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+function toast(msg, type='success') {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+function escapeHtml(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+
+document.getElementById('adminNav').addEventListener('click', function(e) {
+  const tab = e.target.closest('.admin-tab');
+  if (!tab) return;
+  this.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(tab.dataset.section + 'Section').classList.add('active');
+});
+
+document.getElementById('sessionsList').innerHTML = [
+  { teacher:'Ahmed Al-Harbi', student:'Sara Ahmed', time:'10:00 - 10:30', duration:'30 min', status:'Live Now' },
+  { teacher:'Fatima Al-Zahra', student:'Mohammed Khalid', time:'14:00 - 14:45', duration:'45 min', status:'Live Now' },
+].map(s => `
+  <div style="padding:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+    <div style="width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;"></div>
+    <div style="flex:1;"><div style="font-weight:600;">${escapeHtml(s.teacher)} &harr; ${escapeHtml(s.student)}</div><div style="font-size:12px;color:var(--ink-soft);">${s.time} (${s.duration})</div></div>
+    <span class="lesson-status ls-live">Live</span>
+    <button class="action-btn view" onclick="toast('Room opened')">Join</button>
+  </div>`).join('');
+
+document.getElementById('reviewsList').innerHTML = [
+  { student:'Sara', teacher:'Ahmed', rating:5, text:'Excellent and very patient teacher.' },
+  { student:'Mohammed', teacher:'Fatima', rating:5, text:'Amazing approach with kids.' },
+  { student:'Layla', teacher:'Mohammed', rating:4, text:'Great explanation but sometimes goes a bit fast.' },
+].map(r => `
+  <div style="padding:12px 0;border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div style="font-weight:600;font-size:13px;">${r.student}</div>
+      <span style="color:var(--ink-soft);font-size:12px;">&rarr;</span>
+      <div style="font-weight:600;font-size:13px;color:var(--teal);">${r.teacher}</div>
+      <div style="margin-right:auto;display:flex;gap:2px;">${[1,2,3,4,5].map(n => '<span style="color:'+(n<=r.rating?'#f59e0b':'#d1d5db')+'">&#9733;</span>').join('')}</div>
+    </div>
+    <p style="font-size:13px;color:var(--ink-soft);">${escapeHtml(r.text)}</p>
+  </div>`).join('');
+
+document.getElementById('filesList').innerHTML = [
+  { name:'lecture_today.pdf', size:'2.4 MB', owner:'Ahmed Al-Harbi', date:'Today' },
+  { name:'grammar_exercises.docx', size:'856 KB', owner:'Mohammed Al-Ali', date:'Yesterday' },
+  { name:'conversation_notes.pdf', size:'1.2 MB', owner:'Fatima Al-Zahra', date:'3 days ago' },
+].map(f => `
+  <div class="file-item">
+    <div class="fi-icon" style="background:var(--blue-soft);color:var(--blue);">&#128196;</div>
+    <div style="flex:1;"><div style="font-size:13px;font-weight:500;">${escapeHtml(f.name)}</div><div style="font-size:11px;color:var(--ink-soft);">${f.size} - ${escapeHtml(f.owner)} - ${f.date}</div></div>
+    <button class="action-btn delete" onclick="toast('File deleted','error')">Delete</button>
+  </div>`).join('');
+
+document.getElementById('statsContent').innerHTML = `
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+    <div class="lp">
+      <h3 style="font-size:16px;margin-bottom:12px;">Bookings This Week</h3>
+      <div style="display:grid;gap:8px;">
+        ${['Sunday: 12 bookings','Monday: 15 bookings','Tuesday: 18 bookings','Wednesday: 14 bookings','Thursday: 10 bookings'].map(d => {
+          const [day, count] = d.split(': ');
+          const num = parseInt(count);
+          return `<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="min-width:90px;">${day}</span><div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${num/20*100}%;background:linear-gradient(90deg,var(--teal),var(--accent));border-radius:4px;"></div></div><span style="min-width:40px;font-weight:600;">${num}</span></div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="lp">
+      <h3 style="font-size:16px;margin-bottom:12px;">Top Teachers</h3>
+      <div style="display:grid;gap:8px;">
+        ${[
+          {name:'Ahmed Al-Harbi', count:42, pct:100},
+          {name:'Fatima Al-Zahra', count:38, pct:90},
+          {name:'Mohammed Al-Ali', count:35, pct:83},
+          {name:'Noura Al-Salem', count:28, pct:67},
+          {name:'Reem Al-Dosari', count:25, pct:60},
+        ].map(t => `<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="min-width:140px;">${t.name}</span><div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${t.pct}%;background:linear-gradient(90deg,var(--teal),var(--accent));border-radius:4px;"></div></div><span style="min-width:30px;font-weight:600;">${t.count}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="lp">
+      <h3 style="font-size:16px;margin-bottom:12px;">Monthly Revenue</h3>
+      <div style="display:grid;gap:8px;">
+        ${[
+          {month:'July', amount:2340, pct:100},
+          {month:'June', amount:1950, pct:83},
+          {month:'May', amount:2125, pct:91},
+          {month:'April', amount:1775, pct:76},
+        ].map(m => `<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="min-width:60px;">${m.month}</span><div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${m.pct}%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:4px;"></div></div><span style="min-width:50px;font-weight:600;">$${m.amount}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="lp">
+      <h3 style="font-size:16px;margin-bottom:12px;">Peak Hours</h3>
+      <div style="display:grid;gap:8px;">
+        ${[
+          {time:'10:00 AM', pct:95},
+          {time:'2:00 PM', pct:85},
+          {time:'4:00 PM', pct:70},
+          {time:'11:00 AM', pct:60},
+          {time:'9:00 PM', pct:45},
+        ].map(t => `<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="min-width:70px;">${t.time}</span><div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${t.pct}%;background:linear-gradient(90deg,var(--orange),#f59e0b);border-radius:4px;"></div></div><span style="min-width:30px;font-weight:600;">${t.pct}%</span></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+</script>
+</body>
+</html>

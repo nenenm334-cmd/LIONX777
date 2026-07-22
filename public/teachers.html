@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Minbar - Find Teachers</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+body { direction: ltr; text-align: left; }
+.top-nav .nav-links { margin-left: auto; margin-right: 0; }
+.top-nav .user-area { margin-left: 8px; margin-right: 0; }
+.top-nav .logo svg { transform: scaleX(-1); }
+.search-wrap .search-icon { left: 14px; right: auto; }
+.tc-status { left: 12px; right: auto; }
+.hero-section {
+  background: linear-gradient(135deg, var(--teal), var(--accent));
+  border-radius: var(--radius-lg);
+  padding: 52px 24px 48px;
+  text-align: center; color: #fff;
+  margin-bottom: 28px; position: relative; overflow: hidden;
+}
+.hero-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.hero-section h1 {
+  font-family: 'Amiri', serif;
+  font-size: 34px; font-weight: 700;
+  position: relative; z-index: 1;
+  margin-bottom: 10px; letter-spacing: -.3px;
+}
+.hero-section p {
+  font-size: 15px; opacity: .85;
+  position: relative; z-index: 1;
+  max-width: 520px; margin: 0 auto;
+}
+.hero-section .search-hero {
+  position: relative; z-index: 1;
+  max-width: 520px; margin: 24px auto 0;
+}
+.hero-section .search-hero input {
+  width: 100%; padding: 14px 20px 14px 44px;
+  border-radius: 30px; border: none;
+  font-family: inherit; font-size: 15px;
+  box-shadow: var(--shadow-lg);
+  color: var(--ink);
+}
+.hero-section .search-hero input:focus { outline: 2px solid rgba(255,255,255,.5); }
+.hero-section .search-hero .sh-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-soft); font-size: 18px;
+  pointer-events: none;
+}
+.specialty-tags {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  justify-content: center; margin-top: 20px;
+  position: relative; z-index: 1;
+}
+.s-tag {
+  padding: 6px 16px; border-radius: 20px;
+  background: rgba(255,255,255,.15);
+  color: #fff; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+  backdrop-filter: blur(4px);
+  letter-spacing: .2px;
+  user-select: none;
+}
+.s-tag:hover { background: rgba(255,255,255,.28); }
+.s-tag.active { background: rgba(255,255,255,.35); box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
+
+.controls-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.results-info {
+  font-size: 13px; color: var(--ink-soft); font-weight: 500;
+}
+.sort-bar { display: flex; gap: 8px; align-items: center; }
+.sort-bar label {
+  font-size: 12px; font-weight: 600; color: var(--ink-soft);
+  text-transform: uppercase; letter-spacing: .4px;
+}
+.sort-bar select {
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--card); color: var(--ink);
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: border-color .2s;
+}
+.sort-bar select:focus { outline: none; border-color: var(--teal); }
+
+.teacher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 22px;
+}
+
+.tc-header {
+  height: 130px;
+  background: linear-gradient(135deg, var(--teal), var(--accent));
+  position: relative;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.tc-avatar {
+  width: 76px; height: 76px;
+  border-radius: 50%;
+  border: 3px solid var(--card);
+  background: var(--card);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 700; color: var(--teal);
+  position: absolute; bottom: -38px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.tc-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.tc-body { padding: 44px 20px 18px; text-align: center; }
+.tc-name {
+  font-family: 'Amiri', serif;
+  font-size: 17px; font-weight: 700;
+  color: var(--ink); margin-bottom: 6px;
+}
+.tc-rating-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-bottom: 8px;
+}
+.tc-rating-num {
+  font-size: 13px; font-weight: 700; color: var(--orange);
+}
+.tc-bio {
+  font-size: 13px; color: var(--ink-soft);
+  margin-bottom: 14px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tc-tags {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  justify-content: center; margin-bottom: 14px;
+}
+.tc-tag-item {
+  padding: 3px 10px; border-radius: 10px;
+  font-size: 10px; font-weight: 600;
+  background: var(--teal-soft); color: var(--teal);
+  text-transform: capitalize;
+}
+.tc-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.tc-stat { text-align: center; }
+.tc-stat-num { font-size: 15px; font-weight: 700; color: var(--teal); }
+.tc-stat-label { font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .3px; }
+.tc-price {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; background: var(--teal-soft);
+  border-top: 1px solid var(--border);
+}
+.tc-price .price { font-size: 18px; font-weight: 700; color: var(--teal-dark); }
+.tc-price .unit { font-size: 12px; color: var(--ink-soft); }
+.tc-price .lessons-count { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
+
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--ink-soft);
+}
+.empty-state .es-icon { font-size: 52px; margin-bottom: 16px; opacity: .4; }
+.empty-state .es-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--ink); }
+.empty-state .es-text { font-size: 14px; max-width: 380px; margin: 0 auto; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.teacher-card { animation: fadeInUp .35s ease both; }
+.teacher-card:nth-child(2) { animation-delay: .05s; }
+.teacher-card:nth-child(3) { animation-delay: .1s; }
+.teacher-card:nth-child(4) { animation-delay: .15s; }
+.teacher-card:nth-child(5) { animation-delay: .2s; }
+.teacher-card:nth-child(6) { animation-delay: .25s; }
+
+@media (max-width: 768px) {
+  .hero-section h1 { font-size: 26px; }
+  .hero-section p { font-size: 14px; }
+  .controls-bar { flex-direction: column; align-items: stretch; }
+  .sort-bar { justify-content: space-between; }
+  .teacher-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="logo">
+    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(13,148,136,.25);">M</div>
+    Minbar
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="teachers.html" class="nav-link active">Teachers</a>
+    <a href="lessons.html" class="nav-link">My Lessons</a>
+  </div>
+  <div class="user-area">
+    <div class="avatar-sm" id="userAvatar">U</div>
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="hero-section">
+    <h1>Find Your Perfect Teacher</h1>
+    <p>Browse expert Arabic language teachers and book your next lesson today</p>
+    <div class="search-hero">
+      <input type="text" id="searchInput" placeholder="Search by name or specialty...">
+      <span class="sh-icon">&#128269;</span>
+    </div>
+    <div class="specialty-tags" id="specialtyTags">
+      <span class="s-tag active" data-filter="all">All</span>
+      <span class="s-tag" data-filter="arabic">Arabic</span>
+      <span class="s-tag" data-filter="quran">Quran</span>
+      <span class="s-tag" data-filter="kids">Kids</span>
+      <span class="s-tag" data-filter="conversation">Conversation</span>
+      <span class="s-tag" data-filter="grammar">Grammar</span>
+      <span class="s-tag" data-filter="business">Business</span>
+    </div>
+  </div>
+
+  <div class="controls-bar">
+    <span class="results-info" id="resultsInfo"></span>
+    <div class="sort-bar">
+      <label for="sortSelect">Sort by</label>
+      <select id="sortSelect">
+        <option value="rating">Top Rated</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="students">Most Students</option>
+        <option value="experience">Most Experience</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="teacher-grid" id="teacherGrid"></div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="es-icon">&#128269;</div>
+    <div class="es-title">No Teachers Yet</div>
+    <div class="es-text">No teachers have registered on the platform yet. Check back soon!</div>
+  </div>
+
+  <div id="loadingState">
+    <div class="teacher-grid">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+(function(){
+  var sess = JSON.parse(localStorage.getItem('minbar_session') || 'null');
+  if(!sess || !sess.role){ window.location.href = 'index.html'; return; }
+})();
+const API = '/api/kv';
+const SECRET = '';
+
+function toast(msg, type='success') {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+function getHeaders() { return SECRET ? { 'Authorization': 'Bearer ' + SECRET, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' }; }
+
+async function kvGet(key) {
+  const r = await fetch(API + '?key=' + encodeURIComponent(key), { headers: getHeaders() });
+  const data = await r.json();
+  if (data && typeof data.value === 'string') { try { data.value = JSON.parse(data.value); } catch(e) {} }
+  return data;
+}
+
+function starsHTML(rating) {
+  let h = '<span class="stars">';
+  for (let i = 1; i <= 5; i++) h += '<span class="star ' + (i <= Math.round(rating) ? 'filled' : '') + '">&#9733;</span>';
+  return h + '</span>';
+}
+
+function statusBadge(teacher) {
+  const now = Date.now();
+  if (teacher._status === 'teaching') return '<span class="tc-status teaching"><span class="dot"></span>Teaching</span>';
+  if (teacher._status === 'online' || (teacher._lastSeen && now - teacher._lastSeen < 120000))
+    return '<span class="tc-status online"><span class="dot"></span>Online</span>';
+  return '<span class="tc-status offline"><span class="dot"></span>Offline</span>';
+}
+
+function initials(name) { return name ? name.charAt(0) : '?'; }
+
+function renderTeachers(teachers) {
+  const grid = document.getElementById('teacherGrid');
+  const empty = document.getElementById('emptyState');
+  const loading = document.getElementById('loadingState');
+  loading.style.display = 'none';
+
+  if (teachers.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = teachers.map(t => `
+    <div class="teacher-card" onclick="window.location.href='teacher-profile.html?id=${encodeURIComponent(t.id)}'">
+      <div class="tc-header" style="background:linear-gradient(135deg, ${t.gradientStart || 'var(--teal)'}, ${t.gradientEnd || 'var(--accent)'})">
+        ${statusBadge(t)}
+        <div class="tc-avatar">${t.image ? '<img src="' + t.image + '" alt="">' : initials(t.name)}</div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-name">${escapeHtml(t.name)}</div>
+        <div class="tc-rating-row">
+          ${starsHTML(t.rating || 0)}
+          <span class="tc-rating-num">${(t.rating || 0).toFixed(1)}</span>
+        </div>
+        <div class="tc-tags">${(t.specialties || []).map(s => '<span class="tc-tag-item">' + escapeHtml(s) + '</span>').join('')}</div>
+        <div class="tc-bio">${escapeHtml(t.bio || '')}</div>
+        <div class="tc-stats">
+          <div class="tc-stat"><div class="tc-stat-num">${t.studentsCount || 0}</div><div class="tc-stat-label">Students</div></div>
+          <div class="tc-stat"><div class="tc-stat-num">${t.lessonsCount || 0}</div><div class="tc-stat-label">Lessons</div></div>
+          <div class="tc-stat"><div class="tc-stat-num">${t.yearsExp || 0}</div><div class="tc-stat-label">Years</div></div>
+        </div>
+      </div>
+      <div class="tc-price">
+        <div><span class="price">$${t.price || 0}</span> <span class="unit">/ lesson</span></div>
+        <div class="lessons-count">${t.lessonsCount || 0} lessons</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('resultsInfo').textContent = teachers.length + ' teacher' + (teachers.length !== 1 ? 's' : '') + ' found';
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let allTeachers = [];
+let currentFilter = 'all';
+let currentSearch = '';
+
+function filterTeachers() {
+  let filtered = allTeachers;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(t => (t.specialties || []).includes(currentFilter));
+  }
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    filtered = filtered.filter(t =>
+      (t.name || '').toLowerCase().includes(q) ||
+      (t.bio || '').toLowerCase().includes(q) ||
+      (t.specialties || []).some(s => s.toLowerCase().includes(q))
+    );
+  }
+  const sort = document.getElementById('sortSelect').value;
+  if (sort === 'rating') filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  else if (sort === 'price-low') filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+  else if (sort === 'price-high') filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+  else if (sort === 'students') filtered.sort((a, b) => (b.studentsCount || 0) - (a.studentsCount || 0));
+  else if (sort === 'experience') filtered.sort((a, b) => (b.yearsExp || 0) - (a.yearsExp || 0));
+  renderTeachers(filtered);
+}
+
+async function loadTeachers() {
+  try {
+    const res = await kvGet('teachers_list');
+    const list = res.value || [];
+    if (list.length === 0) {
+      allTeachers = [];
+    } else {
+      const promises = list.map(async function(t) {
+        const id = (typeof t === 'string') ? t : (t.id || t.email || '');
+        const baseData = (typeof t === 'string') ? { id: t, name: t.split('@')[0], email: t } : t;
+        if (!id) return null;
+        try {
+          const r = await kvGet('teacher:' + id);
+          const full = r && r.value ? r.value : {};
+          return Object.assign({}, baseData, full, { id: id, email: id });
+        } catch(e) {
+          return baseData;
+        }
+      });
+      allTeachers = (await Promise.all(promises)).filter(Boolean);
+    }
+    filterTeachers();
+  } catch (e) {
+    console.error('Load error:', e);
+    allTeachers = [];
+    filterTeachers();
+  }
+}
+
+function generateDemoTeachers() {
+  return [];
+}
+
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  currentSearch = e.target.value;
+  filterTeachers();
+});
+
+document.getElementById('sortSelect').addEventListener('change', filterTeachers);
+
+document.getElementById('specialtyTags').addEventListener('click', function(e) {
+  const tag = e.target.closest('.s-tag');
+  if (!tag) return;
+  document.querySelectorAll('.s-tag').forEach(t => t.classList.remove('active'));
+  tag.classList.add('active');
+  currentFilter = tag.dataset.filter;
+  filterTeachers();
+});
+
+loadTeachers();
+</script>
+
+<script>
+function toggleMenu() {
+  var m = document.getElementById('mobileMenu');
+  var o = document.getElementById('mobileOverlay');
+  if (m) m.classList.toggle('open');
+  if (o) o.classList.toggle('open');
+}
+</script>
+
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMenu()">✕</button>
+  <a href="dashboard-student.html" onclick="toggleMenu()">📊 Dashboard</a>
+  <a href="teachers.html" onclick="toggleMenu()">👨‍🏫 Teachers</a>
+  <a href="lessons.html" onclick="toggleMenu()">📚 Lessons</a>
+  <a href="profile.html" onclick="toggleMenu()">👤 Profile</a>
+  <a href="index.html" onclick="toggleMenu()">🃏 Cards</a>
+</div>
+</body>
+</html>

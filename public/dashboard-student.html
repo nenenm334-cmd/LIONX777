@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Student Dashboard — Minbar</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg,#f8fafc);color:var(--ink,#111827);min-height:100vh;}
+.container{max-width:1100px;margin:0 auto;padding:24px 20px;}
+.dash-nav{display:flex;gap:6px;overflow-x:auto;padding:4px 0 16px;-webkit-overflow-scrolling:touch;}
+.dash-tab{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;color:var(--ink-soft,#6b7280);background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);cursor:pointer;white-space:nowrap;transition:all .2s;}
+.dash-tab:hover{border-color:var(--teal,#0d9488);color:var(--teal);}
+.dash-tab.active{background:var(--teal,#0d9488);color:#fff;border-color:var(--teal);}
+.tab-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(239,68,68,.15);color:#ef4444;}
+.dash-tab.active .tab-badge{background:rgba(255,255,255,.2);color:#fff;}
+.dash-section{display:none;}
+.dash-section.active{display:block;}
+.section-title{font-size:18px;font-weight:700;margin-bottom:16px;color:var(--ink);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+@media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:18px;text-align:center;transition:all .2s;}
+.stat-card:hover{box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.06));transform:translateY(-1px);}
+.stat-icon{font-size:24px;margin-bottom:6px;}
+.stat-num{font-size:26px;font-weight:800;color:var(--teal,#0d9488);}
+.stat-label{font-size:11px;color:var(--ink-soft,#6b7280);margin-top:2px;font-weight:500;}
+
+/* Lesson Card */
+.lesson-card{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:12px;transition:all .2s;}
+.lesson-card:hover{box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.06));}
+.lc-time{text-align:center;min-width:60px;}
+.lc-hour{font-size:22px;font-weight:800;color:var(--teal,#0d9488);}
+.lc-ampm{font-size:11px;color:var(--ink-soft);font-weight:600;}
+.lc-info{flex:1;min-width:0;}
+.lc-title{font-size:14px;font-weight:700;color:var(--ink);}
+.lc-meta{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.lc-countdown{font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;margin-top:4px;display:inline-block;}
+.lc-countdown.soon{background:rgba(245,158,11,.1);color:#f59e0b;}
+.lc-countdown.later{background:rgba(13,148,136,.08);color:#0d9488;}
+.lc-countdown.live{background:rgba(239,68,68,.1);color:#ef4444;animation:livePulse 1.5s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.lc-actions{display:flex;gap:8px;flex-shrink:0;}
+.lc-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.lc-btn.join{background:linear-gradient(135deg,#0d9488,#0a7e6e);color:#fff;box-shadow:0 2px 8px rgba(13,148,136,.25);}
+.lc-btn.join:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.35);}
+.lc-btn.cancel{background:transparent;border:1.5px solid var(--border,#e5e7eb);color:var(--ink-soft);}
+.lc-btn.cancel:hover{border-color:#ef4444;color:#ef4444;}
+.lc-btn.rate{background:rgba(245,158,11,.1);color:#f59e0b;border:1.5px solid rgba(245,158,11,.2);}
+.lc-btn.rate:hover{background:rgba(245,158,11,.2);}
+.status-badge{padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;}
+.status-pending{background:rgba(245,158,11,.1);color:#f59e0b;}
+.status-confirmed{background:rgba(13,148,136,.1);color:#0d9488;}
+.status-completed{background:rgba(34,197,94,.1);color:#22c55e;}
+.status-rejected{background:rgba(239,68,68,.1);color:#ef4444;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:14px;}
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast-item{padding:12px 24px;border-radius:10px;background:var(--ink,#111827);color:var(--bg,#fff);font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.3);animation:toastIn .3s ease;pointer-events:auto;white-space:nowrap;}
+.toast-item.success{background:#0d9488;color:#fff;}
+.toast-item.error{background:#ef4444;color:#fff;}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<script>if(localStorage.getItem('minbar_dark')==='true') document.body.classList.add('dark');</script>
+
+<nav class="top-nav">
+  <a href="index.html" class="logo">
+    <div class="brand-mark" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(13,148,136,.25);">M</div>
+    Minbar
+  </a>
+  <div class="nav-links">
+    <a href="dashboard-student.html" class="nav-link active">Dashboard</a>
+    <a href="teachers.html" class="nav-link">Teachers</a>
+    <a href="lessons.html" class="nav-link">Lessons</a>
+    <a href="index.html" class="nav-link">Cards</a>
+  </div>
+  <div class="user-area">
+    <button onclick="startTestCall()" style="padding:6px 12px;border:1.5px solid #d4e2da;border-radius:8px;background:#fff;color:#5A7265;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">📹 Test Call</button>
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+    <div class="avatar-sm" id="navAvatar">S</div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-num" id="statUpcoming">0</div><div class="stat-label">Upcoming Lessons</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" id="statCompleted">0</div><div class="stat-label">Completed</div></div>
+    <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-num" id="statStreak">0</div><div class="stat-label">Day Streak</div></div>
+    <div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-num" id="statMinutes">0</div><div class="stat-label">Minutes Studied</div></div>
+  </div>
+
+  <div class="dash-nav" id="dashNav">
+    <div class="dash-tab active" data-section="upcoming">📅 Upcoming Lessons</div>
+    <div class="dash-tab" data-section="past">📚 Past Lessons</div>
+    <div class="dash-tab" data-section="files">📄 My Files</div>
+    <div class="dash-tab" data-section="notes">📝 My Notes</div>
+    <div class="dash-tab" data-section="reviews">⭐ My Reviews</div>
+    <div class="dash-tab" data-section="notifications">🔔 Notifications <span class="tab-badge" id="notifCount" style="display:none;">0</span></div>
+    <div class="dash-tab" data-section="chat">💬 Chat</div>
+    <div class="dash-tab" data-section="subscription">💳 Subscription</div>
+  </div>
+
+  <div class="dash-section active" id="upcomingSection">
+    <div id="upcomingList"></div>
+  </div>
+
+  <div class="dash-section" id="pastSection">
+    <div id="pastList"></div>
+  </div>
+
+  <div class="dash-section" id="filesSection">
+    <h2 class="section-title">My Files</h2>
+    <div id="filesList"></div>
+  </div>
+
+  <div class="dash-section" id="notesSection">
+    <h2 class="section-title">My Notes</h2>
+    <textarea id="newNote" placeholder="Write a note..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;min-height:80px;resize:vertical;margin-bottom:12px;font-family:inherit;"></textarea>
+    <button onclick="addNote()" style="padding:10px 20px;border:none;border-radius:8px;background:#0d9488;color:#fff;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;">Add Note</button>
+    <div id="notesList"></div>
+  </div>
+
+  <div class="dash-section" id="reviewsSection">
+    <h2 class="section-title">My Reviews</h2>
+    <div id="reviewsList"></div>
+  </div>
+
+  <div class="dash-section" id="notificationsSection">
+    <h2 class="section-title">Notifications</h2>
+    <div id="notificationsList"></div>
+  </div>
+
+  <div class="dash-section" id="chatSection">
+    <h2 class="section-title">Messages</h2>
+    <div style="background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:400px;">
+      <div id="chatHeader" style="padding:14px 16px;border-bottom:1px solid var(--border-subtle,#e5e7eb);font-size:14px;font-weight:700;color:var(--ink-soft);">Chat with your teacher</div>
+      <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:400px;">
+        <div class="empty-state" style="padding:24px;"><p>No messages yet</p></div>
+      </div>
+      <div id="chatInputArea" style="display:flex;padding:12px 16px;border-top:1px solid var(--border-subtle,#e5e7eb);gap:8px;">
+        <input id="chatMsgInput" type="text" placeholder="Type a message..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border,#e5e7eb);border-radius:10px;font-size:13px;background:var(--bg,#f8fafc);color:var(--ink);outline:none;">
+        <button id="chatSendBtn" onclick="sendStudentChatMsg()" style="padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,#0d9488,#0a7e6e);color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-section" id="subscriptionSection">
+    <h2 class="section-title">My Subscription</h2>
+    <div id="subCurrentPlan" style="background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:24px;margin-bottom:16px;display:flex;align-items:center;gap:20px;">
+      <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#0d9488,#0a7e6e);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">👑</div>
+      <div style="flex:1;">
+        <div style="font-size:20px;font-weight:800;color:var(--ink);" id="subPlanName">Free</div>
+        <div style="font-size:13px;color:var(--ink-soft);margin-top:4px;" id="subPlanStatus"><span class="status-badge" style="background:rgba(13,148,136,.1);color:#0d9488;">Active</span></div>
+        <div style="font-size:13px;color:var(--ink-soft);margin-top:8px;" id="subNextBilling"></div>
+      </div>
+      <a id="subManageBtn" href="checkout.html" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#0d9488,#0a7e6e);color:#fff;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;">Upgrade</a>
+    </div>
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--ink);">Invoice History</h3>
+    <div id="subInvoices" style="background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;overflow:hidden;">
+      <div class="empty-state" style="padding:24px;"><p>No invoices yet</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+var API = '/api/kv';
+var session = JSON.parse(localStorage.getItem('minbar_session') || '{}');
+var userName = session.name || 'Student';
+var userEmail = session.email || '';
+var allBookings = [];
+var countdownTimers = [];
+
+function toast(msg, type) {
+  type = type || 'success';
+  var w = document.getElementById('toastWrap');
+  var t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); }, 3000);
+}
+
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function kvGet(key) {
+  try {
+    var r = await fetch(API + '?key=' + encodeURIComponent(key));
+    if (!r.ok) return null;
+    var data = await r.json();
+    if (data && typeof data.value === 'string') { try { data.value = JSON.parse(data.value); } catch(e) {} }
+    return data;
+  } catch(e) { return null; }
+}
+
+async function kvSet(key, value) {
+  await fetch(API + '?key=' + encodeURIComponent(key), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: key, value: value })
+  });
+}
+
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return Math.floor(diff/86400000) + 'd ago';
+}
+
+function getCountdown(scheduledAt) {
+  var diff = scheduledAt - Date.now();
+  if (diff <= 0) return { text: 'NOW', cls: 'live', isLive: true };
+  var h = Math.floor(diff / 3600000);
+  var m = Math.floor((diff % 3600000) / 60000);
+  var s = Math.floor((diff % 60000) / 1000);
+  if (h > 24) {
+    var d = Math.floor(h / 24);
+    return { text: 'in ' + d + ' day' + (d > 1 ? 's' : ''), cls: 'later' };
+  }
+  if (h > 0) return { text: 'in ' + h + 'h ' + m + 'm', cls: h <= 2 ? 'soon' : 'later' };
+  if (m > 0) return { text: 'in ' + m + 'm ' + s + 's', cls: 'soon' };
+  return { text: 'in ' + s + 's', cls: 'soon' };
+}
+
+function formatTime12(time24) {
+  if (!time24) return '--:--';
+  var parts = time24.replace(/[^0-9:]/g, '').split(':');
+  var h = parseInt(parts[0]) || 0;
+  var m = parts[1] || '00';
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  if (h > 12) h -= 12;
+  if (h === 0) h = 12;
+  return { hour: h, min: m, ampm: ampm };
+}
+
+function renderUpcoming() {
+  var now = Date.now();
+  var upcoming = allBookings.filter(function(b) {
+    return b.status !== 'rejected' && b.status !== 'completed' && b.scheduledAt > now - 3600000;
+  }).sort(function(a, b) { return a.scheduledAt - b.scheduledAt; });
+
+  document.getElementById('statUpcoming').textContent = upcoming.length;
+  var list = document.getElementById('upcomingList');
+
+  if (upcoming.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">📅</div><p>No upcoming lessons. Book a teacher to get started!</p><button onclick="startTestCall()" style="margin-top:12px;padding:10px 20px;border:none;border-radius:8px;background:#0d9488;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">📹 Try a Test Call</button></div>';
+    return;
+  }
+
+  list.innerHTML = upcoming.map(function(b) {
+    var ft = formatTime12(b.time);
+    var cd = getCountdown(b.scheduledAt);
+    var showJoin = cd.isLive || (b.scheduledAt - now <= 600000 && b.scheduledAt - now > 0);
+    var statusCls = b.status === 'confirmed' ? 'status-confirmed' : (b.status === 'pending' ? 'status-pending' : 'status-completed');
+    return '<div class="lesson-card">' +
+      '<div class="lc-time"><div class="lc-hour">' + ft.hour + ':' + ft.min + '</div><div class="lc-ampm">' + ft.ampm + '</div></div>' +
+      '<div class="lc-info">' +
+        '<div class="lc-title">' + escapeHtml(b.teacherName || 'Teacher') + '</div>' +
+        '<div class="lc-meta">' + escapeHtml(b.day || '') + (b.duration ? ' · ' + b.duration + ' min' : '') + (b.price ? ' · $' + b.price : '') + '</div>' +
+        '<div class="lc-countdown ' + cd.cls + '">' + cd.text + '</div>' +
+      '</div>' +
+      '<div class="lc-actions">' +
+        '<span class="status-badge ' + statusCls + '">' + b.status.charAt(0).toUpperCase() + b.status.slice(1) + '</span>' +
+        (showJoin && b.roomId ? '<button class="lc-btn join" onclick="joinLesson(\'' + b.id + '\',\'' + escapeHtml(b.roomId) + '\',\'' + escapeHtml(b.teacherName || '') + '\')">📞 Join Call</button>' : '') +
+        (b.status !== 'rejected' && b.status !== 'completed' ? '<button class="lc-btn cancel" onclick="cancelBooking(\'' + b.id + '\')">Cancel</button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderPast() {
+  var past = allBookings.filter(function(b) {
+    return b.status === 'completed' || (b.scheduledAt && b.scheduledAt < Date.now() - 3600000);
+  }).sort(function(a, b) { return b.scheduledAt - a.scheduledAt; });
+
+  var list = document.getElementById('pastList');
+  if (past.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">📚</div><p>No past lessons yet.</p></div>';
+    return;
+  }
+
+  list.innerHTML = past.map(function(b) {
+    var ft = formatTime12(b.time);
+    return '<div class="lesson-card">' +
+      '<div class="lc-time"><div class="lc-hour">' + ft.hour + ':' + ft.min + '</div><div class="lc-ampm">' + ft.ampm + '</div></div>' +
+      '<div class="lc-info"><div class="lc-title">' + escapeHtml(b.teacherName || 'Teacher') + '</div><div class="lc-meta">' + escapeHtml(b.day || '') + '</div></div>' +
+      '<div class="lc-actions"><span class="status-badge status-completed">Completed</span></div>' +
+    '</div>';
+  }).join('');
+}
+
+function joinLesson(bookingId, roomId, teacherName) {
+  window.location.href = 'live-room.html?room=' + encodeURIComponent(roomId) + '&role=student&name=' + encodeURIComponent(userName) + '&booking=' + encodeURIComponent(bookingId);
+}
+
+function startTestCall() {
+  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  var roomId = 'minbar-trial-';
+  for (var i = 0; i < 8; i++) roomId += chars.charAt(Math.floor(Math.random() * chars.length));
+  var teacherEmail = session.teacherEmail || '';
+  if (teacherEmail) {
+    var callData = {
+      id: 'call_' + Date.now(),
+      type: 'incoming_call',
+      roomId: roomId,
+      studentName: userName,
+      studentEmail: userEmail,
+      teacherEmail: teacherEmail,
+      createdAt: Date.now(),
+      status: 'ringing'
+    };
+    fetch(API + '?key=' + encodeURIComponent('call_requests:' + teacherEmail), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'call_requests:' + teacherEmail, value: callData })
+    }).then(function() {
+      window.location.href = 'live-room.html?room=' + encodeURIComponent(roomId) + '&role=student&name=' + encodeURIComponent(userName);
+    }).catch(function() {
+      window.location.href = 'live-room.html?room=' + encodeURIComponent(roomId) + '&role=student&name=' + encodeURIComponent(userName);
+    });
+  } else {
+    window.location.href = 'live-room.html?room=' + encodeURIComponent(roomId) + '&role=student&name=' + encodeURIComponent(userName);
+  }
+}
+
+async function cancelBooking(id) {
+  if (!confirm('Cancel this booking?')) return;
+  for (var i = 0; i < allBookings.length; i++) {
+    if (allBookings[i].id === id) {
+      allBookings[i].status = 'cancelled';
+      break;
+    }
+  }
+  await saveBookingsIndex();
+  renderUpcoming();
+  renderPast();
+  toast('Booking cancelled');
+}
+
+async function saveBookingsIndex() {
+  if (!userEmail) return;
+  await fetch(API + '?key=' + encodeURIComponent('bookings:user:' + userEmail), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: 'bookings:user:' + userEmail, value: allBookings })
+  });
+}
+
+var notes = JSON.parse(localStorage.getItem('minbar_notes') || '[]');
+
+function renderNotes() {
+  var list = document.getElementById('notesList');
+  if (notes.length === 0) { list.innerHTML = '<div class="empty-state"><p>No notes yet.</p></div>'; return; }
+  list.innerHTML = notes.map(function(n, i) {
+    return '<div style="background:var(--card);border:1px solid var(--border-subtle);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:start;">' +
+      '<div><div style="font-size:13px;color:var(--ink);">' + escapeHtml(n.text) + '</div><div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">' + timeAgo(n.ts) + '</div></div>' +
+      '<button onclick="deleteNote(' + i + ')" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:16px;">✕</button></div>';
+  }).join('');
+}
+
+function addNote() {
+  var inp = document.getElementById('newNote');
+  var text = inp.value.trim();
+  if (!text) return;
+  notes.unshift({ text: text, ts: Date.now() });
+  localStorage.setItem('minbar_notes', JSON.stringify(notes));
+  inp.value = '';
+  renderNotes();
+  toast('Note added');
+}
+
+function deleteNote(i) {
+  notes.splice(i, 1);
+  localStorage.setItem('minbar_notes', JSON.stringify(notes));
+  renderNotes();
+}
+
+/* ── Chat ── */
+var chatTeacherEmail = session.teacherEmail || '';
+var chatPollTimer = null;
+
+async function loadStudentChat() {
+  if (!userEmail || !chatTeacherEmail) {
+    document.getElementById('chatMessages').innerHTML = '<div class="empty-state"><p>No teacher linked yet. Book a teacher to start chatting.</p></div>';
+    return;
+  }
+  document.getElementById('chatHeader').innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:18px;">💬</span> Chat with your teacher</div>';
+  loadStudentChatMsgs();
+  if (chatPollTimer) clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(loadStudentChatMsgs, 3000);
+}
+
+async function loadStudentChatMsgs() {
+  if (!userEmail || !chatTeacherEmail) return;
+  var key = 'chat:' + chatTeacherEmail + ':' + userEmail;
+  var res = await kvGet(key);
+  var msgs = (res && res.value) || [];
+  var el = document.getElementById('chatMessages');
+  if (msgs.length === 0) {
+    el.innerHTML = '<div class="empty-state" style="padding:24px;"><p>No messages yet. Say hello!</p></div>';
+    return;
+  }
+  var html = msgs.map(function(m) {
+    var isMe = m.from === userEmail;
+    return '<div style="display:flex;flex-direction:column;align-items:' + (isMe ? 'flex-end' : 'flex-start') + ';"><div style="max-width:80%;padding:10px 14px;border-radius:14px;background:' + (isMe ? 'linear-gradient(135deg,#0d9488,#0a7e6e)' : 'var(--bg,#f1f5f9)') + ';color:' + (isMe ? '#fff' : 'var(--ink)') + ';font-size:13px;line-height:1.5;">' + escapeHtml(m.text) + '</div><div style="font-size:10px;color:var(--ink-soft);margin-top:3px;">' + new Date(m.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div></div>';
+  }).join('');
+  el.innerHTML = html;
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendStudentChatMsg() {
+  var input = document.getElementById('chatMsgInput');
+  var text = input.value.trim();
+  if (!text || !userEmail || !chatTeacherEmail) return;
+  input.value = '';
+  var key = 'chat:' + chatTeacherEmail + ':' + userEmail;
+  var res = await kvGet(key);
+  var msgs = (res && res.value) || [];
+  msgs.push({ from: userEmail, to: chatTeacherEmail, text: text, ts: Date.now() });
+  await kvSet(key, msgs);
+  var teacherKey = 'chat:' + userEmail + ':' + chatTeacherEmail;
+  await kvSet(teacherKey, msgs);
+  loadStudentChatMsgs();
+}
+
+function chatKeydown(e) { if (e.key === 'Enter') sendStudentChatMsg(); }
+
+/* ── Subscription & Invoices ── */
+async function loadSubscription() {
+  if (!userEmail) return;
+  var subRes = await kvGet('stripe:subscription:' + userEmail);
+  var sub = subRes && subRes.value;
+  var planName = document.getElementById('subPlanName');
+  var planStatus = document.getElementById('subPlanStatus');
+  var nextBill = document.getElementById('subNextBilling');
+  var manageBtn = document.getElementById('subManageBtn');
+  if (sub) {
+    planName.textContent = sub.planLabel || sub.plan || 'Pro';
+    var statusColor = sub.status === 'active' ? 'rgba(13,148,136,.1)' : (sub.status === 'past_due' ? 'rgba(245,158,11,.1)' : 'rgba(239,68,68,.1)');
+    var statusTextColor = sub.status === 'active' ? '#0d9488' : (sub.status === 'past_due' ? '#f59e0b' : '#ef4444');
+    planStatus.innerHTML = '<span class="status-badge" style="background:' + statusColor + ';color:' + statusTextColor + ';">' + sub.status.charAt(0).toUpperCase() + sub.status.slice(1) + '</span>';
+    if (sub.currentPeriodEnd) {
+      var d = new Date(sub.currentPeriodEnd);
+      nextBill.textContent = 'Next billing: ' + d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    manageBtn.textContent = sub.cancelAtPeriodEnd ? 'Reactivate' : 'Manage';
+    manageBtn.href = 'https://billing.stripe.com/p/login/' + userEmail; // fallback to checkout
+  } else {
+    planName.textContent = 'Free';
+    planStatus.innerHTML = '<span class="status-badge" style="background:rgba(148,163,184,.1);color:#64748b;">Free Plan</span>';
+    nextBill.textContent = 'Upgrade to unlock premium features';
+    manageBtn.textContent = 'Upgrade';
+    manageBtn.href = 'checkout.html';
+  }
+  // Load invoices
+  var invRes = await kvGet('stripe:invoices:' + userEmail);
+  var invoices = (invRes && invRes.value) || [];
+  var invEl = document.getElementById('subInvoices');
+  if (invoices.length === 0) {
+    invEl.innerHTML = '<div class="empty-state" style="padding:24px;"><p>No invoices yet</p></div>';
+  } else {
+    invEl.innerHTML = invoices.map(function(inv) {
+      var icon = inv.status === 'paid' ? '✅' : (inv.status === 'failed' ? '❌' : '⏳');
+      var statusCls = inv.status === 'paid' ? 'status-completed' : (inv.status === 'failed' ? 'status-rejected' : 'status-pending');
+      return '<div class="lesson-card" style="cursor:default;"><div style="font-size:20px;">' + icon + '</div><div class="lc-info"><div class="lc-title">' + escapeHtml(inv.number || 'Invoice') + '</div><div class="lc-meta">' + new Date(inv.created).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' · $' + inv.amount.toFixed(2) + ' ' + inv.currency + '</div></div><span class="status-badge ' + statusCls + '">' + inv.status.charAt(0).toUpperCase() + inv.status.slice(1) + '</span></div>';
+    }).join('');
+  }
+}
+document.querySelectorAll('.dash-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.dash-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.dash-section').forEach(function(s) { s.classList.remove('active'); });
+    tab.classList.add('active');
+    var sec = document.getElementById(tab.getAttribute('data-section') + 'Section');
+    if (sec) sec.classList.add('active');
+  });
+});
+
+/* Nav avatar */
+function updateNav() {
+  var av = document.getElementById('navAvatar');
+  av.textContent = userName.charAt(0).toUpperCase();
+}
+
+/* Countdown refresh */
+function startCountdownRefresh() {
+  setInterval(function() {
+    if (document.getElementById('upcomingSection').classList.contains('active')) {
+      renderUpcoming();
+    }
+    if (document.getElementById('notificationsSection') && document.getElementById('notificationsSection').classList.contains('active')) {
+      loadNotifications();
+    }
+    if (document.getElementById('chatSection') && document.getElementById('chatSection').classList.contains('active')) {
+      loadStudentChatMsgs();
+    }
+  }, 10000);
+}
+
+/* Notifications */
+var allNotifications = [];
+
+async function loadNotifications() {
+  if (!userEmail) return;
+  var res = await kvGet('notifications:' + userEmail);
+  allNotifications = (res && res.value) || [];
+  var unread = allNotifications.filter(function(n) { return !n.read; }).length;
+  var badge = document.getElementById('notifCount');
+  badge.textContent = unread;
+  badge.style.display = unread > 0 ? 'inline' : 'none';
+  renderNotifications();
+}
+
+async function markAllRead() {
+  allNotifications.forEach(function(n) { n.read = true; });
+  await kvSet('notifications:' + userEmail, allNotifications);
+  document.getElementById('notifCount').textContent = '0';
+  document.getElementById('notifCount').style.display = 'none';
+  renderNotifications();
+}
+
+function renderNotifications() {
+  var el = document.getElementById('notificationsList');
+  if (allNotifications.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">🔔</div><p>No notifications yet.</p></div>';
+    return;
+  }
+  el.innerHTML = '<button onclick="markAllRead()" style="padding:8px 16px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--ink-soft);font-size:12px;font-weight:600;cursor:pointer;margin-bottom:12px;">Mark all as read</button>' +
+    allNotifications.map(function(n) {
+      var icon = n.type === 'booking_accepted' ? '✅' : (n.type === 'booking_rejected' ? '❌' : '🔔');
+      var bg = n.read ? 'var(--card)' : 'rgba(13,148,136,.04)';
+      var border = n.read ? 'var(--border-subtle)' : 'rgba(13,148,136,.2)';
+      return '<div class="lesson-card" style="background:' + bg + ';border-color:' + border + ';">' +
+        '<div style="font-size:24px;">' + icon + '</div>' +
+        '<div class="lc-info"><div class="lc-title">' + escapeHtml(n.message) + '</div>' +
+          '<div class="lc-meta">' + timeAgo(n.createdAt) + '</div></div>' +
+      '</div>';
+    }).join('');
+}
+
+/* Init */
+async function init() {
+  updateNav();
+  if (!userEmail) {
+    document.getElementById('upcomingList').innerHTML = '<div class="empty-state"><div class="es-icon">🔒</div><p>Please log in to see your bookings.</p></div>';
+    return;
+  }
+  var res = await kvGet('bookings:user:' + userEmail);
+  allBookings = (res && res.value) || [];
+  renderUpcoming();
+  renderPast();
+  renderNotes();
+  startCountdownRefresh();
+  loadNotifications();
+  loadStudentChat();
+  loadSubscription();
+  document.getElementById('chatMsgInput').addEventListener('keydown', chatKeydown);
+
+  var completed = allBookings.filter(function(b) { return b.status === 'completed'; }).length;
+  document.getElementById('statCompleted').textContent = completed;
+}
+
+init();
+
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+</script>
+
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMenu()">✕</button>
+  <a href="dashboard-student.html" onclick="toggleMenu()">📊 Dashboard</a>
+  <a href="teachers.html" onclick="toggleMenu()">👨‍🏫 Teachers</a>
+  <a href="lessons.html" onclick="toggleMenu()">📚 Lessons</a>
+  <a href="index.html" onclick="toggleMenu()">🃏 Cards</a>
+</div>
+
+</body>
+</html>

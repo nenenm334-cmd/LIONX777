@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>LIONX777 - My Lessons</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+/* ===== LESSON PAGE STYLES ===== */
+.lesson-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+.page-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink, #e2e8f0);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 4px;
+}
+.page-header p {
+  font-size: 14px;
+  color: var(--ink-soft, #94a3b8);
+  margin: 0;
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-pill {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--card-bg, #1e293b);
+  color: var(--ink-soft, #94a3b8);
+  border: 1px solid transparent;
+  user-select: none;
+}
+.filter-pill:hover {
+  background: var(--card-hover, #253349);
+  color: var(--ink, #e2e8f0);
+}
+.filter-pill.active {
+  background: var(--accent, #6366f1);
+  color: #fff;
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 2px 12px rgba(99,102,241,.35);
+}
+
+/* Search */
+.search-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+.search-wrap input {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  border-radius: 12px;
+  border: 1px solid var(--border, #334155);
+  background: var(--card-bg, #1e293b);
+  color: var(--ink, #e2e8f0);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  box-sizing: border-box;
+}
+.search-wrap input::placeholder {
+  color: var(--ink-soft, #64748b);
+}
+.search-wrap input:focus {
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+}
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--ink-soft, #64748b);
+  pointer-events: none;
+}
+
+/* Lesson Card */
+.lesson-card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--card-bg, #1e293b);
+  border-radius: 14px;
+  border: 1px solid var(--border, #334155);
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: transform .15s, box-shadow .15s;
+}
+.lesson-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+}
+
+.lc-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  padding: 16px 12px;
+  background: var(--card-accent, rgba(99,102,241,.08));
+  border-right: 3px solid var(--accent, #6366f1);
+}
+.lc-hour {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink, #e2e8f0);
+  line-height: 1;
+}
+.lc-ampm {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent, #6366f1);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.lc-info {
+  flex: 1;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lc-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink, #e2e8f0);
+}
+.lc-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--ink-soft, #94a3b8);
+}
+.lc-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.lc-note {
+  font-size: 12px;
+  color: var(--ink-soft, #94a3b8);
+  margin-top: 2px;
+}
+
+.lc-actions {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Status Badges */
+.lesson-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  white-space: nowrap;
+}
+.ls-upcoming {
+  background: rgba(59,130,246,.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59,130,246,.25);
+}
+.ls-live {
+  background: rgba(34,197,94,.15);
+  color: #4ade80;
+  border: 1px solid rgba(34,197,94,.25);
+  animation: livePulse 2s ease-in-out infinite;
+}
+.ls-completed {
+  background: rgba(148,163,184,.12);
+  color: #94a3b8;
+  border: 1px solid rgba(148,163,184,.2);
+}
+.ls-cancelled {
+  background: rgba(239,68,68,.12);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,.2);
+  text-decoration: line-through;
+}
+
+@keyframes livePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,.3); }
+  50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--accent, #6366f1);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(99,102,241,.3);
+}
+.btn-primary:hover {
+  background: var(--accent-hover, #5558e6);
+  box-shadow: 0 4px 16px rgba(99,102,241,.45);
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft, #94a3b8);
+  border: 1px solid var(--border, #334155);
+}
+.btn-ghost:hover {
+  background: var(--card-bg, #1e293b);
+  color: var(--ink, #e2e8f0);
+  border-color: var(--ink-soft, #64748b);
+}
+.btn-danger {
+  background: rgba(239,68,68,.12);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,.2);
+}
+.btn-danger:hover {
+  background: rgba(239,68,68,.22);
+}
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.btn-lg {
+  padding: 14px 36px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+/* Countdown */
+.countdown-section {
+  margin-top: 32px;
+}
+.countdown-section h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink, #e2e8f0);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+}
+.countdown-info {
+  font-size: 13px;
+  color: var(--ink-soft, #94a3b8);
+  margin-bottom: 16px;
+}
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.cd-box {
+  background: var(--card-bg, #1e293b);
+  border: 1px solid var(--border, #334155);
+  border-radius: 14px;
+  padding: 16px 20px;
+  min-width: 80px;
+  text-align: center;
+}
+.cd-num {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--accent, #6366f1);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.cd-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-top: 6px;
+}
+.countdown-join {
+  text-align: center;
+  margin-top: 8px;
+}
+.join-hint {
+  font-size: 12px;
+  color: var(--ink-soft, #64748b);
+  margin-top: 10px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.es-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+  opacity: .6;
+}
+.es-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink, #e2e8f0);
+  margin-bottom: 6px;
+}
+.es-text {
+  font-size: 14px;
+  color: var(--ink-soft, #94a3b8);
+  margin-bottom: 20px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+/* Toast */
+.toast-wrap {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast-item {
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: #22c55e;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  transition: opacity .3s;
+}
+.toast-item.error {
+  background: #ef4444;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal {
+  background: var(--card-bg, #1e293b);
+  border: 1px solid var(--border, #334155);
+  border-radius: 18px;
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.modal h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink, #e2e8f0);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal .field {
+  margin-bottom: 14px;
+}
+.modal .field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft, #94a3b8);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.modal .field textarea,
+.modal .field select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #334155);
+  background: var(--bg, #0f172a);
+  color: var(--ink, #e2e8f0);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color .2s;
+}
+.modal .field textarea:focus,
+.modal .field select:focus {
+  border-color: var(--accent, #6366f1);
+}
+
+/* Rating Stars */
+.stars-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.star {
+  font-size: 36px;
+  cursor: pointer;
+  color: var(--border, #334155);
+  transition: color .15s, transform .15s;
+  line-height: 1;
+}
+.star:hover {
+  transform: scale(1.15);
+}
+.star.filled {
+  color: #facc15;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .lesson-card {
+    flex-direction: column;
+  }
+  .lc-time {
+    flex-direction: row;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 3px solid var(--accent, #6366f1);
+    padding: 10px 16px;
+  }
+  .lc-hour { font-size: 18px; }
+  .lc-actions {
+    padding: 10px 16px;
+    justify-content: flex-end;
+  }
+  .countdown {
+    gap: 8px;
+  }
+  .cd-box {
+    min-width: 60px;
+    padding: 12px 10px;
+  }
+  .cd-num { font-size: 24px; }
+  .filter-bar {
+    gap: 6px;
+  }
+  .filter-pill {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="logo">
+    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(13,148,136,.25);">M</div>
+    Minbar
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="teachers.html" class="nav-link">Teachers</a>
+    <a href="lessons.html" class="nav-link active">My Lessons</a>
+  </div>
+  <div class="user-area">
+    <div class="avatar-sm">U</div>
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="lesson-page">
+
+    <div class="page-header">
+      <h2>&#128218; My Lessons</h2>
+      <p>Manage and track your upcoming and past lessons</p>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <span class="filter-pill active" data-filter="upcoming">&#128197; Upcoming</span>
+      <span class="filter-pill" data-filter="completed">&#10004; Completed</span>
+      <span class="filter-pill" data-filter="cancelled">&#10060; Cancelled</span>
+      <span class="filter-pill" data-filter="all">All</span>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="searchLessons" placeholder="Search lessons by teacher or day...">
+      <span class="search-icon">&#128269;</span>
+    </div>
+
+    <div class="lesson-list" id="lessonList"></div>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="es-icon">&#128218;</div>
+      <div class="es-title">No Lessons Found</div>
+      <div class="es-text">You haven't booked any lessons yet. Browse our teachers and book your first lesson today!</div>
+      <a href="teachers.html" class="btn btn-primary">Browse Teachers</a>
+    </div>
+
+    <div class="countdown-section" id="countdownSection" style="display:none;">
+      <h3>&#9200; Next Lesson Countdown</h3>
+      <div class="countdown-info" id="nextLessonInfo"></div>
+      <div class="countdown" id="countdown"></div>
+      <div class="countdown-join">
+        <button class="btn btn-primary btn-lg" id="joinBtn" style="display:none;" onclick="joinLesson()">&#127909; Join Lesson</button>
+        <div class="join-hint" id="joinHint"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const API = '/api/kv';
+
+function toast(msg, type) {
+  type = type || 'success';
+  var w = document.getElementById('toastWrap');
+  var t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 3000);
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function formatTime(timeStr) {
+  if (!timeStr) return { hour: '--', ampm: '' };
+  var parts = timeStr.split(':');
+  var h = parseInt(parts[0], 10);
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  var hh = h > 12 ? h - 12 : h;
+  if (hh === 0) hh = 12;
+  return { hour: hh + ':' + (parts[1] || '00'), ampm: ampm };
+}
+
+function statusClass(status) {
+  var map = { upcoming: 'ls-upcoming', live: 'ls-live', completed: 'ls-completed', cancelled: 'ls-cancelled' };
+  return map[status] || 'ls-upcoming';
+}
+
+function statusLabel(status) {
+  var map = { upcoming: 'Upcoming', live: 'Live Now', completed: 'Completed', cancelled: 'Cancelled', pending: 'Pending' };
+  return map[status] || status;
+}
+
+var allLessons = [];
+var currentFilter = 'upcoming';
+
+function renderLessons(lessons) {
+  var list = document.getElementById('lessonList');
+  var empty = document.getElementById('emptyState');
+  if (lessons.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = lessons.map(function(l) {
+    var ft = formatTime(l.time);
+    var actions = '';
+    if (l.status === 'upcoming') {
+      actions = '<button class="btn btn-danger btn-sm" onclick="cancelLesson(\'' + l.id + '\')">&#10060; Cancel</button>';
+    } else if (l.status === 'live') {
+      actions = '<button class="btn btn-primary btn-sm" onclick="joinLessonById(\'' + l.id + '\')">&#127909; Join</button>';
+    } else if (l.status === 'completed') {
+      actions = '<button class="btn btn-ghost btn-sm" onclick="rateLesson(\'' + l.id + '\')">&#11088; Rate</button>';
+    }
+    return '<div class="lesson-card">' +
+      '<div class="lc-time">' +
+        '<div class="lc-hour">' + escapeHtml(ft.hour) + '</div>' +
+        '<div class="lc-ampm">' + escapeHtml(ft.ampm) + '</div>' +
+      '</div>' +
+      '<div class="lc-info">' +
+        '<div class="lc-title">' + escapeHtml(l.teacherName || 'Lesson') + '</div>' +
+        '<div class="lc-meta">' +
+          '<span>&#128197; ' + escapeHtml(l.day || '') + (l.dateStr ? ' ' + escapeHtml(l.dateStr) : '') + '</span>' +
+          '<span>&#128336; ' + (l.duration || 30) + ' min</span>' +
+          '<span class="lesson-status ' + statusClass(l.status) + '">' + statusLabel(l.status) + '</span>' +
+        '</div>' +
+        (l.note ? '<div class="lc-note">' + escapeHtml(l.note) + '</div>' : '') +
+      '</div>' +
+      '<div class="lc-actions">' + actions + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function filterLessons() {
+  var search = document.getElementById('searchLessons').value.toLowerCase();
+  var filtered = allLessons;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(function(l) { return l.status === currentFilter; });
+  }
+  if (search) {
+    filtered = filtered.filter(function(l) {
+      return (l.teacherName || '').toLowerCase().indexOf(search) !== -1 ||
+             (l.day || '').toLowerCase().indexOf(search) !== -1;
+    });
+  }
+  filtered.sort(function(a, b) { return (b.date || 0) - (a.date || 0); });
+  renderLessons(filtered);
+}
+
+document.getElementById('filterBar').addEventListener('click', function(e) {
+  var pill = e.target.closest('.filter-pill');
+  if (!pill) return;
+  this.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+  pill.classList.add('active');
+  currentFilter = pill.dataset.filter;
+  filterLessons();
+});
+
+document.getElementById('searchLessons').addEventListener('input', filterLessons);
+
+async function cancelLesson(id) {
+  if (!confirm('Are you sure you want to cancel this lesson?')) return;
+  try {
+    var lesson = allLessons.find(function(l) { return l.id === id; });
+    if (lesson) {
+      lesson.status = 'cancelled';
+      await fetch(API + '?key=' + encodeURIComponent('lesson:' + id), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'lesson:' + id, value: lesson })
+      });
+      filterLessons();
+      toast('Lesson cancelled successfully');
+    }
+  } catch (e) {
+    toast('An error occurred', 'error');
+  }
+}
+
+function joinLessonById(id) {
+  window.location.href = 'live-room.html?id=' + id;
+}
+
+function joinLesson() {
+  if (allLessons.length > 0) {
+    var next = allLessons.find(function(l) { return l.status === 'upcoming'; });
+    if (next) joinLessonById(next.id);
+  }
+}
+
+function rateLesson(id) {
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML =
+    '<div class="modal">' +
+      '<h3>&#11088; Rate This Lesson</h3>' +
+      '<div style="text-align:center;margin-bottom:16px;">' +
+        '<div class="stars-row" id="ratingStars">' +
+          [1,2,3,4,5].map(function(n) {
+            return '<span class="star" data-val="' + n + '">&#9733;</span>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label>Your Comment</label>' +
+        '<textarea id="rateComment" placeholder="How was the lesson?" rows="3"></textarea>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label>Teaching Quality</label>' +
+        '<select id="rateQuality">' +
+          '<option>Excellent</option>' +
+          '<option>Very Good</option>' +
+          '<option>Good</option>' +
+          '<option>Fair</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn btn-primary" onclick="submitRating(\'' + id + '\')">Submit Rating</button>' +
+        '<button class="btn btn-ghost" onclick="this.closest(\'.modal-overlay\').remove()">Cancel</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+
+  var selectedRating = 0;
+  document.getElementById('ratingStars').addEventListener('click', function(e) {
+    var star = e.target.closest('.star');
+    if (!star) return;
+    selectedRating = parseInt(star.dataset.val, 10);
+    this.querySelectorAll('.star').forEach(function(s) {
+      s.classList.toggle('filled', parseInt(s.dataset.val, 10) <= selectedRating);
+    });
+  });
+}
+
+async function submitRating(lessonId) {
+  var rating = document.querySelector('.star.filled') ? document.querySelectorAll('.star.filled').length : 0;
+  var comment = document.getElementById('rateComment').value;
+  var quality = document.getElementById('rateQuality').value;
+  try {
+    await fetch(API + '?key=' + encodeURIComponent('rating:' + lessonId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        key: 'rating:' + lessonId,
+        value: { lessonId: lessonId, rating: rating, comment: comment, quality: quality, timestamp: Date.now() }
+      })
+    });
+  } catch (e) {}
+  document.querySelector('.modal-overlay')?.remove();
+  toast('Thank you for your rating! &#11088;');
+}
+
+function updateCountdown() {
+  var next = allLessons.find(function(l) { return l.status === 'upcoming'; });
+  var section = document.getElementById('countdownSection');
+  var cd = document.getElementById('countdown');
+  var joinBtn = document.getElementById('joinBtn');
+  var hint = document.getElementById('joinHint');
+  var info = document.getElementById('nextLessonInfo');
+
+  if (!next) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  var ft = formatTime(next.time);
+  info.textContent = next.teacherName + '  \u2022  ' + next.day + ' at ' + ft.hour + ' ' + ft.ampm;
+
+  var now = Date.now();
+  var lessonTime = next.date || (now + 86400000);
+  var diff = lessonTime - now;
+
+  if (diff <= 0) {
+    cd.innerHTML = '<div class="cd-box"><div class="cd-num">!</div><div class="cd-label">Started</div></div>';
+    joinBtn.style.display = '';
+    hint.textContent = '';
+    return;
+  }
+
+  if (diff <= 600000) {
+    joinBtn.style.display = '';
+    hint.textContent = 'You can join now';
+  } else {
+    joinBtn.style.display = 'none';
+    hint.textContent = 'Join button appears 10 minutes before the lesson';
+  }
+
+  var days = Math.floor(diff / 86400000);
+  var hours = Math.floor((diff % 86400000) / 3600000);
+  var mins = Math.floor((diff % 3600000) / 60000);
+  var secs = Math.floor((diff % 60000) / 1000);
+
+  cd.innerHTML =
+    '<div class="cd-box"><div class="cd-num">' + days + '</div><div class="cd-label">Days</div></div>' +
+    '<div class="cd-box"><div class="cd-num">' + hours + '</div><div class="cd-label">Hours</div></div>' +
+    '<div class="cd-box"><div class="cd-num">' + mins + '</div><div class="cd-label">Minutes</div></div>' +
+    '<div class="cd-box"><div class="cd-num">' + secs + '</div><div class="cd-label">Seconds</div></div>';
+}
+
+async function loadLessons() {
+  try {
+    var session = JSON.parse(localStorage.getItem('minbar_session') || '{}');
+    var name = session.name || 'student';
+    var res = await fetch(API + '?prefix=lesson:', { headers: { 'Content-Type': 'application/json' } });
+    var data = await res.json();
+    allLessons = (data.keys || []).map(function(k) { return k; });
+
+    var promises = allLessons.map(async function(k) {
+      var r = await fetch(API + '?key=' + encodeURIComponent(k), { headers: { 'Content-Type': 'application/json' } });
+      var d = await r.json();
+      return d.value;
+    });
+
+    allLessons = (await Promise.all(promises)).filter(function(l) { return l && (l.studentName === name || l.teacherName); });
+
+    if (allLessons.length === 0) {
+      allLessons = generateDemoLessons();
+    }
+  } catch (e) {
+    allLessons = generateDemoLessons();
+  }
+
+  filterLessons();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+}
+
+function generateDemoLessons() {
+  var now = Date.now();
+  return [
+    { id: 'l1', teacherName: 'Dr. James Wilson', studentName: 'student', day: 'Monday', time: '10:00', duration: 30, status: 'upcoming', date: now + 3600000 * 5, note: 'Review pronunciation and fluency' },
+    { id: 'l2', teacherName: 'Prof. Sarah Mitchell', studentName: 'student', day: 'Wednesday', time: '14:00', duration: 45, status: 'upcoming', date: now + 86400000 * 2, note: '' },
+    { id: 'l3', teacherName: 'Mr. David Chen', studentName: 'student', day: 'Tuesday', time: '09:00', duration: 60, status: 'completed', date: now - 86400000 * 1 },
+    { id: 'l4', teacherName: 'Ms. Emily Carter', studentName: 'student', day: 'Thursday', time: '16:00', duration: 30, status: 'completed', date: now - 86400000 * 3 },
+    { id: 'l5', teacherName: 'Dr. James Wilson', studentName: 'student', day: 'Friday', time: '11:00', duration: 30, status: 'cancelled', date: now - 86400000 * 5 },
+  ];
+}
+
+loadLessons();
+</script>
+
+<script>
+function toggleMenu() {
+  var m = document.getElementById('mobileMenu');
+  var o = document.getElementById('mobileOverlay');
+  if (m) m.classList.toggle('open');
+  if (o) o.classList.toggle('open');
+}
+</script>
+
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMenu()">✕</button>
+  <a href="dashboard-student.html" onclick="toggleMenu()">📊 Dashboard</a>
+  <a href="teachers.html" onclick="toggleMenu()">👨‍🏫 Teachers</a>
+  <a href="lessons.html" onclick="toggleMenu()">📚 Lessons</a>
+  <a href="profile.html" onclick="toggleMenu()">👤 Profile</a>
+  <a href="index.html" onclick="toggleMenu()">🃏 Cards</a>
+</div>
+</body>
+</html>

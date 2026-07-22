@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F5C34">
+<meta name="description" content="Minbar is the ultimate platform to learn Arabic online. Master Arabic with expert teachers, interactive flashcards, spaced repetition (SRS), live classes, exams, and personalized learning paths. Start your Arabic journey today.">
+<meta name="keywords" content="learn Arabic, Arabic online, Arabic flashcards, SRS, Arabic lessons, Arabic teacher, Quran Arabic, Arabic language, study Arabic">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Minbar">
+<link rel="canonical" href="https://lionx777.vercel.app/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lionx777.vercel.app/">
+<meta property="og:title" content="Minbar — Learn Arabic Online with Expert Teachers">
+<meta property="og:description" content="Master Arabic with interactive flashcards, spaced repetition, live classes, and expert teachers. Join Minbar today.">
+<meta property="og:image" content="https://lionx777.vercel.app/icon.svg">
+<meta property="og:site_name" content="Minbar">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Minbar — Learn Arabic Online">
+<meta name="twitter:description" content="Master Arabic with interactive flashcards, spaced repetition, and expert teachers.">
+<meta name="twitter:image" content="https://lionx777.vercel.app/icon.svg">
+<title>Minbar — Learn Arabic Online with Expert Teachers</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "Minbar",
+  "url": "https://lionx777.vercel.app",
+  "logo": "https://lionx777.vercel.app/icon.svg",
+  "description": "Learn Arabic online with interactive flashcards, spaced repetition (SRS), live classes, and expert teachers.",
+  "sameAs": [],
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  }
+}
+</script>
+<link rel="stylesheet" href="css/common.css">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon.svg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#fff;color:#111827;overflow-x:hidden;}
+body.dark{background:#0f172a;color:#f1f5f9;}
+a{text-decoration:none!important;}
+a:hover{text-decoration:none!important;}
+::selection{background:rgba(13,148,136,.15);color:inherit;}
+</style>
+<style>
+/* ── Navbar ── */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.05);transition:all .3s;}
+body.dark .navbar{background:rgba(15,23,42,.85);border-bottom:1px solid rgba(255,255,255,.05);}
+.navbar.scrolled{box-shadow:0 1px 12px rgba(0,0,0,.06);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;font-size:20px;font-weight:800;}
+.nav-logo-icon{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#0a7e6e);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;flex-shrink:0;}
+.nav-links{display:flex;align-items:center;gap:8px;}
+.nav-link{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;color:#6b7280;text-decoration:none!important;transition:all .2s;}
+.nav-link:hover{color:#111827;background:#f3f4f6;text-decoration:none!important;}
+body.dark .nav-link{color:#94a3b8;}
+body.dark .nav-link:hover{color:#f1f5f9;background:#1e293b;}
+.nav-actions{display:flex;align-items:center;gap:8px;}
+.menu-btn{display:none;width:36px;height:36px;border:none;background:none;cursor:pointer;font-size:20px;color:#374151;align-items:center;justify-content:center;border-radius:8px;}
+body.dark .menu-btn{color:#e2e8f0;}
+@media(max-width:768px){.menu-btn{display:flex;}}
+.mobile-overlay{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);display:none;}
+.mobile-overlay.open{display:block;}
+.mobile-menu{position:fixed;top:0;right:-280px;width:280px;height:100vh;z-index:100;background:#fff;padding:80px 24px 24px;transition:right .3s ease;box-shadow:-4px 0 24px rgba(0,0,0,.08);}
+body.dark .mobile-menu{background:#0f172a;}
+.mobile-menu.open{right:0;}
+.mobile-menu a{display:block;padding:12px 0;font-size:16px;font-weight:600;color:#374151;text-decoration:none;border-bottom:1px solid #f3f4f6;}
+body.dark .mobile-menu a{color:#e2e8f0;border-color:#1e293b;}
+.mobile-menu a:last-child{border-bottom:none;}
+.mobile-menu-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border:none;background:none;cursor:pointer;font-size:20px;color:#374151;}
+body.dark .mobile-menu-close{color:#e2e8f0;}
+.nav-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s;}
+.nav-btn-outline{border:1.5px solid #e5e7eb;color:#374151;background:transparent;}
+.nav-btn-outline:hover{border-color:#0d9488;color:#0d9488;}
+body.dark .nav-btn-outline{border-color:#334155;color:#e2e8f0;}
+body.dark .nav-btn-outline:hover{border-color:#0d9488;color:#0d9488;}
+.nav-btn-primary{background:linear-gradient(135deg,#0d9488,#0a7e6e);color:#fff;box-shadow:0 2px 8px rgba(13,148,136,.25);}
+.nav-btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.35);}
+
+/* ── Sections ── */
+.section{max-width:1100px;margin:0 auto;padding:60px 24px;}
+.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#0d9488;margin-bottom:12px;}
+.section-title{font-size:36px;font-weight:800;line-height:1.2;margin-bottom:16px;letter-spacing:-.03em;}
+.section-sub{font-size:17px;color:#6b7280;line-height:1.6;max-width:600px;}
+body.dark .section-sub{color:#94a3b8;}
+
+/* ── Hero ── */
+.hero{display:flex;align-items:center;padding:100px 24px 60px;position:relative;overflow:hidden;}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:100px;font-size:12px;font-weight:600;color:#0d9488;margin-bottom:20px;}
+.hero h1{font-size:52px;font-weight:800;line-height:1.1;letter-spacing:-.04em;margin-bottom:20px;}
+.hero h1 span{background:linear-gradient(135deg,#0d9488,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:18px;color:#6b7280;line-height:1.7;margin-bottom:32px;max-width:480px;}
+body.dark .hero p{color:#94a3b8;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.hero-btn{padding:14px 32px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none!important;transition:all .2s;}
+.hero-btn-primary{background:linear-gradient(135deg,#0d9488,#059669);color:#fff;box-shadow:0 4px 16px rgba(13,148,136,.3);}
+.hero-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,148,136,.4);}
+.hero-btn-secondary{border:1.5px solid #e5e7eb;color:#374151;background:rgba(255,255,255,.5);}
+.hero-btn-secondary:hover{border-color:#0d9488;color:#0d9488;transform:translateY(-2px);}
+body.dark .hero-btn-secondary{border-color:#334155;color:#e2e8f0;}
+body.dark .hero-btn-secondary:hover{border-color:#0d9488;color:#0d9488;}
+.hero-visual{display:flex;align-items:center;justify-content:center;}
+.hero-card{width:100%;max-width:480px;background:linear-gradient(135deg,#0d9488,#059669);border-radius:24px;padding:40px;color:#fff;position:relative;overflow:hidden;}
+.hero-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,.15),transparent 60%);pointer-events:none;}
+.hero-card-icon{font-size:48px;margin-bottom:16px;}
+.hero-card h3{font-size:20px;font-weight:700;margin-bottom:8px;}
+.hero-card p{font-size:14px;color:rgba(255,255,255,.8);max-width:none;}
+.hero-stats{display:flex;gap:24px;margin-top:24px;}
+.hero-stat{text-align:center;}
+.hero-stat-num{font-size:28px;font-weight:800;}
+.hero-stat-label{font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+
+.hero-wave{position:absolute;bottom:0;left:0;right:0;height:120px;pointer-events:none;}
+.hero-wave svg{width:100%;height:100%;}
+
+/* ── Features ── */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+.feature-card{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:32px;transition:all .3s;}
+.feature-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.06);transform:translateY(-4px);border-color:#e5e7eb;}
+body.dark .feature-card{background:#1e293b;border-color:#334155;}
+body.dark .feature-card:hover{border-color:#475569;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;}
+.feature-card h3{font-size:17px;font-weight:700;margin-bottom:8px;color:#111827;}
+body.dark .feature-card h3{color:#f1f5f9;}
+.feature-card p{font-size:14px;color:#6b7280;line-height:1.6;}
+body.dark .feature-card p{color:#94a3b8;}
+
+/* ── How it Works ── */
+#how-it-works{background:#f8fafc;}
+body.dark #how-it-works{background:#1e293b;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:48px;position:relative;}
+.step{text-align:center;}
+.step-num{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;margin:0 auto 20px;box-shadow:0 4px 16px rgba(13,148,136,.25);}
+.step h3{font-size:18px;font-weight:700;margin-bottom:8px;}
+.step p{font-size:14px;color:#6b7280;line-height:1.6;}
+body.dark .step p{color:#94a3b8;}
+
+/* ── Testimonials ── */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+.testimonial-card{background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:28px 24px;transition:all .3s;}
+body.dark .testimonial-card{background:#1e293b;border-color:#334155;}
+.testimonial-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.06);transform:translateY(-2px);}
+.testimonial-stars{font-size:14px;margin-bottom:12px;letter-spacing:2px;}
+.testimonial-text{font-size:14px;color:#6b7280;line-height:1.7;margin-bottom:16px;font-style:italic;}
+body.dark .testimonial-text{color:#94a3b8;}
+.testimonial-author{display:flex;align-items:center;gap:12px;}
+.testimonial-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+.testimonial-name{font-size:14px;font-weight:600;color:#111827;}
+body.dark .testimonial-name{color:#f1f5f9;}
+.testimonial-role{font-size:12px;color:#9ca3af;}
+
+/* ── Stats ── */
+.stats-banner{background:linear-gradient(135deg,#0d9488,#059669);padding:60px 24px;color:#fff;text-align:center;}
+.stats-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;}
+.stat-item{text-align:center;}
+.stat-number{font-size:40px;font-weight:800;letter-spacing:-.03em;}
+.stat-label{font-size:14px;color:rgba(255,255,255,.7);margin-top:4px;font-weight:500;}
+
+/* ── Pricing ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+.pricing-card{background:#fff;border:1px solid #f0f0f0;border-radius:20px;padding:40px 32px;transition:all .3s;position:relative;}
+body.dark .pricing-card{background:#1e293b;border-color:#334155;}
+.pricing-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.08);transform:translateY(-4px);}
+body.dark .pricing-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.2);}
+.pricing-card.featured{border-color:#0d9488;border-width:2px;}
+.pricing-card.featured::before{content:'Popular';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#0d9488,#059669);color:#fff;padding:4px 16px;border-radius:100px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.pricing-name{font-size:14px;font-weight:600;color:#0d9488;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.pricing-price{font-size:44px;font-weight:800;letter-spacing:-.04em;margin-bottom:4px;}
+.pricing-price span{font-size:16px;font-weight:500;color:#6b7280;letter-spacing:0;}
+.pricing-desc{font-size:14px;color:#6b7280;margin-bottom:24px;}
+body.dark .pricing-desc{color:#94a3b8;}
+.pricing-features{list-style:none;padding:0;margin-bottom:28px;}
+.pricing-features li{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:14px;color:#374151;}
+body.dark .pricing-features li{color:#e2e8f0;}
+.pricing-features li .check{color:#0d9488;font-weight:700;}
+.pricing-btn{display:block;text-align:center;padding:12px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;}
+.pricing-btn-primary{background:linear-gradient(135deg,#0d9488,#059669);color:#fff;}
+.pricing-btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.3);}
+.pricing-btn-secondary{border:1.5px solid #e5e7eb;color:#374151;}
+.pricing-btn-secondary:hover{border-color:#0d9488;color:#0d9488;}
+body.dark .pricing-btn-secondary{border-color:#334155;color:#e2e8f0;}
+body.dark .pricing-btn-secondary:hover{border-color:#0d9488;color:#0d9488;}
+
+/* ── CTA ── */
+.cta{border-radius:24px;padding:80px;text-align:center;color:#fff;position:relative;overflow:hidden;}
+.cta-bg{background:linear-gradient(135deg,#0d9488,#059669);}
+.cta::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(255,255,255,.1),transparent 60%);pointer-events:none;}
+.cta h2{font-size:36px;font-weight:800;margin-bottom:16px;position:relative;letter-spacing:-.03em;}
+.cta p{font-size:17px;color:rgba(255,255,255,.8);max-width:500px;margin:0 auto 28px;line-height:1.6;position:relative;}
+.cta-btn{display:inline-block;padding:16px 40px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none!important;transition:all .2s;background:#fff;color:#0d9488;position:relative;}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15);}
+
+/* ── Footer ── */
+.footer{background:#0f172a;color:#fff;padding:60px 24px 32px;}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;}
+.footer-brand{font-size:20px;font-weight:800;margin-bottom:12px;}
+.footer-brand span{color:#0d9488;}
+.footer-desc{font-size:14px;color:#94a3b8;line-height:1.7;margin-bottom:20px;}
+.footer-col h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:16px;}
+.footer-col a{display:block;padding:5px 0;font-size:14px;color:#94a3b8;text-decoration:none;transition:color .2s;}
+.footer-col a:hover{color:#0d9488;}
+.footer-bottom{border-top:1px solid #1e293b;padding-top:24px;margin-top:40px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#64748b;}
+.footer-bottom-links{display:flex;gap:16px;}
+.footer-bottom-links a{color:#64748b;text-decoration:none;}
+.footer-bottom-links a:hover{color:#0d9488;}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;}
+  .hero h1{font-size:36px;}
+  .hero-visual{order:-1;}
+  .hero-card{padding:28px;max-width:100%;}
+  .hero-btn{padding:12px 24px;font-size:14px;}
+  .features-grid,.testimonials-grid{grid-template-columns:1fr;}
+  .steps{grid-template-columns:1fr;max-width:360px;margin-left:auto;margin-right:auto;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .pricing-grid{grid-template-columns:1fr;max-width:380px;margin-left:auto;margin-right:auto;}
+  .footer-inner{grid-template-columns:1fr 1fr;gap:32px;}
+  .section-title{font-size:28px;}
+  .cta{padding:48px 24px;}
+  .cta h2{font-size:28px;}
+  .cta-btn{padding:12px 28px;font-size:14px;}
+  .navbar{padding:12px 16px;}
+  .nav-links{display:none!important;}
+  .nav-logo{font-size:17px;}
+  .nav-actions{margin-left:auto;gap:4px;}
+  .nav-btn{padding:6px 10px;font-size:11px;}
+  .nav-btn-primary{padding:6px 10px;font-size:11px;}
+  .menu-btn{display:flex;}
+}
+</style>
+</head>
+<body>
+<script>if(localStorage.getItem('minbar_dark')==='true') document.body.classList.add('dark');</script>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">M</div>
+    Minbar
+  </a>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#pricing" class="nav-link">Pricing</a>
+  </div>
+  <div class="nav-actions">
+    <a href="index.html?app" class="nav-btn nav-btn-outline">Login</a>
+    <a href="index.html?app" class="nav-btn nav-btn-primary">Get Started Free</a>
+    <button class="menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
+  <a href="#features" onclick="toggleMobileMenu()">Features</a>
+  <a href="#pricing" onclick="toggleMobileMenu()">Pricing</a>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">🌟 Trusted by 1,000+ learners</div>
+      <h1>Master Arabic with <span>Expert Teachers</span></h1>
+      <p>Interactive lessons, live video sessions, and personalized learning paths — all from the comfort of your home.</p>
+      <div class="hero-btns">
+        <a href="index.html?app" class="hero-btn hero-btn-primary">Start Learning Free</a>
+        <a href="#features" class="hero-btn hero-btn-secondary">Explore Features</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-icon">📖</div>
+        <h3>Your Learning Journey</h3>
+        <p>Complete 90-Day Arabic Mastery program with daily lessons, flashcards, and live practice.</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-num">90</div>
+            <div class="hero-stat-label">Days</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">1,000+</div>
+            <div class="hero-stat-label">Words</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">50+</div>
+            <div class="hero-stat-label">Teachers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features">
+  <div style="text-align:center;margin-bottom:48px;">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need to learn Arabic</h2>
+    <p class="section-sub" style="margin:0 auto;">Interactive tools, live sessions, and proven methodology to help you speak Arabic with confidence.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(13,148,136,.1);">🎯</div>
+      <h3>Spaced Repetition</h3>
+      <p>Smart flashcards that adapt to your learning pace. Review words just before you forget them.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(245,158,11,.1);">📹</div>
+      <h3>Live Video Sessions</h3>
+      <p>One-on-one video calls with expert teachers. Practice speaking in real-time from anywhere.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(59,130,246,.1);">📊</div>
+      <h3>Progress Tracking</h3>
+      <p>Detailed analytics on your learning journey. Track streaks, vocabulary mastery, and lesson completion.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(139,92,246,.1);">🎬</div>
+      <h3>YouTube Integration</h3>
+      <p>Import any Arabic YouTube video with subtitles. Turn your favorite content into interactive lessons.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(236,72,153,.1);">📝</div>
+      <h3>Interactive Quizzes</h3>
+      <p>Typing quizzes, listening exercises, and exam-style tests to reinforce your learning.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(16,185,129,.1);">🔔</div>
+      <h3>Smart Reminders</h3>
+      <p>Daily study reminders, booking notifications, and progress reports to keep you on track.</p>
+    </div>
+  </div>
+</section>
+
+<!-- How it Works -->
+<section class="section" id="how-it-works" style="background:#f8fafc;border-radius:32px;margin:24px 24px;padding:60px 24px;">
+  <div style="text-align:center;margin-bottom:48px;">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Start learning in 3 simple steps</h2>
+    <p class="section-sub" style="margin:0 auto;">Get started with Minbar and begin your Arabic learning journey today.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Create Your Account</h3>
+      <p>Sign up for free and set up your learning profile. Tell us your level and goals.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Find Your Teacher</h3>
+      <p>Browse our expert teachers, read reviews, and book a session that fits your schedule.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Start Learning</h3>
+      <p>Join live sessions, complete interactive exercises, and track your progress daily.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section">
+  <div style="text-align:center;margin-bottom:48px;">
+    <div class="section-label">Testimonials</div>
+    <h2 class="section-title">What our students say</h2>
+    <p class="section-sub" style="margin:0 auto;">Hear from learners who transformed their Arabic skills with Minbar.</p>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+      <p class="testimonial-text">"After 3 months with Minbar, I can finally hold a conversation in Arabic. The teachers are incredibly patient and the SRS system helped me remember vocabulary I'd always forget."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:linear-gradient(135deg,#0d9488,#059669);">S</div>
+        <div>
+          <div class="testimonial-name">Sarah Ahmed</div>
+          <div class="testimonial-role">Intermediate Learner, 6 months</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+      <p class="testimonial-text">"I tried many apps before but nothing compares to live sessions with a real teacher. The ability to book lessons that fit my schedule and get instant feedback is game-changing."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">M</div>
+        <div>
+          <div class="testimonial-name">Mohammed Ali</div>
+          <div class="testimonial-role">Beginner, 3 months</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+      <p class="testimonial-text">"The 90-Day Journey program kept me consistent. I loved the flashcards, the YouTube integration, and the quizzes. Minbar made learning Arabic feel like a daily habit, not a chore."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706);">L</div>
+        <div>
+          <div class="testimonial-name">Lina Hassan</div>
+          <div class="testimonial-role">Advanced Learner, 1 year</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-banner">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-number">1,000+</div>
+      <div class="stat-label">Active Learners</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">50+</div>
+      <div class="stat-label">Expert Teachers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">10,000+</div>
+      <div class="stat-label">Lessons Completed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">⭐ 4.9</div>
+      <div class="stat-label">Average Rating</div>
+    </div>
+  </div>
+</div>
+
+<!-- Pricing -->
+<section class="section" id="pricing">
+  <div style="text-align:center;margin-bottom:48px;">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <p class="section-sub" style="margin:0 auto;">Choose the plan that fits your learning style. No hidden fees, cancel anytime.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-name">Free</div>
+      <div class="pricing-price">$0<span>/mo</span></div>
+      <div class="pricing-desc">Get started with basic features.</div>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> 100 flashcards</li>
+        <li><span class="check">✓</span> Basic SRS reviews</li>
+        <li><span class="check">✓</span> 1 lesson per week</li>
+        <li><span class="check">✓</span> Progress tracking</li>
+      </ul>
+      <a href="index.html?app" class="pricing-btn pricing-btn-secondary">Get Started</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-name">Pro</div>
+      <div class="pricing-price">$29<span>/mo</span></div>
+      <div class="pricing-desc">Best for serious learners.</div>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Unlimited flashcards</li>
+        <li><span class="check">✓</span> Full SRS + exams</li>
+        <li><span class="check">✓</span> 4 live sessions/mo</li>
+        <li><span class="check">✓</span> Downloadable resources</li>
+        <li><span class="check">✓</span> Priority support</li>
+      </ul>
+      <a href="checkout.html?plan=pro" class="pricing-btn pricing-btn-primary">Start Free Trial</a>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-name">Premium</div>
+      <div class="pricing-price">$59<span>/mo</span></div>
+      <div class="pricing-desc">For dedicated learners.</div>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Everything in Pro</li>
+        <li><span class="check">✓</span> Unlimited live sessions</li>
+        <li><span class="check">✓</span> Personal teacher</li>
+        <li><span class="check">✓</span> Custom learning path</li>
+        <li><span class="check">✓</span> 24/7 support</li>
+      </ul>
+      <a href="checkout.html?plan=premium" class="pricing-btn pricing-btn-secondary">Start Free Trial</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="padding-bottom:60px;">
+  <div class="cta cta-bg">
+    <h2>Ready to start your Arabic journey?</h2>
+    <p>Join thousands of learners mastering Arabic with expert teachers. Your first lesson is free.</p>
+    <a href="index.html?app" class="cta-btn">Start Learning Free →</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">Min<span>bar</span></div>
+      <p class="footer-desc">Learn Arabic online with expert teachers. Interactive lessons, live sessions, and personalized learning paths to help you achieve fluency.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="mailto:support@minbar.app">Contact</a>
+      <a href="#">Help Center</a>
+      <a href="#" id="toggleDarkFooter">Dark Mode</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+  <div class="footer-inner">
+    <div class="footer-bottom">
+      <span>© 2026 Minbar. All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="index.html?app">App</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Navbar scroll effect
+window.addEventListener('scroll', function() {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Mobile menu
+function toggleMobileMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+
+// Footer dark mode toggle
+document.getElementById('toggleDarkFooter').addEventListener('click', function(e) {
+  e.preventDefault();
+  var isDark = localStorage.getItem('minbar_dark') === 'true';
+  localStorage.setItem('minbar_dark', isDark ? 'false' : 'true');
+  document.body.classList.toggle('dark');
+});
+</script>
+</body>
+</html>

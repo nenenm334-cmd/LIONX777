@@ -1,30 +1,21 @@
 const { MongoClient } = require('mongodb');
+const { sendJson, setCors, checkAuth, rateLimit, readBody } = require('./_helpers');
 
-const MAX_BODY = 1048576;
-let clientPromise;
+const MAX_VALUE_SIZE = 524288; // 512KB max value
 
-function getDb() {
-  if (!clientPromise) {
-    clientPromise = new MongoClient(process.env.MONGO_URL).connect();
+let _cachedClient = null;
+async function getDb() {
+  if (_cachedClient) {
+    try { await _cachedClient.db().command({ ping: 1 }); return _cachedClient.db(process.env.DB_NAME || 'minbar'); }
+    catch (e) { try { await _cachedClient.close(); } catch (x) {} _cachedClient = null; }
   }
-  return clientPromise.then(c => c.db(process.env.DB_NAME || 'minbar'));
+  _cachedClient = await new MongoClient(process.env.MONGO_URL).connect();
+  return _cachedClient.db(process.env.DB_NAME || 'minbar');
 }
 
-function checkAuth(req, res) {
-  const secret = process.env.API_SECRET || '';
-  if (!secret) return true;
-  const tok = (req.headers?.authorization || '').replace('Bearer ', '');
-  if (tok !== secret) { res.status(401).json({ error: 'Unauthorized' }); return false; }
-  return true;
-}
-
-function readBody(req) {
-  return new Promise((ok, fail) => {
-    let d = '', n = 0;
-    req.on('data', c => { n += c.length; if (n > MAX_BODY) { req.destroy(); fail(new Error('Too large')); return; } d += c; });
-    req.on('end', () => { try { ok(d ? JSON.parse(d) : {}); } catch (e) { fail(e); } });
-    req.on('error', fail);
-  });
+function sanitizeKey(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+  return raw.replace(/[^a-zA-Z0-9_\-:.\/@]/g, '').slice(0, 512);
 }
 
 function regexEsc(s) {
@@ -32,37 +23,50 @@ function regexEsc(s) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') { res.status(204).end(); return; }
+  setCors(res, req.headers?.origin);
+  if (req.method === 'OPTIONS') { res.statusCode = 204; res.end(); return; }
+
+  // Rate limit: 120 reads/min, 40 writes/min per IP
+  const ip = req.headers?.['x-forwarded-for']?.split(',')[0]?.trim() || 'unknown';
+  const isWrite = req.method === 'PUT' || req.method === 'DELETE';
+  if (!rateLimit(ip, 'kv:' + (isWrite ? 'w' : 'r'), { max: isWrite ? 40 : 120, windowMs: 120000 })) {
+    sendJson(res, 429, { error: 'Too many requests' }); return;
+  }
+
   if (!checkAuth(req, res)) return;
 
   try {
     const db = await getDb();
     const col = db.collection('kv_store');
-    const key = req.query?.key || '';
+    const key = sanitizeKey(req.query?.key);
 
     if (!key) {
-      if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return; }
-      const prefix = req.query?.prefix || '';
-      const filter = prefix ? { key: { $regex: `^${regexEsc(prefix)}` } } : {};
+      if (req.method !== 'GET') { sendJson(res, 405, { error: 'Method not allowed' }); return; }
+      const rawPrefix = String(req.query?.prefix || '').replace(/[^a-zA-Z0-9_\-:.\/]/g, '').slice(0, 512);
+      const filter = rawPrefix ? { key: { $regex: `^${regexEsc(rawPrefix)}` } } : {};
       const docs = await col.find(filter, { projection: { _id: 0, key: 1 } }).limit(10000).toArray();
-      res.status(200).json({ keys: docs.map(d => d.key), prefix });
+      sendJson(res, 200, { keys: docs.map(d => d.key), prefix: rawPrefix });
       return;
     }
 
     if (req.method === 'GET') {
       const doc = await col.findOne({ key });
-      if (!doc) { res.status(404).json({ error: 'Key not found' }); return; }
-      res.status(200).json({ key: doc.key, value: doc.value });
+      if (!doc) { sendJson(res, 200, { key, value: null }); return; }
+      sendJson(res, 200, { key: doc.key, value: doc.value });
       return;
     }
 
     if (req.method === 'PUT') {
-      const body = await readBody(req);
-      if (typeof body !== 'object' || !('value' in body)) {
-        res.status(400).json({ error: 'Invalid body' }); return;
+      let body;
+      try { body = await readBody(req, MAX_VALUE_SIZE); }
+      catch (e) { sendJson(res, 400, { error: e.message }); return; }
+      if (typeof body !== 'object' || body === null || Array.isArray(body) || !('value' in body)) {
+        sendJson(res, 400, { error: 'Invalid body' }); return;
+      }
+      // Validate value size
+      const valStr = JSON.stringify(body.value);
+      if (valStr.length > MAX_VALUE_SIZE) {
+        sendJson(res, 413, { error: 'Value too large (max 512KB)' }); return;
       }
       const now = new Date().toISOString();
       await col.updateOne(
@@ -70,19 +74,19 @@ module.exports = async function handler(req, res) {
         { $set: { key, value: body.value, updated_at: now }, $setOnInsert: { created_at: now } },
         { upsert: true }
       );
-      res.status(200).json({ key, value: body.value });
+      sendJson(res, 200, { key, value: body.value });
       return;
     }
 
     if (req.method === 'DELETE') {
       const r = await col.deleteOne({ key });
-      res.status(200).json({ key, deleted: r.deletedCount > 0 });
+      sendJson(res, 200, { key, deleted: r.deletedCount > 0 });
       return;
     }
 
-    res.status(405).json({ error: 'Method not allowed' });
+    sendJson(res, 405, { error: 'Method not allowed' });
   } catch (err) {
     console.error('[KV]', req.method, err);
-    res.status(500).json({ error: 'Internal error', detail: err.message });
+    sendJson(res, 500, { error: 'Internal error' });
   }
 };

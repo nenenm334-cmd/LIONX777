@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Dashboard — Minbar</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg,#f8fafc);color:var(--ink,#111827);}
+body.dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--card2:#273549;--ink:#f1f5f9;--ink-soft:#94a3b8;--border:#334155;--border-subtle:#1e293b;}
+
+/* Layout */
+.dash-layout{display:flex;height:100vh;overflow:hidden;}
+
+/* Sidebar */
+.sidebar{width:260px;background:var(--card,#fff);border-right:1px solid var(--border-subtle,#e5e7eb);display:flex;flex-direction:column;flex-shrink:0;transition:transform .3s;}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border-subtle,#e5e7eb);}
+.sidebar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);}
+.sidebar-brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal,#0d9488),var(--teal-dark,#0a7e6e));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;}
+.sidebar-brand-text{font-size:16px;font-weight:700;}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.nav-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft,#6b7280);padding:12px 10px 6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:var(--ink-soft,#6b7280);cursor:pointer;transition:all .15s;text-decoration:none;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:var(--bg,#f8fafc);color:var(--ink);}
+.nav-item.active{background:rgba(13,148,136,.08);color:var(--teal,#0d9488);font-weight:600;}
+.nav-item-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-item-badge{margin-left:auto;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(239,68,68,.15);color:#ef4444;}
+.nav-item.active .nav-item-badge{background:rgba(13,148,136,.15);color:var(--teal);}
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--border-subtle,#e5e7eb);}
+.sidebar-user{display:flex;align-items:center;gap:10px;}
+.sidebar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#e6f7ef,#d1fae5);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#0d9488;flex-shrink:0;}
+.sidebar-user-info{flex:1;min-width:0;}
+.sidebar-user-name{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-user-email{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-logout{padding:6px;border-radius:8px;border:none;background:none;color:var(--ink-soft);cursor:pointer;font-size:14px;transition:all .15s;}
+.sidebar-logout:hover{background:rgba(239,68,68,.1);color:#ef4444;}
+
+/* Main content */
+.dash-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.dash-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border-subtle,#e5e7eb);background:var(--card,#fff);flex-shrink:0;z-index:10;}
+.dash-topbar h1{font-size:18px;font-weight:700;color:var(--ink);}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.topbar-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
+.topbar-btn.primary{background:linear-gradient(135deg,var(--teal,#0d9488),var(--teal-dark,#0a7e6e));color:#fff;box-shadow:0 2px 8px rgba(13,148,136,.25);}
+.topbar-btn.primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.35);}
+.topbar-btn.ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border,#e5e7eb);}
+.topbar-btn.ghost:hover{border-color:var(--teal);color:var(--teal);}
+.online-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer;transition:all .15s;border:none;}
+.online-badge.online{background:rgba(34,197,94,.1);color:#22c55e;}
+.online-badge.offline{background:rgba(107,114,128,.1);color:#6b7280;}
+.online-dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:onlinePulse 2s infinite;}
+.online-badge.offline .online-dot{animation:none;}
+@keyframes onlinePulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+.dash-content{flex:1;overflow-y:auto;padding:24px 28px;}
+.dash-section{display:none;}
+.dash-section.active{display:block;}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:18px;transition:all .2s;}
+.stat-card:hover{box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.06));transform:translateY(-1px);}
+.stat-icon{font-size:22px;margin-bottom:6px;}
+.stat-num{font-size:26px;font-weight:800;color:var(--teal,#0d9488);}
+.stat-label{font-size:11px;color:var(--ink-soft,#6b7280);margin-top:2px;font-weight:500;}
+
+/* Booking cards */
+.booking-card{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:16px 20px;margin-bottom:12px;transition:all .2s;}
+.booking-card:hover{box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.06));}
+.bk-top{display:flex;align-items:center;gap:12px;}
+.bk-avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#e6f7ef,#d1fae5);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#0d9488;flex-shrink:0;}
+.bk-info{flex:1;min-width:0;}
+.bk-name{font-size:14px;font-weight:700;color:var(--ink);}
+.bk-time{font-size:12px;color:var(--ink-soft);margin-top:2px;display:flex;align-items:center;gap:4px;}
+.bk-note{margin-top:10px;padding:10px 14px;background:var(--bg,#f8fafc);border-radius:8px;font-size:12px;color:var(--ink-soft);line-height:1.5;}
+.bk-countdown{margin-top:8px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;display:inline-block;}
+.bk-countdown.soon{background:rgba(245,158,11,.1);color:#f59e0b;}
+.bk-countdown.later{background:rgba(13,148,136,.08);color:#0d9488;}
+.bk-countdown.live{background:rgba(239,68,68,.1);color:#ef4444;animation:livePulse 1.5s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.bk-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.bk-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.bk-btn.accept{background:linear-gradient(135deg,#0d9488,#0a7e6e);color:#fff;box-shadow:0 2px 8px rgba(13,148,136,.25);}
+.bk-btn.accept:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.35);}
+.bk-btn.start{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.25);animation:livePulse 2s infinite;}
+.bk-btn.start:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(34,197,94,.35);}
+.bk-btn.reject{background:transparent;border:1.5px solid var(--border,#e5e7eb);color:var(--ink-soft);}
+.bk-btn.reject:hover{border-color:#ef4444;color:#ef4444;}
+.status-badge{padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;margin-left:auto;}
+.status-pending{background:rgba(245,158,11,.1);color:#f59e0b;}
+.status-confirmed{background:rgba(13,148,136,.1);color:#0d9488;}
+.status-completed{background:rgba(34,197,94,.1);color:#22c55e;}
+.status-rejected{background:rgba(239,68,68,.1);color:#ef4444;}
+
+/* Content cards */
+.content-card{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:14px;transition:all .2s;}
+.content-card:hover{box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.06));}
+.content-icon{font-size:24px;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.content-info{flex:1;min-width:0;}
+.content-title{font-size:14px;font-weight:600;color:var(--ink);}
+.content-meta{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.content-actions{display:flex;gap:6px;}
+
+/* Settings */
+.setting-group{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:20px;margin-bottom:16px;}
+.setting-label{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+.setting-desc{font-size:12px;color:var(--ink-soft);margin-bottom:12px;}
+.setting-input{width:100%;padding:10px 14px;border:1.5px solid var(--border,#e5e7eb);border-radius:10px;font-size:13px;background:var(--bg,#f8fafc);color:var(--ink);transition:border .2s;font-family:inherit;}
+.setting-input:focus{outline:none;border-color:var(--teal);}
+textarea.setting-input{min-height:80px;resize:vertical;}
+.setting-row{display:flex;gap:12px;margin-bottom:12px;}
+.setting-row .setting-group{flex:1;margin-bottom:0;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:14px;}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast-item{padding:12px 24px;border-radius:10px;background:var(--ink,#111827);color:var(--bg,#fff);font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.3);animation:toastIn .3s ease;pointer-events:auto;white-space:nowrap;}
+.toast-item.success{background:#0d9488;color:#fff;}
+.toast-item.error{background:#ef4444;color:#fff;}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* Mobile sidebar toggle */
+.sidebar-toggle{display:none;padding:8px;border:none;background:none;color:var(--ink);font-size:20px;cursor:pointer;border-radius:8px;}
+.sidebar-toggle:hover{background:var(--bg);}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{width:64px;overflow:visible;}
+  .sidebar-header{padding:12px 0;display:flex;justify-content:center;}
+  .sidebar-brand-text{display:none;}
+  .sidebar-brand-icon{margin:0;}
+  .sidebar-nav{padding:8px 6px;}
+  .nav-section-label{display:none;}
+  .nav-item{padding:10px;justify-content:center;gap:0;position:relative;}
+  .nav-item span:not(.nav-item-icon):not(.nav-item-badge){display:none;}
+  .nav-item-badge{position:absolute;top:4px;right:4px;margin:0;font-size:9px;padding:1px 5px;}
+  .sidebar-footer{padding:10px 6px;display:flex;justify-content:center;}
+  .sidebar-user-info{display:none;}
+  .sidebar-logout{margin:0;}
+  .dash-main{min-width:0;}
+  .dash-content{padding:16px;}
+  .dash-topbar{padding:12px 16px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .stat-card{padding:12px;}
+  .stat-num{font-size:20px;}
+  .setting-row{flex-direction:column;}
+  .quick-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .quick-card{padding:14px;}
+  .quick-card-icon{font-size:22px;}
+  #sec-chat > div:first-child{grid-template-columns:1fr!important;grid-template-rows:auto 1fr auto;height:auto!important;min-height:calc(100vh - 200px);}
+  #sec-chat #chatStudentsList{max-height:120px;}
+}
+@media(max-width:480px){
+  .sidebar{width:52px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .stat-label{font-size:10px;}
+}
+
+/* Quick actions grid */
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+@media(max-width:768px){.quick-grid{grid-template-columns:repeat(2,1fr);}}
+.quick-card{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;text-decoration:none;color:var(--ink);}
+.quick-card:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:var(--shadow,0 4px 12px rgba(0,0,0,.08));}
+.quick-card-icon{font-size:28px;margin-bottom:8px;}
+.quick-card-title{font-size:13px;font-weight:600;}
+.quick-card-desc{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+
+/* Announcement card */
+.ann-card{background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;padding:16px 20px;margin-bottom:12px;transition:all .2s;}
+.ann-card:hover{box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.06));}
+.ann-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.ann-badge{padding:3px 10px;border-radius:8px;font-size:10px;font-weight:600;background:rgba(13,148,136,.1);color:#0d9488;}
+.ann-date{font-size:12px;color:var(--ink-soft);margin-left:auto;}
+.ann-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.ann-body{font-size:13px;color:var(--ink-soft);line-height:1.6;}
+.ann-actions{display:flex;gap:8px;margin-top:12px;}
+.ann-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.ann-btn.del{background:transparent;border:1.5px solid var(--border);color:var(--ink-soft);}
+.ann-btn.del:hover{border-color:#ef4444;color:#ef4444;}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card,#fff);border-radius:16px;width:100%;max-width:480px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:16px;color:var(--ink);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+/* Incoming Call Overlay */
+.call-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.call-overlay.show{display:flex;}
+.call-popup{background:var(--card,#1e293b);border-radius:20px;padding:32px 28px;text-align:center;max-width:360px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.5);animation:callPop .4s ease;}
+@keyframes callPop{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+.call-ring-icon{font-size:56px;margin-bottom:12px;animation:ringBounce 1s infinite;}
+@keyframes ringBounce{0%,100%{transform:rotate(0deg);}15%{transform:rotate(15deg);}30%{transform:rotate(-15deg);}45%{transform:rotate(8deg);}60%{transform:rotate(-8deg);}75%{transform:rotate(0deg);}}
+.call-student-name{font-size:20px;font-weight:700;color:var(--ink,#f1f5f9);margin-bottom:4px;}
+.call-subtitle{font-size:13px;color:var(--ink-soft,#94a3b8);margin-bottom:24px;}
+.call-actions{display:flex;gap:12px;justify-content:center;}
+.call-btn{padding:14px 32px;border-radius:14px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .2s;}
+.call-btn.answer{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.4);}
+.call-btn.answer:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(34,197,94,.5);}
+.call-btn.decline{background:rgba(239,68,68,.15);color:#ef4444;border:1.5px solid rgba(239,68,68,.3);}
+.call-btn.decline:hover{background:rgba(239,68,68,.25);}
+</style>
+</head>
+<body>
+<script>if(localStorage.getItem('minbar_dark')==='true') document.body.classList.add('dark');</script>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="dash-layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="sidebar-brand">
+      <div class="sidebar-brand-icon">M</div>
+      <span class="sidebar-brand-text">Minbar</span>
+    </a>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <button class="nav-item active" data-section="overview" onclick="switchSection('overview')">
+      <span class="nav-item-icon">📊</span> Overview
+    </button>
+    <button class="nav-item" data-section="chat" onclick="switchSection('chat');loadChat()">
+      <span class="nav-item-icon">💬</span> Chat
+      <span class="nav-item-badge" id="chatBadge" style="display:none;">0</span>
+    </button>
+    <button class="nav-item" data-section="bookings" onclick="switchSection('bookings')">
+      <span class="nav-item-icon">📅</span> Bookings
+      <span class="nav-item-badge" id="reqCount">0</span>
+    </button>
+    <button class="nav-item" data-section="schedule" onclick="switchSection('schedule')">
+      <span class="nav-item-icon">🕐</span> Schedule
+    </button>
+    <button class="nav-item" data-section="students" onclick="switchSection('students')">
+      <span class="nav-item-icon">👥</span> Students
+    </button>
+
+    <div class="nav-section-label">Content</div>
+    <button class="nav-item" data-section="lessons" onclick="switchSection('lessons')">
+      <span class="nav-item-icon">📚</span> Lessons
+    </button>
+    <button class="nav-item" data-section="content" onclick="switchSection('content')">
+      <span class="nav-item-icon">📁</span> Content Library
+    </button>
+    <button class="nav-item" data-section="exams" onclick="switchSection('exams')">
+      <span class="nav-item-icon">📝</span> Exams
+    </button>
+    <button class="nav-item" data-section="announcements" onclick="switchSection('announcements')">
+      <span class="nav-item-icon">📢</span> Announcements
+    </button>
+
+    <div class="nav-section-label">Account</div>
+    <button class="nav-item" data-section="payments" onclick="switchSection('payments');loadPayments()">
+      <span class="nav-item-icon">💳</span> Payments
+    </button>
+    <button class="nav-item" data-section="analytics" onclick="switchSection('analytics')">
+      <span class="nav-item-icon">📈</span> Analytics
+    </button>
+    <button class="nav-item" data-section="profile" onclick="switchSection('profile')">
+      <span class="nav-item-icon">👤</span> My Profile
+    </button>
+    <button class="nav-item" data-section="notifications" onclick="switchSection('notifications')">
+      <span class="nav-item-icon">🔔</span> Notifications
+      <span class="nav-item-badge" id="notifCount">0</span>
+    </button>
+    <button class="nav-item" data-section="settings" onclick="switchSection('settings')">
+      <span class="nav-item-icon">⚙️</span> Settings
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">T</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebarName">Teacher</div>
+        <div class="sidebar-user-email" id="sidebarEmail">—</div>
+      </div>
+      <button class="sidebar-logout" onclick="logout()" title="Log out">🚪</button>
+    </div>
+  </div>
+</aside>
+
+<main class="dash-main">
+  <div class="dash-topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <h1 id="pageTitle">Overview</h1>
+    </div>
+    <div class="topbar-actions">
+      <button class="online-badge online" id="onlineBtn" onclick="toggleOnline()">
+        <span class="online-dot"></span>
+        <span id="onlineLabel">Online</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- OVERVIEW -->
+    <div class="dash-section active" id="sec-overview">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="statStudents">0</div><div class="stat-label">Students</div></div>
+        <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-num" id="statLessons">0</div><div class="stat-label">Total Lessons</div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-num" id="statEarnings">$0</div><div class="stat-label">Earnings</div></div>
+        <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num" id="statRating">-</div><div class="stat-label">Rating</div></div>
+      </div>
+
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--ink);">Quick Actions</h3>
+      <div class="quick-grid">
+        <a class="quick-card" href="lessons.html">
+          <div class="quick-card-icon">📚</div>
+          <div class="quick-card-title">Add Lesson</div>
+          <div class="quick-card-desc">Upload new content</div>
+        </a>
+        <div class="quick-card" onclick="switchSection('announcements');setTimeout(()=>openAnnModal(),100);">
+          <div class="quick-card-icon">📢</div>
+          <div class="quick-card-title">Announcement</div>
+          <div class="quick-card-desc">Send to students</div>
+        </div>
+        <div class="quick-card" onclick="switchSection('schedule')">
+          <div class="quick-card-icon">🕐</div>
+          <div class="quick-card-title">Schedule</div>
+          <div class="quick-card-desc">View lessons</div>
+        </div>
+      </div>
+
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--ink);">Upcoming Bookings</h3>
+      <div id="overviewBookings"></div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="dash-section" id="sec-chat">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="section-title" style="margin:0;">Messages</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:260px 1fr;gap:16px;height:calc(100vh - 160px);min-height:400px;">
+        <div style="background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="padding:12px 14px;border-bottom:1px solid var(--border-subtle,#e5e7eb);font-size:13px;font-weight:700;color:var(--ink-soft);">Students</div>
+          <div id="chatStudentsList" style="flex:1;overflow-y:auto;padding:6px;">
+            <div class="empty-state" style="padding:24px 12px;"><p>No students yet</p></div>
+          </div>
+        </div>
+        <div style="background:var(--card,#fff);border:1px solid var(--border-subtle,#e5e7eb);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
+          <div id="chatHeader" style="padding:14px 16px;border-bottom:1px solid var(--border-subtle,#e5e7eb);font-size:14px;font-weight:700;color:var(--ink-soft);">Select a student to chat</div>
+          <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;">
+            <div class="empty-state" style="padding:24px;"><p>No messages yet</p></div>
+          </div>
+          <div id="chatInputArea" style="display:none;padding:12px 16px;border-top:1px solid var(--border-subtle,#e5e7eb);">
+            <div style="display:flex;gap:8px;">
+              <input id="chatMsgInput" type="text" placeholder="Type a message..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border,#e5e7eb);border-radius:10px;font-size:13px;background:var(--bg,#f8fafc);color:var(--ink);outline:none;">
+              <button id="chatSendBtn" onclick="sendChatMsg()" style="padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,#0d9488,#0a7e6e);color:#fff;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="dash-section" id="sec-bookings">
+      <div id="bookingsList"></div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div class="dash-section" id="sec-schedule">
+      <div id="scheduleList"></div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div class="dash-section" id="sec-students">
+      <div id="studentsList"></div>
+    </div>
+
+    <!-- LESSONS -->
+    <div class="dash-section" id="sec-lessons">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="section-title" style="margin:0;">My Lessons</h2>
+        <a href="lessons.html" class="topbar-btn primary">+ Add Lesson</a>
+      </div>
+      <div id="lessonsList"></div>
+    </div>
+
+    <!-- CONTENT LIBRARY -->
+    <div class="dash-section" id="sec-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="section-title" style="margin:0;">Content Library</h2>
+        <a href="lessons.html" class="topbar-btn primary">+ Upload Content</a>
+      </div>
+      <div id="contentList"></div>
+    </div>
+
+    <!-- EXAMS -->
+    <div class="dash-section" id="sec-exams">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="section-title" style="margin:0;">Exams</h2>
+      </div>
+      <div id="examsList"></div>
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+    <div class="dash-section" id="sec-announcements">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="section-title" style="margin:0;">Announcements</h2>
+        <button class="topbar-btn primary" onclick="openAnnModal()">+ New Announcement</button>
+      </div>
+      <div id="announcementsList"></div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="dash-section" id="sec-payments">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="section-title" style="margin:0;">Payments & Subscriptions</h2>
+      </div>
+      <div class="stats-grid" style="margin-bottom:24px;">
+        <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="paySubscribers">0</div><div class="stat-label">Active Students</div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-num" id="payRevenue">$0</div><div class="stat-label">Total Revenue</div></div>
+        <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-num" id="payPending">0</div><div class="stat-label">Pending</div></div>
+        <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num" id="payAvgPerStudent">$0</div><div class="stat-label">Avg Per Student</div></div>
+      </div>
+      <div id="stripeSubSummary" style="display:none;background:linear-gradient(135deg,rgba(13,148,136,.06),rgba(5,150,105,.04));border:1px solid rgba(13,148,136,.15);border-radius:14px;padding:16px 20px;margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;">💳 Stripe Subscriptions</div>
+        <div id="stripeSubList" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+      </div>
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--ink);">Subscribers</h3>
+      <div id="paymentsList"><div class="empty-state"><p>No subscribers yet</p></div></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="dash-section" id="sec-analytics">
+      <div class="stats-grid" style="margin-bottom:24px;">
+        <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-num" id="anTotalBookings">0</div><div class="stat-label">Total Bookings</div></div>
+        <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" id="anConfirmed">0</div><div class="stat-label">Confirmed</div></div>
+        <div class="stat-card"><div class="stat-icon">❌</div><div class="stat-num" id="anRejected">0</div><div class="stat-label">Rejected</div></div>
+        <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-num" id="anPending">0</div><div class="stat-label">Pending</div></div>
+      </div>
+      <div class="stats-grid" style="margin-bottom:24px;">
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-num" id="anEarnings">$0</div><div class="stat-label">Total Earnings</div></div>
+        <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="anUniqueStudents">0</div><div class="stat-label">Unique Students</div></div>
+        <div class="stat-card"><div class="stat-icon">📢</div><div class="stat-num" id="anAnnouncements">0</div><div class="stat-label">Announcements</div></div>
+        <div class="stat-card"><div class="stat-icon">🔔</div><div class="stat-num" id="anUnreadNotifs">0</div><div class="stat-label">Unread Notifs</div></div>
+      </div>
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--ink);">Weekly Booking Activity</h3>
+      <div id="analyticsChart" style="background:var(--card);border:1px solid var(--border-subtle);border-radius:14px;padding:20px;margin-bottom:24px;"></div>
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--ink);">Top Students</h3>
+      <div id="analyticsTopStudents"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="dash-section" id="sec-profile">
+      <div class="setting-row">
+        <div class="setting-group">
+          <div class="setting-label">Full Name</div>
+          <input class="setting-input" id="profName" placeholder="Your name">
+        </div>
+        <div class="setting-group">
+          <div class="setting-label">Profile Image URL</div>
+          <input class="setting-input" id="profImage" placeholder="https://...">
+        </div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label">Bio</div>
+        <textarea class="setting-input" id="profBio" placeholder="Tell students about yourself..."></textarea>
+      </div>
+      <div class="setting-row">
+        <div class="setting-group">
+          <div class="setting-label">Hourly Rate ($)</div>
+          <input class="setting-input" id="profPrice" type="number" placeholder="25">
+        </div>
+        <div class="setting-group">
+          <div class="setting-label">Years of Experience</div>
+          <input class="setting-input" id="profExp" type="number" placeholder="5">
+        </div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label">Specialties (comma-separated)</div>
+        <input class="setting-input" id="profSpec" placeholder="Quran, Tajweed, Arabic">
+      </div>
+      <button class="topbar-btn primary" onclick="saveProfile()" style="margin-top:8px;">Save Profile</button>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="dash-section" id="sec-notifications">
+      <div id="notificationsList"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="dash-section" id="sec-settings">
+      <div class="setting-group">
+        <div class="setting-label">Theme</div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="topbar-btn ghost" onclick="setTheme(false)" id="lightBtn">☀️ Light</button>
+          <button class="topbar-btn ghost" onclick="setTheme(true)" id="darkBtn">🌙 Dark</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label">Teacher Profile</div>
+        <div class="setting-desc">Your public profile visible to students.</div>
+        <a href="teacher-profile.html" class="topbar-btn primary">View Public Profile →</a>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label">Account</div>
+        <div class="setting-desc">Logged in as <strong id="settingsEmail">—</strong></div>
+        <button class="topbar-btn ghost" onclick="logout()" style="border-color:#ef4444;color:#ef4444;">Log Out</button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- Announcement Modal -->
+<div class="modal-overlay" id="annModal">
+  <div class="modal">
+    <h2>New Announcement</h2>
+    <div class="setting-group" style="border:none;padding:0;margin:0;">
+      <div class="setting-label">Title</div>
+      <input class="setting-input" id="annTitle" placeholder="Announcement title">
+    </div>
+    <div class="setting-group" style="border:none;padding:0;margin:12px 0 0;">
+      <div class="setting-label">Message</div>
+      <textarea class="setting-input" id="annBody" placeholder="Write your announcement..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="topbar-btn ghost" onclick="closeAnnModal()">Cancel</button>
+      <button class="topbar-btn primary" onclick="publishAnnouncement()">Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Incoming Call Overlay -->
+<div class="call-overlay" id="callOverlay">
+  <div class="call-popup">
+    <div class="call-ring-icon">📞</div>
+    <div class="call-student-name" id="callStudentName">Student</div>
+    <div class="call-subtitle">is calling you now</div>
+    <div class="call-actions">
+      <button class="call-btn answer" onclick="answerCall()">📞 Answer</button>
+      <button class="call-btn decline" onclick="declineCall()">✕ Decline</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+var API = '/api/kv';
+var teacherSession = JSON.parse(localStorage.getItem('minbar_teacher_session') || 'null');
+var userEmail = teacherSession ? (teacherSession.email || '') : '';
+var userName = teacherSession ? (teacherSession.name || 'Teacher') : 'Teacher';
+var allBookings = [];
+var allAnnouncements = [];
+var allNotifications = [];
+var isOnline = true;
+var currentSection = 'overview';
+
+function toast(msg, type) {
+  type = type || 'success';
+  var w = document.getElementById('toastWrap');
+  var t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){t.remove();},300); }, 3000);
+}
+
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function kvGet(key) {
+  try {
+    var r = await fetch(API + '?key=' + encodeURIComponent(key));
+    if (!r.ok) return null;
+    var data = await r.json();
+    if (data && typeof data.value === 'string') { try { data.value = JSON.parse(data.value); } catch(e) {} }
+    return data;
+  } catch(e) { return null; }
+}
+
+async function kvSet(key, value) {
+  await fetch(API + '?key=' + encodeURIComponent(key), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: key, value: value })
+  });
+}
+
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return Math.floor(diff/86400000) + 'd ago';
+}
+
+function getCountdown(scheduledAt) {
+  var diff = scheduledAt - Date.now();
+  if (diff <= 0) return { text: 'NOW', cls: 'live', isLive: true };
+  var h = Math.floor(diff / 3600000);
+  var m = Math.floor((diff % 3600000) / 60000);
+  var s = Math.floor((diff % 60000) / 1000);
+  if (h > 24) { var d = Math.floor(h / 24); return { text: 'in ' + d + ' day' + (d > 1 ? 's' : ''), cls: 'later' }; }
+  if (h > 0) return { text: 'in ' + h + 'h ' + m + 'm', cls: h <= 2 ? 'soon' : 'later' };
+  if (m > 0) return { text: 'in ' + m + 'm ' + s + 's', cls: 'soon' };
+  return { text: 'in ' + s + 's', cls: 'soon' };
+}
+
+function formatTime12(time24) {
+  if (!time24) return { hour: '--', min: '--', ampm: '' };
+  var parts = time24.replace(/[^0-9:]/g, '').split(':');
+  var h = parseInt(parts[0]) || 0;
+  var m = parts[1] || '00';
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  if (h > 12) h -= 12;
+  if (h === 0) h = 12;
+  return { hour: h, min: m, ampm: ampm };
+}
+
+/* Auth check */
+if (!userEmail) {
+  window.location.href = 'teacher-login.html';
+}
+
+/* Section switching */
+function switchSection(name) {
+  currentSection = name;
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  document.querySelectorAll('.dash-section').forEach(function(s) { s.classList.remove('active'); });
+  var navBtn = document.querySelector('.nav-item[data-section="'+name+'"]');
+  if (navBtn) navBtn.classList.add('active');
+  var sec = document.getElementById('sec-' + name);
+  if (sec) sec.classList.add('active');
+  var titles = {overview:'Overview',bookings:'Bookings',schedule:'Schedule',students:'Students',lessons:'Lessons',content:'Content Library',exams:'Exams',announcements:'Announcements',analytics:'Analytics',profile:'My Profile',notifications:'Notifications',settings:'Settings'};
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+}
+
+/* Sidebar mobile */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+/* Theme */
+function setTheme(dark) {
+  if (dark) { document.body.classList.add('dark'); localStorage.setItem('minbar_dark','true'); }
+  else { document.body.classList.remove('dark'); localStorage.setItem('minbar_dark','false'); }
+  updateThemeBtns();
+}
+function updateThemeBtns() {
+  var d = document.body.classList.contains('dark');
+  document.getElementById('darkBtn').style.borderColor = d ? 'var(--teal)' : '';
+  document.getElementById('darkBtn').style.color = d ? 'var(--teal)' : '';
+  document.getElementById('lightBtn').style.borderColor = !d ? 'var(--teal)' : '';
+  document.getElementById('lightBtn').style.color = !d ? 'var(--teal)' : '';
+}
+
+/* Logout */
+function logout() {
+  localStorage.removeItem('minbar_teacher_session');
+  window.location.href = 'teacher-login.html';
+}
+
+/* Online toggle */
+async function toggleOnline() {
+  isOnline = !isOnline;
+  updateOnlineBadge();
+  var res = await kvGet('teacher:' + userEmail);
+  var t = (res && res.value) || {};
+  t._status = isOnline ? 'online' : 'offline';
+  t._lastSeen = Date.now();
+  await kvSet('teacher:' + userEmail, t);
+  var listRes = await kvGet('teachers_list');
+  var list = (listRes && listRes.value) || [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].email === userEmail) {
+      list[i]._status = t._status;
+      list[i]._lastSeen = t._lastSeen;
+      break;
+    }
+  }
+  await kvSet('teachers_list', list);
+  toast(isOnline ? 'You are now online' : 'You are now offline');
+}
+
+function updateOnlineBadge() {
+  var btn = document.getElementById('onlineBtn');
+  var lbl = document.getElementById('onlineLabel');
+  btn.className = 'online-badge ' + (isOnline ? 'online' : 'offline');
+  lbl.textContent = isOnline ? 'Online' : 'Offline';
+}
+
+async function getTeachersList() {
+  var res = await kvGet('teachers_list');
+  var list = (res && res.value) || [];
+  return list;
+}
+
+/* Booking operations */
+async function updateBooking(booking) {
+  for (var i = 0; i < allBookings.length; i++) {
+    if (allBookings[i].id === booking.id) { allBookings[i] = booking; break; }
+  }
+  await kvSet('booking:' + booking.id, booking);
+  await saveBookingsIndex();
+}
+
+async function saveBookingsIndex() {
+  if (!userEmail) return;
+  await kvSet('bookings:user:' + userEmail, allBookings);
+  if (allBookings.length > 0) {
+    var studentEmails = [];
+    allBookings.forEach(function(b) {
+      if (b.studentEmail && studentEmails.indexOf(b.studentEmail) === -1) studentEmails.push(b.studentEmail);
+    });
+    for (var i = 0; i < studentEmails.length; i++) {
+      var res = await kvGet('bookings:user:' + studentEmails[i]);
+      var sList = (res && res.value) || [];
+      for (var j = 0; j < sList.length; j++) {
+        for (var k = 0; k < allBookings.length; k++) {
+          if (sList[j].id === allBookings[k].id) { sList[j] = allBookings[k]; break; }
+        }
+      }
+      await kvSet('bookings:user:' + studentEmails[i], sList);
+    }
+  }
+}
+
+async function notifyStudent(studentEmail, message, type) {
+  if (!studentEmail) return;
+  var res = await kvGet('notifications:' + studentEmail);
+  var nList = (res && res.value) || [];
+  nList.unshift({ id: 'notif_' + Date.now(), type: type || 'info', message: message, read: false, createdAt: Date.now() });
+  await kvSet('notifications:' + studentEmail, nList);
+}
+
+async function acceptBooking(id) {
+  for (var i = 0; i < allBookings.length; i++) {
+    if (allBookings[i].id === id) {
+      allBookings[i].status = 'confirmed';
+      await updateBooking(allBookings[i]);
+      await notifyStudent(allBookings[i].studentEmail, userName + ' accepted your booking on ' + allBookings[i].day + ' at ' + allBookings[i].time, 'booking_accepted');
+      break;
+    }
+  }
+  renderAll();
+  toast('Booking accepted — student notified');
+}
+
+async function rejectBooking(id) {
+  if (!confirm('Reject this booking?')) return;
+  for (var i = 0; i < allBookings.length; i++) {
+    if (allBookings[i].id === id) {
+      allBookings[i].status = 'rejected';
+      await updateBooking(allBookings[i]);
+      await notifyStudent(allBookings[i].studentEmail, userName + ' declined your booking on ' + allBookings[i].day, 'booking_rejected');
+      break;
+    }
+  }
+  renderAll();
+  toast('Booking rejected — student notified', 'error');
+}
+
+function startCall(bookingId, roomId) {
+  window.location.href = 'live-room.html?room=' + encodeURIComponent(roomId) + '&role=teacher&name=' + encodeURIComponent(userName) + '&booking=' + encodeURIComponent(bookingId);
+}
+
+/* Render bookings */
+function renderBookings() {
+  var now = Date.now();
+  var pending = allBookings.filter(function(b) { return b.status === 'pending'; });
+  document.getElementById('reqCount').textContent = pending.length;
+
+  var active = allBookings.filter(function(b) { return b.status !== 'rejected' && b.status !== 'completed'; })
+    .sort(function(a, b) { return (a.scheduledAt || 0) - (b.scheduledAt || 0); });
+
+  var el = document.getElementById('bookingsList');
+  if (active.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">📅</div><p>No booking requests yet.</p></div>';
+    return;
+  }
+  el.innerHTML = active.map(function(b) {
+    var ft = formatTime12(b.time);
+    var statusCls = b.status === 'confirmed' ? 'status-confirmed' : (b.status === 'pending' ? 'status-pending' : '');
+    var cd = b.scheduledAt ? getCountdown(b.scheduledAt) : null;
+    var showStart = b.status === 'confirmed' && cd && (cd.isLive || (b.scheduledAt - now <= 600000 && b.scheduledAt - now > -3600000));
+    var actionsHtml = '';
+    if (b.status === 'pending') {
+      actionsHtml = '<div class="bk-actions"><button class="bk-btn accept" onclick="acceptBooking(\'' + b.id + '\')">✓ Accept</button><button class="bk-btn reject" onclick="rejectBooking(\'' + b.id + '\')">✕ Reject</button></div>';
+    } else if (showStart && b.roomId) {
+      actionsHtml = '<div class="bk-actions"><button class="bk-btn start" onclick="startCall(\'' + b.id + '\',\'' + escapeHtml(b.roomId) + '\')">📞 Start Call</button></div>';
+    }
+    return '<div class="booking-card"><div class="bk-top"><div class="bk-avatar">' + escapeHtml((b.studentName || 'S')[0].toUpperCase()) + '</div><div class="bk-info"><div class="bk-name">' + escapeHtml(b.studentName || 'Student') + '</div><div class="bk-time">📅 ' + escapeHtml(b.day || '') + ' — ' + ft.hour + ':' + ft.min + ' ' + ft.ampm + (b.duration ? ' · ' + b.duration + ' min' : '') + '</div></div><span class="status-badge ' + statusCls + '">' + b.status.charAt(0).toUpperCase() + b.status.slice(1) + '</span></div>' + (b.note ? '<div class="bk-note">"' + escapeHtml(b.note) + '"</div>' : '') + (cd ? '<div class="bk-countdown ' + cd.cls + '">' + cd.text + '</div>' : '') + actionsHtml + '</div>';
+  }).join('');
+
+  /* Overview bookings */
+  var upcoming = allBookings.filter(function(b) { return b.status === 'confirmed' && b.scheduledAt && b.scheduledAt > Date.now(); }).slice(0, 3);
+  var oEl = document.getElementById('overviewBookings');
+  if (upcoming.length === 0) {
+    oEl.innerHTML = '<div class="empty-state" style="padding:24px;"><p>No upcoming bookings.</p></div>';
+  } else {
+    oEl.innerHTML = upcoming.map(function(b) {
+      var ft = formatTime12(b.time);
+      var cd = getCountdown(b.scheduledAt);
+      return '<div class="booking-card"><div class="bk-top"><div class="bk-avatar">' + escapeHtml((b.studentName || 'S')[0].toUpperCase()) + '</div><div class="bk-info"><div class="bk-name">' + escapeHtml(b.studentName || 'Student') + '</div><div class="bk-time">📅 ' + escapeHtml(b.day || '') + ' — ' + ft.hour + ':' + ft.min + ' ' + ft.ampm + '</div></div><div class="bk-countdown ' + cd.cls + '">' + cd.text + '</div></div></div>';
+    }).join('');
+  }
+}
+
+function renderSchedule() {
+  var confirmed = allBookings.filter(function(b) { return b.status === 'confirmed'; }).sort(function(a, b) { return (a.scheduledAt || 0) - (b.scheduledAt || 0); });
+  var el = document.getElementById('scheduleList');
+  if (confirmed.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">🕐</div><p>No confirmed lessons in your schedule.</p></div>';
+    return;
+  }
+  el.innerHTML = confirmed.map(function(b) {
+    var ft = formatTime12(b.time);
+    var cd = b.scheduledAt ? getCountdown(b.scheduledAt) : null;
+    return '<div class="booking-card"><div class="bk-top"><div class="bk-avatar">' + escapeHtml((b.studentName || 'S')[0].toUpperCase()) + '</div><div class="bk-info"><div class="bk-name">' + escapeHtml(b.studentName || 'Student') + '</div><div class="bk-time">📅 ' + escapeHtml(b.day || '') + ' — ' + ft.hour + ':' + ft.min + ' ' + ft.ampm + '</div></div>' + (cd ? '<div class="bk-countdown ' + cd.cls + '">' + cd.text + '</div>' : '') + '</div></div>';
+  }).join('');
+}
+
+function renderStudents() {
+  var students = {};
+  allBookings.forEach(function(b) {
+    if (b.studentName && !students[b.studentEmail || b.studentName]) {
+      students[b.studentEmail || b.studentName] = { name: b.studentName, email: b.studentEmail, count: 0, totalSpent: 0 };
+    }
+    if (b.studentEmail || b.studentName) {
+      students[b.studentEmail || b.studentName].count++;
+      students[b.studentEmail || b.studentName].totalSpent += b.price || 0;
+    }
+  });
+  var list = Object.values(students);
+  document.getElementById('statStudents').textContent = list.length;
+  var el = document.getElementById('studentsList');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">👥</div><p>No students yet.</p></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(s) {
+    return '<div class="booking-card"><div class="bk-top"><div class="bk-avatar">' + escapeHtml(s.name[0].toUpperCase()) + '</div><div class="bk-info"><div class="bk-name">' + escapeHtml(s.name) + '</div><div class="bk-time">' + escapeHtml(s.email || '') + '</div></div><div style="text-align:right;"><div style="font-size:14px;font-weight:700;color:var(--teal);">' + s.count + ' lessons</div><div style="font-size:12px;color:var(--ink-soft);">$' + s.totalSpent + ' spent</div></div></div></div>';
+  }).join('');
+}
+
+function renderEarnings() {
+  var total = 0;
+  var completed = allBookings.filter(function(b) { return b.status === 'completed' || b.status === 'confirmed'; });
+  completed.forEach(function(b) { total += b.price || 0; });
+  document.getElementById('statEarnings').textContent = '$' + total;
+  document.getElementById('statLessons').textContent = allBookings.length;
+}
+
+/* Content library / lessons from KV */
+async function renderContent() {
+  var res = await kvGet('content_library');
+  var items = (res && res.value) || [];
+  var el = document.getElementById('contentList');
+  var lEl = document.getElementById('lessonsList');
+  if (items.length === 0) {
+    var empty = '<div class="empty-state"><div class="es-icon">📁</div><p>No content uploaded yet.</p></div>';
+    el.innerHTML = empty;
+    lEl.innerHTML = empty;
+    return;
+  }
+  var html = items.map(function(c) {
+    var icon = c.type === 'video' ? '🎥' : (c.type === 'audio' ? '🎵' : '📄');
+    return '<div class="content-card"><div class="content-icon" style="background:var(--bg);">' + icon + '</div><div class="content-info"><div class="content-title">' + escapeHtml(c.title || 'Untitled') + '</div><div class="content-meta">' + escapeHtml(c.type || 'file') + (c.duration ? ' · ' + c.duration : '') + '</div></div></div>';
+  }).join('');
+  el.innerHTML = html;
+  lEl.innerHTML = html;
+}
+
+/* Exams from KV */
+async function renderExams() {
+  var res = await kvGet('exams');
+  var items = (res && res.value) || [];
+  var el = document.getElementById('examsList');
+  if (items.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">📝</div><p>No exams created yet.</p></div>';
+    return;
+  }
+  el.innerHTML = items.map(function(e) {
+    return '<div class="content-card"><div class="content-icon" style="background:var(--bg);">📝</div><div class="content-info"><div class="content-title">' + escapeHtml(e.title || 'Untitled Exam') + '</div><div class="content-meta">' + (e.questions ? e.questions.length + ' questions' : '0 questions') + '</div></div></div>';
+  }).join('');
+}
+
+/* Announcements */
+async function loadAnnouncements() {
+  var res = await kvGet('announcements');
+  var items = (res && res.value) || [];
+  allAnnouncements = items.filter(function(a) { return a.teacherEmail === userEmail; });
+  renderAnnouncements();
+}
+
+function openAnnModal() {
+  document.getElementById('annModal').classList.add('open');
+  document.getElementById('annTitle').value = '';
+  document.getElementById('annBody').value = '';
+  document.getElementById('annTitle').focus();
+}
+function closeAnnModal() {
+  document.getElementById('annModal').classList.remove('open');
+}
+
+async function publishAnnouncement() {
+  var title = document.getElementById('annTitle').value.trim();
+  var body = document.getElementById('annBody').value.trim();
+  if (!title || !body) { toast('Please fill in title and message', 'error'); return; }
+  var ann = { id: 'ann_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), title: title, body: body, teacherEmail: userEmail, teacherName: userName, createdAt: Date.now() };
+  allAnnouncements.unshift(ann);
+  var res = await kvGet('announcements');
+  var all = (res && res.value) || [];
+  all.unshift(ann);
+  await kvSet('announcements', all);
+  closeAnnModal();
+  renderAnnouncements();
+  toast('Announcement published');
+}
+
+async function deleteAnnouncement(id) {
+  if (!confirm('Delete this announcement?')) return;
+  allAnnouncements = allAnnouncements.filter(function(a) { return a.id !== id; });
+  var res = await kvGet('announcements');
+  var all = (res && res.value) || [];
+  all = all.filter(function(a) { return a.id !== id; });
+  await kvSet('announcements', all);
+  renderAnnouncements();
+  toast('Announcement deleted');
+}
+
+function renderAnnouncements() {
+  var el = document.getElementById('announcementsList');
+  if (allAnnouncements.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">📢</div><p>No announcements yet. Click "New Announcement" to create one.</p></div>';
+    return;
+  }
+  el.innerHTML = allAnnouncements.map(function(a) {
+    return '<div class="ann-card"><div class="ann-top"><span class="ann-badge">Announcement</span><span class="ann-date">' + timeAgo(a.createdAt) + '</span></div><div class="ann-title">' + escapeHtml(a.title) + '</div><div class="ann-body">' + escapeHtml(a.body) + '</div><div class="ann-actions"><button class="ann-btn del" onclick="deleteAnnouncement(\'' + a.id + '\')">🗑 Delete</button></div></div>';
+  }).join('');
+}
+
+/* Notifications */
+async function loadNotifications() {
+  if (!userEmail) return;
+  var res = await kvGet('notifications:' + userEmail);
+  allNotifications = (res && res.value) || [];
+  var unread = allNotifications.filter(function(n) { return !n.read; }).length;
+  document.getElementById('notifCount').textContent = unread;
+  document.getElementById('notifCount').style.display = unread > 0 ? 'inline' : 'none';
+  renderNotifications();
+}
+
+async function markAllRead() {
+  allNotifications.forEach(function(n) { n.read = true; });
+  await kvSet('notifications:' + userEmail, allNotifications);
+  document.getElementById('notifCount').textContent = '0';
+  document.getElementById('notifCount').style.display = 'none';
+  renderNotifications();
+}
+
+function renderNotifications() {
+  var el = document.getElementById('notificationsList');
+  if (allNotifications.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">🔔</div><p>No notifications yet.</p></div>';
+    return;
+  }
+  el.innerHTML = '<button onclick="markAllRead()" class="topbar-btn ghost" style="margin-bottom:12px;">Mark all as read</button>' +
+    allNotifications.map(function(n) {
+      var icon = n.type === 'new_booking' ? '📅' : (n.type === 'booking_accepted' ? '✅' : '🔔');
+      var bg = n.read ? 'var(--card)' : 'rgba(13,148,136,.04)';
+      var border = n.read ? 'var(--border-subtle)' : 'rgba(13,148,136,.2)';
+      return '<div class="booking-card" style="background:' + bg + ';border-color:' + border + ';"><div class="bk-top"><div class="bk-avatar" style="font-size:20px;">' + icon + '</div><div class="bk-info"><div class="bk-name">' + escapeHtml(n.message) + '</div><div class="bk-time">' + timeAgo(n.createdAt) + '</div></div></div></div>';
+    }).join('');
+}
+
+/* Profile */
+async function loadProfile() {
+  var res = await kvGet('teacher:' + userEmail);
+  var t = (res && res.value) || {};
+  document.getElementById('profName').value = t.name || userName;
+  document.getElementById('profBio').value = t.bio || '';
+  document.getElementById('profPrice').value = t.price || '';
+  document.getElementById('profExp').value = t.yearsExp || '';
+  document.getElementById('profSpec').value = (t.specialties || []).join(', ');
+  document.getElementById('profImage').value = t.photo || '';
+  isOnline = t._status !== 'offline';
+  updateOnlineBadge();
+}
+
+async function saveProfile() {
+  var name = document.getElementById('profName').value.trim();
+  var bio = document.getElementById('profBio').value.trim();
+  var price = parseFloat(document.getElementById('profPrice').value) || 0;
+  var exp = parseInt(document.getElementById('profExp').value) || 0;
+  var spec = document.getElementById('profSpec').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var photo = document.getElementById('profImage').value.trim();
+  if (!name) { toast('Name is required', 'error'); return; }
+  var res = await kvGet('teacher:' + userEmail);
+  var t = (res && res.value) || {};
+  t.name = name; t.bio = bio; t.price = price; t.yearsExp = exp; t.specialties = spec; t.photo = photo; t.email = userEmail;
+  await kvSet('teacher:' + userEmail, t);
+  var listRes = await kvGet('teachers_list');
+  var list = (listRes && listRes.value) || [];
+  var found = false;
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].email === userEmail) { list[i] = { id: userEmail, name: name, photo: photo, email: userEmail, price: price, bio: bio, specialties: spec }; found = true; break; }
+  }
+  if (!found) list.push({ id: userEmail, name: name, photo: photo, email: userEmail, price: price, bio: bio, specialties: spec });
+  await kvSet('teachers_list', list);
+  userName = name;
+  document.getElementById('sidebarName').textContent = name;
+  document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+  toast('Profile saved');
+}
+
+/* Stats */
+function renderStats() {
+  renderEarnings();
+  renderStudents();
+}
+
+function renderAnalytics() {
+  var total = allBookings.length;
+  var confirmed = allBookings.filter(function(b) { return b.status === 'confirmed'; }).length;
+  var rejected = allBookings.filter(function(b) { return b.status === 'rejected'; }).length;
+  var pending = allBookings.filter(function(b) { return b.status === 'pending'; }).length;
+  var earnings = 0;
+  allBookings.forEach(function(b) { if (b.status === 'confirmed' || b.status === 'completed') earnings += b.price || 0; });
+  var uniqueStudents = {};
+  allBookings.forEach(function(b) { if (b.studentEmail) uniqueStudents[b.studentEmail] = b.studentName; });
+  var unreadNotifs = allNotifications.filter(function(n) { return !n.read; }).length;
+
+  document.getElementById('anTotalBookings').textContent = total;
+  document.getElementById('anConfirmed').textContent = confirmed;
+  document.getElementById('anRejected').textContent = rejected;
+  document.getElementById('anPending').textContent = pending;
+  document.getElementById('anEarnings').textContent = '$' + earnings;
+  document.getElementById('anUniqueStudents').textContent = Object.keys(uniqueStudents).length;
+  document.getElementById('anAnnouncements').textContent = allAnnouncements.length;
+  document.getElementById('anUnreadNotifs').textContent = unreadNotifs;
+
+  /* Weekly chart */
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var weekCounts = [0,0,0,0,0,0,0];
+  var now = Date.now();
+  allBookings.forEach(function(b) {
+    if (b.createdAt && now - b.createdAt < 7 * 86400000) {
+      var d = new Date(b.createdAt);
+      weekCounts[d.getDay()]++;
+    }
+  });
+  var maxCount = Math.max.apply(null, weekCounts.concat([1]));
+  var chartHtml = '<div style="display:flex;align-items:flex-end;gap:12px;height:120px;">';
+  for (var i = 0; i < 7; i++) {
+    var pct = (weekCounts[i] / maxCount) * 100;
+    chartHtml += '<div style="flex:1;text-align:center;"><div style="display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">';
+    chartHtml += '<div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;">' + weekCounts[i] + '</div>';
+    chartHtml += '<div style="width:100%;max-width:40px;height:' + Math.max(pct, 4) + '%;background:linear-gradient(180deg,var(--teal),rgba(13,148,136,.4));border-radius:6px 6px 2px 2px;transition:height .3s;"></div>';
+    chartHtml += '</div><div style="font-size:11px;color:var(--ink-soft);margin-top:6px;font-weight:500;">' + days[i] + '</div></div>';
+  }
+  chartHtml += '</div>';
+  document.getElementById('analyticsChart').innerHTML = chartHtml;
+
+  /* Top students */
+  var students = {};
+  allBookings.forEach(function(b) {
+    if (b.studentEmail) {
+      if (!students[b.studentEmail]) students[b.studentEmail] = { name: b.studentName || 'Student', email: b.studentEmail, count: 0, spent: 0 };
+      students[b.studentEmail].count++;
+      if (b.status === 'confirmed' || b.status === 'completed') students[b.studentEmail].spent += b.price || 0;
+    }
+  });
+  var sorted = Object.values(students).sort(function(a, b) { return b.count - a.count; }).slice(0, 5);
+  var sEl = document.getElementById('analyticsTopStudents');
+  if (sorted.length === 0) {
+    sEl.innerHTML = '<div class="empty-state" style="padding:24px;"><p>No student data yet.</p></div>';
+  } else {
+    sEl.innerHTML = sorted.map(function(s, i) {
+      return '<div class="booking-card"><div class="bk-top"><div class="bk-avatar">' + (i + 1) + '</div><div class="bk-info"><div class="bk-name">' + escapeHtml(s.name) + '</div><div class="bk-time">' + escapeHtml(s.email) + '</div></div><div style="text-align:right;"><div style="font-size:14px;font-weight:700;color:var(--teal);">' + s.count + ' bookings</div><div style="font-size:12px;color:var(--ink-soft);">$' + s.spent + ' spent</div></div></div></div>';
+    }).join('');
+  }
+}
+
+function renderAll() {
+  renderBookings();
+  renderSchedule();
+  renderStats();
+  renderAnalytics();
+}
+
+/* ── Chat System ── */
+var chatStudents = [];
+var chatSelectedEmail = null;
+var chatPollTimer = null;
+var chatMsgCount = {};
+
+async function loadChat() {
+  chatStudents = [];
+  chatSelectedEmail = null;
+  var seen = {};
+  allBookings.forEach(function(b) {
+    if (b.studentEmail && !seen[b.studentEmail]) {
+      seen[b.studentEmail] = true;
+      chatStudents.push({ name: b.studentName || 'Student', email: b.studentEmail });
+    }
+  });
+  var listEl = document.getElementById('chatStudentsList');
+  if (chatStudents.length === 0) {
+    listEl.innerHTML = '<div class="empty-state" style="padding:24px 12px;"><p>No students yet</p></div>';
+    return;
+  }
+  listEl.innerHTML = chatStudents.map(function(s) {
+    var unread = chatMsgCount[s.email] || 0;
+    return '<div class="chat-student" data-email="' + s.email + '" onclick="selectChatStudent(\'' + s.email + '\')" style="padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;margin-bottom:2px;"><div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#e6f7ef,#d1fae5);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#0d9488;flex-shrink:0;">' + s.name.charAt(0).toUpperCase() + '</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(s.name) + '</div><div style="font-size:11px;color:var(--ink-soft);">' + escapeHtml(s.email) + '</div></div>' + (unread > 0 ? '<span style="padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#ef4444;color:#fff;">' + unread + '</span>' : '') + '</div>';
+  }).join('');
+  if (chatPollTimer) clearInterval(chatPollTimer);
+}
+
+function selectChatStudent(email) {
+  chatSelectedEmail = email;
+  document.querySelectorAll('.chat-student').forEach(function(el) {
+    el.style.background = el.dataset.email === email ? 'rgba(13,148,136,.08)' : '';
+  });
+  chatMsgCount[email] = 0;
+  updateChatBadge();
+  loadChatMessages(email);
+  document.getElementById('chatInputArea').style.display = 'flex';
+  document.getElementById('chatHeader').innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#e6f7ef,#d1fae5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#0d9488;">' + (chatStudents.find(function(s) { return s.email === email; })?.name?.charAt(0) || '?').toUpperCase() + '</div><span>' + escapeHtml(chatStudents.find(function(s) { return s.email === email; })?.name || 'Student') + '</span></div>';
+  if (chatPollTimer) clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(function() { loadChatMessages(email, true); }, 3000);
+}
+
+async function loadChatMessages(email, silent) {
+  if (!email) return;
+  var key = 'chat:' + userEmail + ':' + email;
+  var res = await kvGet(key);
+  var msgs = (res && res.value) || [];
+  var el = document.getElementById('chatMessages');
+  if (msgs.length === 0) {
+    if (!silent) el.innerHTML = '<div class="empty-state" style="padding:24px;"><p>No messages yet. Say hello!</p></div>';
+    return;
+  }
+  if (!silent || msgs.length > 0) {
+    var html = msgs.map(function(m) {
+      var isMe = m.from === userEmail;
+      return '<div style="display:flex;flex-direction:column;align-items:' + (isMe ? 'flex-end' : 'flex-start') + ';"><div style="max-width:80%;padding:10px 14px;border-radius:14px;background:' + (isMe ? 'linear-gradient(135deg,#0d9488,#0a7e6e)' : 'var(--bg,#f1f5f9)') + ';color:' + (isMe ? '#fff' : 'var(--ink)') + ';font-size:13px;line-height:1.5;">' + escapeHtml(m.text) + '</div><div style="font-size:10px;color:var(--ink-soft);margin-top:3px;">' + new Date(m.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div></div>';
+    }).join('');
+    el.innerHTML = html;
+    el.scrollTop = el.scrollHeight;
+  }
+}
+
+async function sendChatMsg() {
+  var input = document.getElementById('chatMsgInput');
+  var text = input.value.trim();
+  if (!text || !chatSelectedEmail) return;
+  input.value = '';
+  var key = 'chat:' + userEmail + ':' + chatSelectedEmail;
+  var res = await kvGet(key);
+  var msgs = (res && res.value) || [];
+  msgs.push({ from: userEmail, to: chatSelectedEmail, text: text, ts: Date.now() });
+  await fetch('/api/kv?key=' + encodeURIComponent(key), {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: key, value: msgs })
+  });
+  // Also update student's chat
+  var stuKey = 'chat:' + chatSelectedEmail + ':' + userEmail;
+  await fetch('/api/kv?key=' + encodeURIComponent(stuKey), {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: stuKey, value: msgs })
+  });
+  loadChatMessages(chatSelectedEmail);
+}
+
+function updateChatBadge() {
+  var total = Object.values(chatMsgCount).reduce(function(a, b) { return a + b; }, 0);
+  var badge = document.getElementById('chatBadge');
+  if (total > 0) { badge.textContent = total; badge.style.display = ''; }
+  else badge.style.display = 'none';
+}
+
+/* ── Payments ── */
+async function loadPayments() {
+  // Count subscribers from booking data
+  var uniqueEmails = {};
+  var totalRevenue = 0;
+  var pendingCount = 0;
+  allBookings.forEach(function(b) {
+    if (b.studentEmail) {
+      if (!uniqueEmails[b.studentEmail]) uniqueEmails[b.studentEmail] = { count: 0, spent: 0 };
+      uniqueEmails[b.studentEmail].count++;
+      if (b.price) {
+        if (b.status === 'confirmed' || b.status === 'completed') {
+          uniqueEmails[b.studentEmail].spent += b.price;
+          totalRevenue += b.price;
+        }
+        if (b.status === 'pending') pendingCount++;
+      }
+    }
+  });
+  var subCount = Object.keys(uniqueEmails).length;
+  document.getElementById('paySubscribers').textContent = subCount;
+  document.getElementById('payRevenue').textContent = '$' + totalRevenue;
+  document.getElementById('payPending').textContent = pendingCount;
+  document.getElementById('payAvgPerStudent').textContent = '$' + (subCount > 0 ? Math.round(totalRevenue / subCount) : 0);
+
+  var listEl = document.getElementById('paymentsList');
+  var entries = Object.entries(uniqueEmails).sort(function(a, b) { return b[1].spent - a[1].spent; });
+  if (entries.length === 0) {
+    listEl.innerHTML = '<div class="empty-state" style="padding:24px;"><p>No subscribers yet</p></div>';
+  } else {
+    listEl.innerHTML = '<div style="display:flex;gap:8px;margin-bottom:12px;"><label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);cursor:pointer;"><input type="checkbox" id="bulkSelectAll" onchange="toggleBulkStudents()"> Select all</label><button class="bk-btn accept" onclick="sendBulkAnnouncement()" style="display:none;" id="bulkAnnBtn">📢 Announce to Selected</button></div>' + entries.map(function(e) {
+      return '<div class="booking-card" style="display:flex;align-items:center;gap:12px;"><input type="checkbox" class="bulk-student-cb" data-email="' + e[0] + '" data-name="' + escapeHtml(e[1].name || 'Student') + '" onchange="updateBulkAnnBtn()" style="flex-shrink:0;"><div class="bk-avatar">' + (escapeHtml(e[1].name || 'S').charAt(0).toUpperCase()) + '</div><div class="bk-info"><div class="bk-name">' + escapeHtml(e[1].name || 'Student') + '</div><div class="bk-time">' + escapeHtml(e[0]) + ' · ' + e[1].count + ' bookings</div></div><div style="text-align:right;"><div style="font-size:16px;font-weight:700;color:var(--teal);">$' + e[1].spent + '</div></div></div>';
+    }).join('');
+  }
+
+  // Load Stripe subscription data
+  loadStripeSubs();
+}
+
+async function loadStripeSubs() {
+  var res = await kvGet('stripe:subscriptions:all');
+  var subs = (res && res.value) || [];
+  var container = document.getElementById('stripeSubSummary');
+  var list = document.getElementById('stripeSubList');
+  if (subs.length === 0) { container.style.display = 'none'; return; }
+  container.style.display = '';
+  var active = subs.filter(function(s) { return s.status === 'active'; });
+  list.innerHTML = subs.map(function(s) {
+    var isActive = s.status === 'active';
+    var bg = isActive ? 'rgba(13,148,136,.1)' : 'rgba(239,68,68,.1)';
+    var color = isActive ? '#0d9488' : '#ef4444';
+    return '<div style="padding:6px 14px;border-radius:8px;background:' + bg + ';color:' + color + ';font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;"><span>' + (isActive ? '✅' : '❌') + '</span>' + escapeHtml(s.name || s.email || '?') + ' <span style="opacity:.6;">(' + s.plan + ')</span></div>';
+  }).join('');
+  if (active.length > 0) {
+    container.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;">💳 Stripe Subscriptions <span style="font-weight:400;color:var(--ink-soft);font-size:12px;">(' + active.length + ' active / ' + subs.length + ' total)</span></div>' +
+      '<div id="stripeSubList" style="display:flex;gap:10px;flex-wrap:wrap;">' + list.innerHTML + '</div>';
+  }
+}
+
+/* ── Bulk Operations ── */
+function toggleBulkStudents() {
+  var checked = document.getElementById('bulkSelectAll').checked;
+  document.querySelectorAll('.bulk-student-cb').forEach(function(cb) { cb.checked = checked; });
+  updateBulkAnnBtn();
+}
+
+function updateBulkAnnBtn() {
+  var checked = document.querySelectorAll('.bulk-student-cb:checked').length;
+  var btn = document.getElementById('bulkAnnBtn');
+  btn.style.display = checked > 0 ? '' : 'none';
+  btn.textContent = '📢 Announce to ' + checked + ' student' + (checked > 1 ? 's' : '');
+}
+
+function sendBulkAnnouncement() {
+  var selected = [];
+  document.querySelectorAll('.bulk-student-cb:checked').forEach(function(cb) {
+    selected.push({ email: cb.dataset.email, name: cb.dataset.name });
+  });
+  if (selected.length === 0) return;
+  document.getElementById('annTitle').value = '';
+  document.getElementById('annBody').value = '';
+  openAnnModal();
+  // Override save to target selected
+  var origSave = document.getElementById('annSaveBtn').onclick;
+  document.getElementById('annSaveBtn').onclick = async function() {
+    var title = document.getElementById('annTitle').value.trim();
+    var msg = document.getElementById('annBody').value.trim();
+    if (!title || !msg) return;
+    for (var i = 0; i < selected.length; i++) {
+      var ann = { title: title, message: msg, teacherEmail: userEmail, teacherName: userName, ts: Date.now(), targetEmail: selected[i].email };
+      var annKey = 'announcements:' + selected[i].email;
+      var r = await kvGet(annKey);
+      var list = (r && r.value) || [];
+      list.unshift(ann);
+      await fetch('/api/kv?key=' + encodeURIComponent(annKey), {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: annKey, value: list })
+      });
+    }
+    closeAnnModal();
+    toast('Announcement sent to ' + selected.length + ' students');
+    document.getElementById('annSaveBtn').onclick = origSave;
+  };
+}
+var currentCallData = null;
+var callCheckInterval = null;
+
+async function checkIncomingCalls() {
+  if (!userEmail) return;
+  var res = await kvGet('call_requests:' + userEmail);
+  var data = res && res.value;
+  if (data && data.status === 'ringing' && data.roomId && data.studentName) {
+    if (currentCallData && currentCallData.id === data.id) return;
+    currentCallData = data;
+    document.getElementById('callStudentName').textContent = data.studentName;
+    document.getElementById('callOverlay').classList.add('show');
+    try {
+      var audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgip2Lf2BXXoSrm3VCPU1xip+Lf2BXXoSrm3VCPU1xiZ6MgGFXXoarmXJBPk1xiZ6MgGFXXoarmXJBPk1xiZ6MgGFXXoarmnNCQk1xiZ6MgGFXXoarmnNCQk1w');
+      audio.play().catch(function(){});
+    } catch(e) {}
+  } else {
+    if (currentCallData && (!data || data.status !== 'ringing')) {
+      currentCallData = null;
+      document.getElementById('callOverlay').classList.remove('show');
+    }
+  }
+}
+
+function answerCall() {
+  if (!currentCallData || !currentCallData.roomId) return;
+  currentCallData.status = 'answered';
+  fetch('/api/kv?key=' + encodeURIComponent('call_requests:' + userEmail), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: 'call_requests:' + userEmail, value: currentCallData })
+  });
+  document.getElementById('callOverlay').classList.remove('show');
+  window.open('live-room.html?room=' + encodeURIComponent(currentCallData.roomId) + '&role=teacher&name=' + encodeURIComponent(userName), '_blank');
+  currentCallData = null;
+}
+
+function declineCall() {
+  if (!currentCallData) return;
+  currentCallData.status = 'declined';
+  fetch('/api/kv?key=' + encodeURIComponent('call_requests:' + userEmail), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: 'call_requests:' + userEmail, value: currentCallData })
+  });
+  document.getElementById('callOverlay').classList.remove('show');
+  currentCallData = null;
+}
+
+function startCallPolling() {
+  checkIncomingCalls();
+  callCheckInterval = setInterval(checkIncomingCalls, 5000);
+}
+
+/* Init */
+async function init() {
+  if (!userEmail) return;
+  document.getElementById('sidebarName').textContent = userName;
+  document.getElementById('sidebarEmail').textContent = userEmail;
+  document.getElementById('sidebarAvatar').textContent = userName.charAt(0).toUpperCase();
+  document.getElementById('settingsEmail').textContent = userEmail;
+  updateThemeBtns();
+
+  var res = await kvGet('bookings:user:' + userEmail);
+  allBookings = (res && res.value) || [];
+  renderAll();
+  loadNotifications();
+  loadProfile();
+  renderContent();
+  renderExams();
+  loadAnnouncements();
+  startCallPolling();
+  document.getElementById('chatMsgInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendChatMsg(); });
+}
+
+init();
+
+/* Countdown refresh */
+setInterval(function() {
+  if (currentSection === 'bookings') renderBookings();
+  if (currentSection === 'schedule') renderSchedule();
+  if (currentSection === 'overview') renderBookings();
+  if (currentSection === 'notifications') loadNotifications();
+  if (currentSection === 'chat' && chatSelectedEmail) loadChatMessages(chatSelectedEmail, true);
+}, 10000);
+</script>
+</body>
+</html>
