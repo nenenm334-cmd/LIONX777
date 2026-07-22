@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "rewrites": [
+    { "source": "/api/booking-checkout", "destination": "/api/stripe" },
+    { "source": "/api/stripe-checkout", "destination": "/api/stripe" },
+    { "source": "/api/stripe-session", "destination": "/api/stripe" },
+    { "source": "/api/stripe-subscribe", "destination": "/api/stripe" },
+    { "source": "/api/stripe-webhook", "destination": "/api/stripe" },
+    { "source": "/api/setup-payments", "destination": "/api/stripe" },
+    { "source": "/api/student-auth", "destination": "/api/auth" },
+    { "source": "/api/teacher-auth", "destination": "/api/auth" }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
