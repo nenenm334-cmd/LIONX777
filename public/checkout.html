@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upgrade — Minbar</title>
-<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#f8fafc,#ecfdf5);padding:16px;}body.dark{background:linear-gradient(135deg,#08080e,#0a0a12,#080c0a);color:#e2e8f0;}.card{width:100%;max-width:460px;background:rgba(255,255,255,.85);backdrop-filter:blur(32px);border-radius:24px;padding:40px 36px;box-shadow:0 24px 80px rgba(0,0,0,.06);}body.dark .card{background:rgba(16,16,24,.85);box-shadow:0 24px 80px rgba(0,0,0,.3);}.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#0d9488;margin-bottom:4px;}body.dark .badge{color:#34d399;}h1{font-size:26px;margin-bottom:4px;}p{color:#64748b;font-size:14px;line-height:1.5;margin-bottom:24px;}body.dark p{color:#94a3b8;}.price{font-size:44px;font-weight:800;letter-spacing:-.04em;margin-bottom:4px;}.price span{font-size:16px;font-weight:500;color:#6b7280;}.field{margin-bottom:16px;}label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:5px;}body.dark label{color:#94a3b8;}input{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:15px;outline:none;background:#fff;color:#0f172a;}body.dark input{border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e2e8f0;}input:focus{border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.12);}.btn{width:100%;padding:14px 24px;border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;margin-top:8px;}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.3);}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}.sec{font-size:12px;color:#94a3b8;text-align:center;margin-top:16px;line-height:1.5;}.features{list-style:none;padding:0;margin:16px 0 24px;}.features li{padding:6px 0;font-size:14px;color:#334155;}body.dark .features li{color:#cbd5e1;}.features li .c{color:#0d9488;font-weight:700;margin-right:8px;}.err{font-size:13px;color:#ef4444;margin-bottom:12px;display:none;}.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#94a3b8;font-size:12px;}.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e2e8f0;}body.dark .divider::before,body.dark .divider::after{background:rgba(255,255,255,.08);}#card-element{border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff;margin-bottom:12px;}body.dark #card-element{border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.04);}#card-element.StripeElement--focus{border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.12);}.btn-card{background:linear-gradient(135deg,#0d9488,#059669);}.btn-gpay{background:linear-gradient(135deg,#4285F4,#3367D6);display:flex;align-items:center;justify-content:center;gap:8px;}.btn-apay{background:linear-gradient(135deg,#000,#1a1a1a);display:flex;align-items:center;justify-content:center;gap:8px;}.gpay-btn-wrap{padding:0;margin-bottom:12px;}#gpay-btn-wrap .StripeElement{border:1.5px solid #e2e8f0;border-radius:12px;padding:0;margin:0;}body.dark #gpay-btn-wrap .StripeElement{border-color:rgba(255,255,255,.08);}.pmt-label{font-size:12px;font-weight:600;color:#64748b;margin-bottom:8px;display:block;}body.dark .pmt-label{color:#94a3b8;}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#f8fafc,#ecfdf5);padding:16px;}body.dark{background:linear-gradient(135deg,#08080e,#0a0a12,#080c0a);color:#e2e8f0;}.card{width:100%;max-width:460px;background:rgba(255,255,255,.85);backdrop-filter:blur(32px);border-radius:24px;padding:40px 36px;box-shadow:0 24px 80px rgba(0,0,0,.06);}body.dark .card{background:rgba(16,16,24,.85);box-shadow:0 24px 80px rgba(0,0,0,.3);}.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#0d9488;margin-bottom:4px;}body.dark .badge{color:#34d399;}h1{font-size:26px;margin-bottom:4px;}p{color:#64748b;font-size:14px;line-height:1.5;margin-bottom:24px;}body.dark p{color:#94a3b8;}.price{font-size:44px;font-weight:800;letter-spacing:-.04em;margin-bottom:4px;}.price span{font-size:16px;font-weight:500;color:#6b7280;}.field{margin-bottom:16px;}label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:5px;}body.dark label{color:#94a3b8;}input{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:15px;outline:none;background:#fff;color:#0f172a;}body.dark input{border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e2e8f0;}input:focus{border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.12);}.btn{width:100%;padding:14px 24px;border:none;border-radius:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;margin:8px 0;}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.3);}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}.btn-card{background:linear-gradient(135deg,#0d9488,#059669);}.btn-gpay{background:#000;display:flex;align-items:center;justify-content:center;gap:8px;}.btn-gpay:hover{background:#1a1a1a;}.sec{font-size:12px;color:#94a3b8;text-align:center;margin-top:16px;line-height:1.5;}.features{list-style:none;padding:0;margin:16px 0 24px;}.features li{padding:6px 0;font-size:14px;color:#334155;}body.dark .features li{color:#cbd5e1;}.features li .c{color:#0d9488;font-weight:700;margin-right:8px;}.err{font-size:13px;color:#ef4444;margin-bottom:12px;display:none;}.pmt-row{display:flex;gap:8px;}.pmt-row .btn{flex:1;margin:0;}</style>
 </head><body>
 <div class="card">
   <div class="badge" id="planBadge">Pro Plan</div>
@@ -20,24 +20,18 @@
     <input id="name" type="text" placeholder="Your name">
   </div>
 
-  <span class="pmt-label">Pay with</span>
-  <div id="gpay-btn-wrap"><!-- Stripe GPay button mounts here --></div>
-  <div id="card-element"><!-- Stripe card element --></div>
   <div class="err" id="error"></div>
-  <button class="btn btn-card" id="cardPayBtn">💳 Pay with Card</button>
-  <button class="btn btn-gpay" id="gpayBtn" style="display:none;">
-    <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="2" fill="#fff"/><text x="2.5" y="10" font-size="7" font-weight="700" fill="#000">G Pay</text></svg>
+
+  <button class="btn btn-gpay" id="gpayBtn">
+    <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="2" fill="#fff"/><text x="3" y="10" font-size="7" font-weight="700" fill="#4285F4">G</text><text x="8" y="10" font-size="7" font-weight="700" fill="#4285F4">Pay</text></svg>
     Google Pay
   </button>
-  <div class="sec">🔒 Secure checkout via Stripe · Cancel anytime</div>
+  <button class="btn btn-card" id="cardBtn">💳 Card</button>
+
+  <div class="sec">🔒 Secure via Stripe · Google Pay & Apple Pay accepted · Cancel anytime</div>
 </div>
 
-<script src="https://js.stripe.com/v3/"></script>
 <script>
-const STRIPE_KEY = 'pk_live_51MgwK2JN6bTgEyE5V3ACybnBDMdr62dJYGR7f0tqCryiZVRmQli93SHFPs7wc56PRd7YQDlecdGadGpBPqRfJrQp00I9TzGnqj';
-const stripe = Stripe(STRIPE_KEY);
-var elements = stripe.elements();
-
 const params = new URLSearchParams(location.search);
 const plan = params.get('plan') || 'pro';
 const saved = JSON.parse(localStorage.getItem('minbar_session') || 'null');
@@ -50,92 +44,30 @@ document.getElementById('planFeatures').innerHTML = p.features.map(f => '<li><sp
 if(saved && saved.email) document.getElementById('email').value = saved.email;
 if(saved && saved.name) document.getElementById('name').value = saved.name;
 
-// Card element
-var card = elements.create('card', { style: { base: { fontSize: '15px', fontFamily: 'system-ui, sans-serif', color: '#0f172a', '::placeholder': { color: '#94a3b8' } } } });
-card.mount('#card-element');
+function getEmail() { return document.getElementById('email').value.trim(); }
+function getName() { return document.getElementById('name').value.trim(); }
+function validate() {
+  var email = getEmail();
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ document.getElementById('error').textContent = 'Please enter a valid email'; document.getElementById('error').style.display = 'block'; return false; }
+  document.getElementById('error').style.display = 'none'; return true;
+}
 
-// Google Pay via Payment Request Button
-var paymentRequest = stripe.paymentRequest({
-  country: 'US',
-  currency: 'usd',
-  total: { label: p.name, amount: plan === 'premium' ? 5900 : 2900 },
-  requestPayerName: true,
-  requestPayerEmail: true
-});
+function pay(method) {
+  if(!validate()) return;
+  var email = getEmail(), name = getName();
+  var url = '/api/stripe-checkout';
+  document.getElementById('error').style.display = 'none';
+  [].forEach.call(document.querySelectorAll('.btn'), function(b){ b.disabled = true; });
+  fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:plan,email:email,name:name,successUrl:location.origin+'/payment-success.html?session_id={CHECKOUT_SESSION_ID}',cancelUrl:location.origin+'/payment-cancel.html'})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.url) { window.location.href = d.url; }
+      else { document.getElementById('error').textContent = d.error || 'Error'; document.getElementById('error').style.display = 'block'; [].forEach.call(document.querySelectorAll('.btn'), function(b){ b.disabled = false; }); }
+    })
+    .catch(function(e){ document.getElementById('error').textContent = 'Network error'; document.getElementById('error').style.display = 'block'; [].forEach.call(document.querySelectorAll('.btn'), function(b){ b.disabled = false; }); });
+}
 
-var prButton = elements.create('paymentRequestButton', { paymentRequest: paymentRequest, style: { paymentRequestButton: { type: 'default', theme: 'dark', height: '48px' } } });
-
-var gpaySupported = false;
-paymentRequest.canMakePayment().then(function(result) {
-  if (result) {
-    gpaySupported = true;
-    document.getElementById('gpay-btn-wrap').style.display = '';
-    prButton.mount('#gpay-btn-wrap');
-    document.getElementById('card-element').style.marginTop = '12px';
-  } else {
-    document.getElementById('gpay-btn-wrap').style.display = 'none';
-    document.getElementById('gpayBtn').style.display = '';
-  }
-});
-
-paymentRequest.on('paymentmethod', async function(ev) {
-  var email = document.getElementById('email').value.trim() || ev.payerEmail || '';
-  var name = document.getElementById('name').value.trim() || ev.payerName || '';
-  var err = document.getElementById('error');
-  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent = 'Please enter a valid email'; err.style.display = 'block'; ev.complete('fail'); return; }
-  err.style.display = 'none';
-  try {
-    var r = await fetch('/api/stripe-subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan, email: email, name: name, paymentMethodId: ev.paymentMethod.id })
-    });
-    var data = await r.json();
-    if (!data.clientSecret) { err.textContent = data.error || 'Something went wrong'; err.style.display = 'block'; ev.complete('fail'); return; }
-    var result = await stripe.confirmCardPayment(data.clientSecret);
-    if (result.error) { err.textContent = result.error.message; err.style.display = 'block'; ev.complete('fail'); }
-    else { ev.complete('success'); window.location.href = 'payment-success.html?session_id=' + data.subscriptionId; }
-  } catch(e) { err.textContent = 'Network error. Please try again.'; err.style.display = 'block'; ev.complete('fail'); }
-});
-
-// Card pay
-document.getElementById('cardPayBtn').onclick = async function() {
-  var btn = this; btn.disabled = true; btn.textContent = 'Processing…';
-  var email = document.getElementById('email').value.trim();
-  var name = document.getElementById('name').value.trim();
-  var err = document.getElementById('error');
-  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent = 'Please enter a valid email'; err.style.display = 'block'; btn.disabled = false; btn.textContent = '💳 Pay with Card'; return; }
-  err.style.display = 'none';
-  try {
-    var r = await fetch('/api/stripe-subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan, email: email, name: name })
-    });
-    var data = await r.json();
-    if (!data.clientSecret) { err.textContent = data.error || 'Something went wrong'; err.style.display = 'block'; btn.disabled = false; btn.textContent = '💳 Pay with Card'; return; }
-    var result = await stripe.confirmCardPayment(data.clientSecret, {
-      payment_method: { card: card },
-      billing_details: { email: email, name: name }
-    });
-    if (result.error) { err.textContent = result.error.message; err.style.display = 'block'; btn.disabled = false; btn.textContent = '💳 Pay with Card'; }
-    else { window.location.href = 'payment-success.html?session_id=' + data.subscriptionId; }
-  } catch(e) { err.textContent = 'Network error. Please try again.'; err.style.display = 'block'; btn.disabled = false; btn.textContent = '💳 Pay with Card'; }
-};
-
-// Fallback GPay button (redirects to Stripe Checkout which supports GPay)
-document.getElementById('gpayBtn').onclick = async function() {
-  var btn = this; btn.disabled = true; btn.textContent = 'Processing…';
-  var email = document.getElementById('email').value.trim();
-  var name = document.getElementById('name').value.trim();
-  var err = document.getElementById('error');
-  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent = 'Please enter a valid email'; err.style.display = 'block'; btn.disabled = false; btn.innerHTML = '<svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="2" fill="#fff"/><text x="2.5" y="10" font-size="7" font-weight="700" fill="#000">G Pay</text></svg> Google Pay'; return; }
-  try {
-    var r = await fetch('/api/stripe-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,email,name,successUrl:location.origin+'/payment-success.html?session_id={CHECKOUT_SESSION_ID}',cancelUrl:location.origin+'/payment-cancel.html'})});
-    var d = await r.json();
-    if(d.url) window.location.href = d.url;
-    else { err.textContent = d.error || 'Something went wrong'; err.style.display = 'block'; btn.disabled = false; btn.innerHTML = '<svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="2" fill="#fff"/><text x="2.5" y="10" font-size="7" font-weight="700" fill="#000">G Pay</text></svg> Google Pay'; }
-  } catch(e){ err.textContent = 'Network error. Please try again.'; err.style.display = 'block'; btn.disabled = false; btn.innerHTML = '<svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="2" fill="#fff"/><text x="2.5" y="10" font-size="7" font-weight="700" fill="#000">G Pay</text></svg> Google Pay'; }
-};
+document.getElementById('gpayBtn').onclick = function(){ pay('gpay'); };
+document.getElementById('cardBtn').onclick = function(){ pay('card'); };
 </script>
 </body></html>
