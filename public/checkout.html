@@ -26,7 +26,15 @@
   </div>
   <div class="err" id="error"></div>
   <button class="btn" id="subscribeBtn">Subscribe Now</button>
-  <div class="sec">Secure payment via Stripe. Cancel anytime.</div>
+  <div class="sec" style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:18px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><rect width="28" height="18" rx="3" fill="#fff" stroke="#e2e8f0" stroke-width=".5"/><rect x="4" y="3" width="10" height="12" rx="1.5" fill="#4285F4" opacity=".9"/><rect x="14" y="3" width="10" height="12" rx="1.5" fill="#34A853" opacity=".9"/><circle cx="19" cy="9" r="3" fill="#FBBC04"/></svg>
+      <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><rect width="28" height="18" rx="3" fill="#fff" stroke="#e2e8f0" stroke-width=".5"/><text x="5" y="13" font-size="8" font-weight="700" fill="#000">G Pay</text></svg>
+      <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><rect width="28" height="18" rx="3" fill="#fff" stroke="#e2e8f0" stroke-width=".5"/><text x="4" y="13" font-size="7" font-weight="700" fill="#000">A Pay</text></svg>
+    </div>
+    <span>🔒 Secure checkout via Stripe · Google Pay & Apple Pay accepted</span>
+    <span style="font-size:11px;color:#94a3b8;">Cancel anytime. No hidden fees.</span>
+  </div>
 </div>
 <script>
 const params = new URLSearchParams(location.search);
