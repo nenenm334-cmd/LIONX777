@@ -2202,70 +2202,158 @@ function speak(text){
 
 /* ── Pronunciation Practice ── */
 var _practiceRec = null;
+var _practiceMediaRecorder = null;
+var _practiceStream = null;
+
+function scorePractice(target, spoken, confidence) {
+  target = target.toLowerCase().trim();
+  spoken = (spoken || '').toLowerCase().trim();
+  var match = spoken === target;
+  var partial = spoken && (spoken.includes(target) || target.includes(spoken));
+  var score = Math.round((confidence || 0) * 100);
+  if (match) score = Math.max(score, 90);
+  else if (partial) score = Math.max(score, 60);
+  else score = Math.min(score, 40);
+  var cls, msg;
+  if (score >= 80) { cls = 'pr-good'; msg = '✅ ' + score + '% — Excellent!'; }
+  else if (score >= 50) { cls = 'pr-ok'; msg = '🔄 ' + score + '% — Keep practicing'; }
+  else { cls = 'pr-bad'; msg = '🔊 ' + score + '% — Try again'; }
+  return { score: score, cls: cls, msg: msg };
+}
+
+function showPracticeResult(cardId, spoken, result) {
+  var el = document.getElementById('pr' + cardId);
+  if (!el) return;
+  el.textContent = result.msg + (spoken ? ' ("' + spoken + '")' : '');
+  el.className = 'practice-result ' + result.cls;
+}
+
 function startPractice(word, cardId) {
   var el = document.getElementById('pr' + cardId);
   if (!el) return;
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { el.textContent = '❌ Browser not supported'; el.className = 'practice-result pr-bad'; return; }
 
+  // Clean up any existing recording
   if (_practiceRec) { _practiceRec.abort(); _practiceRec = null; }
-  speak(word);
+  if (_practiceMediaRecorder) { _practiceMediaRecorder.stop(); _practiceMediaRecorder = null; }
+  if (_practiceStream) { _practiceStream.getTracks().forEach(function(t) { t.stop(); }); _practiceStream = null; }
 
+  speak(word);
   el.textContent = '🎤 Listening...'; el.className = 'practice-result pr-recording';
 
-  var rec = new SR();
-  rec.lang = 'ar-SA';
-  rec.interimResults = true;
-  rec.maxAlternatives = 3;
-  rec.continuous = false;
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    // Chrome/Edge native SpeechRecognition
+    var rec = new SR();
+    rec.lang = 'ar-SA';
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+    rec.continuous = false;
+    var finalTranscript = '';
+    var bestConfidence = 0;
 
-  var finalTranscript = '';
-  var bestConfidence = 0;
-
-  rec.onresult = function(e) {
-    var interim = '';
-    for (var i = e.resultIndex; i < e.results.length; i++) {
-      var r = e.results[i];
-      if (r.isFinal) {
-        finalTranscript = r[0].transcript.trim().toLowerCase();
-        bestConfidence = Math.max(bestConfidence, r[0].confidence);
-      } else {
-        interim = r[0].transcript.trim().toLowerCase();
-        el.textContent = '🎤 ' + interim; el.className = 'practice-result pr-recording';
+    rec.onresult = function(e) {
+      for (var i = e.resultIndex; i < e.results.length; i++) {
+        var r = e.results[i];
+        if (r.isFinal) {
+          finalTranscript = r[0].transcript.trim();
+          bestConfidence = Math.max(bestConfidence, r[0].confidence);
+        } else {
+          var interim = r[0].transcript.trim();
+          if (interim) { el.textContent = '🎤 ' + interim; el.className = 'practice-result pr-recording'; }
+        }
       }
-    }
-  };
+    };
 
-  rec.onend = function() {
-    _practiceRec = null;
-    if (!finalTranscript) { el.textContent = '❌ Didn\'t catch that, try again'; el.className = 'practice-result pr-bad'; return; }
+    rec.onend = function() {
+      _practiceRec = null;
+      if (!finalTranscript) { el.textContent = '❌ Didn\'t catch that, try again'; el.className = 'practice-result pr-bad'; return; }
+      var result = scorePractice(word, finalTranscript, bestConfidence);
+      showPracticeResult(cardId, finalTranscript, result);
+    };
 
-    var target = word.toLowerCase().trim();
-    var spoken = finalTranscript;
-    var match = spoken === target;
-    var partial = spoken.includes(target) || target.includes(spoken);
-    var score = Math.round(bestConfidence * 100);
+    rec.onerror = function() {
+      _practiceRec = null;
+      // Fallback to server-side if native fails
+      startServerPractice(word, cardId);
+    };
 
-    if (match) { score = Math.max(score, 90); }
-    else if (partial) { score = Math.max(score, 60); }
-    else { score = Math.min(score, 40); }
+    rec.start();
+    _practiceRec = rec;
+    setTimeout(function() { if (_practiceRec) { try { rec.stop(); } catch(e) {} } }, 4000);
+  } else {
+    // Safari/Firefox - use MediaRecorder + server
+    startServerPractice(word, cardId);
+  }
+}
 
-    var cls, msg;
-    if (score >= 80) { cls = 'pr-good'; msg = '✅ ' + score + '% — Excellent!'; }
-    else if (score >= 50) { cls = 'pr-ok'; msg = '🔄 ' + score + '% — Keep practicing'; }
-    else { cls = 'pr-bad'; msg = '🔊 ' + score + '% — Try again'; }
+function startServerPractice(word, cardId) {
+  var el = document.getElementById('pr' + cardId);
+  if (!el) return;
+  el.textContent = '🎤 Recording (server)...'; el.className = 'practice-result pr-recording';
 
-    el.textContent = msg + ' ("' + spoken + '")'; el.className = 'practice-result ' + cls;
-  };
+  // Get OpenAI key from localStorage or from server env
+  var openaiKey = '';
+  try { openaiKey = localStorage.getItem('minbar_openai_key') || ''; } catch(e) {}
 
-  rec.onerror = function() {
-    _practiceRec = null;
-    el.textContent = '❌ Mic error'; el.className = 'practice-result pr-bad';
-  };
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    el.textContent = '❌ Mic not available. Use Chrome or Edge'; el.className = 'practice-result pr-bad';
+    return;
+  }
 
-  rec.start();
-  _practiceRec = rec;
-  setTimeout(function() { if (_practiceRec) { _practiceRec.stop(); } }, 4000);
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+    _practiceStream = stream;
+    var chunks = [];
+    var mr = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4' });
+    _practiceMediaRecorder = mr;
+
+    mr.ondataavailable = function(e) { if (e.data.size > 0) chunks.push(e.data); };
+
+    mr.onstop = function() {
+      _practiceMediaRecorder = null;
+      if (_practiceStream) { _practiceStream.getTracks().forEach(function(t) { t.stop(); }); _practiceStream = null; }
+      var blob = new Blob(chunks, { type: mr.mimeType });
+      if (blob.size < 1000) { el.textContent = '❌ No audio detected'; el.className = 'practice-result pr-bad'; return; }
+
+      el.textContent = '🔄 Transcribing...'; el.className = 'practice-result pr-recording';
+
+      // Convert blob to base64
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        var base64data = reader.result.split(',')[1];
+        var headers = { 'Content-Type': 'application/json' };
+        var openaiKey = '';
+        try { openaiKey = localStorage.getItem('minbar_openai_key') || ''; } catch(e) {}
+        if (openaiKey) headers['x-openai-key'] = openaiKey;
+
+        fetch('/api/transcribe', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ audio: base64data, mime: blob.type })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.error) {
+            el.innerHTML = '❌ ' + data.error + ' <button onclick="startPractice(\'' + escapeHtml(word) + '\',\'' + cardId + '\')" style="background:none;border:1px solid;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:12px;">Retry</button>';
+            el.className = 'practice-result pr-bad';
+            return;
+          }
+          var spoken = (data.text || '').trim();
+          if (!spoken) { el.textContent = '❌ No speech detected'; el.className = 'practice-result pr-bad'; return; }
+          var result = scorePractice(word, spoken, 0.7);
+          showPracticeResult(cardId, spoken, result);
+        })
+        .catch(function() {
+          el.textContent = '❌ Transcription failed'; el.className = 'practice-result pr-bad';
+        });
+      };
+      reader.readAsDataURL(blob);
+    };
+
+    mr.start();
+    setTimeout(function() { try { mr.stop(); } catch(e) {} }, 4000);
+  }).catch(function() {
+    el.textContent = '❌ Mic access denied'; el.className = 'practice-result pr-bad';
+  });
 }
 let AVAILABLE_VOICES=[];
 if(typeof speechSynthesis!=='undefined'){
