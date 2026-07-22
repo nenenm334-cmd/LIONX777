@@ -642,9 +642,9 @@ textarea.setting-input{min-height:80px;resize:vertical;}
       <div class="setting-label">Message</div>
       <textarea class="setting-input" id="annBody" placeholder="Write your announcement..."></textarea>
     </div>
-    <div class="modal-actions">
+      <div class="modal-actions">
       <button class="topbar-btn ghost" onclick="closeAnnModal()">Cancel</button>
-      <button class="topbar-btn primary" onclick="publishAnnouncement()">Publish</button>
+      <button class="topbar-btn primary" id="annSaveBtn" onclick="publishAnnouncement()">Publish</button>
     </div>
   </div>
 </div>
@@ -1079,9 +1079,12 @@ async function saveProfile() {
   var list = (listRes && listRes.value) || [];
   var found = false;
   for (var i = 0; i < list.length; i++) {
-    if (list[i].email === userEmail) { list[i] = { id: userEmail, name: name, photo: photo, email: userEmail, price: price, bio: bio, specialties: spec }; found = true; break; }
+    if (list[i].email === userEmail) {
+      list[i] = { id: userEmail, name: name, photo: photo, email: userEmail, price: price, bio: bio, specialties: spec, yearsExp: exp, rating: list[i].rating || t.stat_rating || 0, studentsCount: list[i].studentsCount || t.stat_students || 0, lessonsCount: list[i].lessonsCount || t.stat_lessons || 0 };
+      found = true; break;
+    }
   }
-  if (!found) list.push({ id: userEmail, name: name, photo: photo, email: userEmail, price: price, bio: bio, specialties: spec });
+  if (!found) list.push({ id: userEmail, name: name, photo: photo, email: userEmail, price: price, bio: bio, specialties: spec, yearsExp: exp });
   await kvSet('teachers_list', list);
   userName = name;
   document.getElementById('sidebarName').textContent = name;
@@ -1295,20 +1298,17 @@ async function loadStripeSubs() {
   var res = await kvGet('stripe:subscriptions:all');
   var subs = (res && res.value) || [];
   var container = document.getElementById('stripeSubSummary');
-  var list = document.getElementById('stripeSubList');
   if (subs.length === 0) { container.style.display = 'none'; return; }
   container.style.display = '';
   var active = subs.filter(function(s) { return s.status === 'active'; });
-  list.innerHTML = subs.map(function(s) {
+  var listHtml = subs.map(function(s) {
     var isActive = s.status === 'active';
     var bg = isActive ? 'rgba(13,148,136,.1)' : 'rgba(239,68,68,.1)';
     var color = isActive ? '#0d9488' : '#ef4444';
     return '<div style="padding:6px 14px;border-radius:8px;background:' + bg + ';color:' + color + ';font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;"><span>' + (isActive ? '✅' : '❌') + '</span>' + escapeHtml(s.name || s.email || '?') + ' <span style="opacity:.6;">(' + s.plan + ')</span></div>';
   }).join('');
-  if (active.length > 0) {
-    container.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--dh-text);margin-bottom:8px;">💳 Stripe Subscriptions <span style="font-weight:400;color:var(--dh-soft);font-size:12px;">(' + active.length + ' active / ' + subs.length + ' total)</span></div>' +
-      '<div id="stripeSubList" style="display:flex;gap:10px;flex-wrap:wrap;">' + list.innerHTML + '</div>';
-  }
+  container.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--dh-text);margin-bottom:8px;">💳 Stripe Subscriptions <span style="font-weight:400;color:var(--dh-soft);font-size:12px;">(' + active.length + ' active / ' + subs.length + ' total)</span></div>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;">' + listHtml + '</div>';
 }
 
 /* ── Bulk Operations ── */
@@ -1365,11 +1365,32 @@ async function checkIncomingCalls() {
   if (data && data.status === 'ringing' && data.roomId && data.studentName) {
     if (currentCallData && currentCallData.id === data.id) return;
     currentCallData = data;
-    document.getElementById('callStudentName').textContent = data.studentName;
+      document.getElementById('callStudentName').textContent = data.studentName;
     document.getElementById('callOverlay').classList.add('show');
     try {
-      var audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgip2Lf2BXXoSrm3VCPU1xip+Lf2BXXoSrm3VCPU1xiZ6MgGFXXoarmXJBPk1xiZ6MgGFXXoarmXJBPk1xiZ6MgGFXXoarmnNCQk1xiZ6MgGFXXoarmnNCQk1w');
-      audio.play().catch(function(){});
+      var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 440;
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.5);
+      setTimeout(function() {
+        var osc2 = audioCtx.createOscillator();
+        var gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.value = 660;
+        gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(audioCtx.currentTime);
+        osc2.stop(audioCtx.currentTime + 0.5);
+      }, 600);
     } catch(e) {}
   } else {
     if (currentCallData && (!data || data.status !== 'ringing')) {
@@ -1433,13 +1454,20 @@ async function init() {
 init();
 
 /* Countdown refresh */
-setInterval(function() {
+var countdownInterval = setInterval(function() {
   if (currentSection === 'bookings') renderBookings();
   if (currentSection === 'schedule') renderSchedule();
   if (currentSection === 'overview') renderBookings();
   if (currentSection === 'notifications') loadNotifications();
   if (currentSection === 'chat' && chatSelectedEmail) loadChatMessages(chatSelectedEmail, true);
 }, 10000);
+
+/* Clean up intervals on page unload */
+window.addEventListener('beforeunload', function() {
+  clearInterval(countdownInterval);
+  if (callCheckInterval) clearInterval(callCheckInterval);
+  if (chatPollTimer) clearInterval(chatPollTimer);
+});
 </script>
 </body>
 </html>

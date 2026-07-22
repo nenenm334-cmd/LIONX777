@@ -4,12 +4,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Payment Canceled — Minbar</title>
 <link rel="stylesheet" href="css/common.css">
-<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#f8fafc,#ecfdf5);padding:24px;}.card{background:rgba(255,255,255,.85);backdrop-filter:blur(24px);border-radius:24px;padding:48px;text-align:center;max-width:420px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.06);}.icon{width:64px;height:64px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;color:#fff;}h1{font-size:28px;color:#0f172a;margin-bottom:8px;}p{color:#64748b;font-size:15px;line-height:1.6;margin-bottom:24px;}.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;font-weight:700;font-size:15px;text-decoration:none;transition:all .2s;}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.3);}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#f8fafc,#ecfdf5);padding:24px;}body.dark{background:linear-gradient(135deg,#08080e,#0a0a12,#080c0a);color:#e2e8f0;}.card{background:rgba(255,255,255,.85);backdrop-filter:blur(24px);border-radius:24px;padding:48px;text-align:center;max-width:420px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.06);}body.dark .card{background:rgba(16,16,24,.85);box-shadow:0 24px 80px rgba(0,0,0,.3);}.icon{width:64px;height:64px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;color:#fff;}h1{font-size:28px;color:#0f172a;margin-bottom:8px;}body.dark h1{color:#e2e8f0;}p{color:#64748b;font-size:15px;line-height:1.6;margin-bottom:24px;}body.dark p{color:#94a3b8;}.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;font-weight:700;font-size:15px;text-decoration:none;transition:all .2s;}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.3);}.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;border:1.5px solid #d4e2da;color:#64748b;font-size:14px;font-weight:600;text-decoration:none;transition:all .2s;margin-top:8px;}.btn-ghost:hover{border-color:#0d9488;color:#0d9488;background:rgba(13,148,136,.05);}body.dark .btn-ghost{border-color:#243830;color:#94a3b8;}body.dark .btn-ghost:hover{border-color:#34d399;color:#34d399;}</style>
 </head><body>
+<script>if(localStorage.getItem('minbar_dark')==='true')document.body.classList.add('dark');</script>
 <div class="card">
   <div class="icon">○</div>
   <h1>Payment Canceled</h1>
   <p>Your payment was not completed. No charges have been made. You can try again whenever you're ready.</p>
-  <a href="/index.html?app" class="btn">Back to Dashboard →</a>
+  <a class="btn" id="mainBtn">Try Again →</a>
+  <a class="btn-ghost" id="backBtn">← Back to Teacher</a>
 </div>
+<script>
+var params = new URLSearchParams(location.search);
+var teacherId = params.get('teacherId');
+if (teacherId) { document.getElementById('backBtn').href = '/teacher-profile.html?id=' + encodeURIComponent(teacherId); }
+else { document.getElementById('backBtn').href = '/teachers.html'; }
+document.getElementById('mainBtn').href = document.referrer || '/teachers.html';
+</script>
 </body></html>

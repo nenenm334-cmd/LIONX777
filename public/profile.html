@@ -895,7 +895,7 @@ document.getElementById('delConfirm').addEventListener('click', async function()
   if (!userRecord || !userRecord.email) return;
   try {
     await kvDel('user:' + userRecord.email);
-    await kvDel('progress:' + userRecord.name);
+    await kvDel('progress:' + userRecord.email);
   } catch (e) {}
   localStorage.removeItem('minbar_session');
   localStorage.removeItem('minbar_tab');

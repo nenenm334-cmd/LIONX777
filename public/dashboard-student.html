@@ -176,7 +176,7 @@ var session = JSON.parse(localStorage.getItem('minbar_session') || '{}');
 var userName = session.name || 'Student';
 var userEmail = session.email || '';
 var allBookings = [];
-var countdownTimers = [];
+var countdownRefreshInterval = null;
 
 function toast(msg, type) {
   type = type || 'success';
@@ -441,7 +441,8 @@ function updateNav() {
 
 /* Countdown refresh */
 function startCountdownRefresh() {
-  setInterval(function() {
+  if (countdownRefreshInterval) clearInterval(countdownRefreshInterval);
+  countdownRefreshInterval = setInterval(function() {
     if (document.getElementById('upcomingSection').classList.contains('active')) {
       renderUpcoming();
     }
@@ -453,6 +454,12 @@ function startCountdownRefresh() {
     }
   }, 10000);
 }
+
+/* Clean up on page unload */
+window.addEventListener('beforeunload', function() {
+  if (countdownRefreshInterval) clearInterval(countdownRefreshInterval);
+  if (chatPollTimer) clearInterval(chatPollTimer);
+});
 
 /* Notifications */
 var allNotifications = [];

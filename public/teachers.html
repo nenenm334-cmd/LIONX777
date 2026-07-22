@@ -261,9 +261,9 @@ body { direction: ltr; text-align: left; }
 <script>
 (function(){
   var sess = JSON.parse(localStorage.getItem('minbar_session') || 'null');
-  if(!sess || !sess.role){ window.location.href = 'index.html'; return; }
+  if(!sess || !sess.email){ window.location.href = 'index.html'; }
 })();
-const API = '/api/kv';
+var API = '/api/kv';
 const SECRET = '';
 
 function toast(msg, type='success') {
@@ -313,8 +313,8 @@ function renderTeachers(teachers) {
   }
   empty.style.display = 'none';
 
-  grid.innerHTML = teachers.map(t => `
-    <div class="teacher-card" onclick="window.location.href='teacher-profile.html?id=${encodeURIComponent(t.id)}'">
+  grid.innerHTML = teachers.map(function(t) { return `
+    <div class="teacher-card" onclick="window.location.href='teacher-profile.html?id=${encodeURIComponent(t.id || t.email || '')}'">
       <div class="tc-header" style="background:linear-gradient(135deg, ${t.gradientStart || 'var(--teal)'}, ${t.gradientEnd || 'var(--accent)'})">
         ${statusBadge(t)}
         <div class="tc-avatar">${t.image ? '<img src="' + t.image + '" alt="">' : initials(t.name)}</div>

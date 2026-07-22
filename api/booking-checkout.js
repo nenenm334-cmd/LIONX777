@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
         duration: String(duration || 60)
       },
       success_url: origin + '/payment-success.html?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: origin + '/payment-cancel.html',
+      cancel_url: origin + '/payment-cancel.html?teacherId=' + encodeURIComponent(teacherId || teacherEmail || ''),
       allow_promotion_codes: true
     });
 
