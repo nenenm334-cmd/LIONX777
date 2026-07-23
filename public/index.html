@@ -1067,16 +1067,7 @@ body.dark .pr-hm-cell.l4{background:#059669;}
 .pr-ach.unlocked .pr-ach-name{color:var(--ink);}
 .pr-ach-check{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;}
 /* Timers */
-.pr-timers{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;}
-.pr-timer{text-align:center;min-width:130px;}
-.pr-timer-ring{width:76px;height:76px;border-radius:50%;border:3px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 8px;transition:border-color .3s;}
-.pr-timer-ring.running{border-color:var(--accent);animation:prRingPulse 1.5s infinite;}
-@keyframes prRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.3)}50%{box-shadow:0 0 0 8px rgba(16,185,129,0);}}
-.pr-timer-icon{font-size:16px;color:var(--ink-soft);margin-bottom:2px;}
-.pr-timer-time{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink);}
-.pr-timer-label{font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:6px;}
-.pr-timer-btns{display:flex;gap:6px;justify-content:center;}
-.pr-timer-btns .ghost-btn{padding:5px 10px;font-size:12px;min-height:auto;}
+
 /* Recommendation cards */
 .pr-rec-box{padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);margin-bottom:8px;}
 .pr-rec-icon{font-size:16px;margin-right:8px;}
@@ -4292,10 +4283,6 @@ function renderProgress(){
   const nextXp = sfXpForLevel(s.sfLevel+1);
   const currXp = sfXpForLevel(s.sfLevel);
   const xpPct = nextXp>currXp ? Math.min(100,Math.round(((s.sfXp-currXp)/(nextXp-currXp))*100)) : 100;
-  const isListen = STATE.timers.listening;
-  const isSpeak = STATE.timers.speaking;
-  const lTime = isListen ? fmtClock(Date.now()-STATE.timers.listeningStart) : '00:00';
-  const sTime = isSpeak ? fmtClock(Date.now()-STATE.timers.speakingStart) : '00:00';
   const achUnlocked = ACHIEVEMENTS.filter(a=>a.check(STATE.progress)).length;
   return `
   <div class="pr-hero">
@@ -4330,13 +4317,7 @@ function renderProgress(){
       <div class="pr-insights">${prInsights(s)}</div>
     </div>
   </div>
-  <div class="panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Study Timers</h2></div>
-    <div class="pr-timers">
-      <div class="pr-timer"><div class="pr-timer-ring ${isListen?'running':''}"><div class="pr-timer-icon">${ico('headphonesLg')}</div><div class="pr-timer-time" id="listenClock">${lTime}</div></div><div class="pr-timer-label">Listening</div><div class="pr-timer-btns"><button class="ghost-btn" id="startListen" ${isListen?'disabled':''}>${ico('play')}</button><button class="ghost-btn danger" id="stopListen" ${isListen?'':'disabled'}>${ico('x')}</button></div></div>
-      <div class="pr-timer"><div class="pr-timer-ring ${isSpeak?'running':''}"><div class="pr-timer-icon">${ico('micLg')}</div><div class="pr-timer-time" id="speakClock">${sTime}</div></div><div class="pr-timer-label">Speaking</div><div class="pr-timer-btns"><button class="ghost-btn" id="startSpeak" ${isSpeak?'disabled':''}>${ico('play')}</button><button class="ghost-btn danger" id="stopSpeak" ${isSpeak?'':'disabled'}>${ico('x')}</button></div></div>
-    </div>
-  </div>
+
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Achievements</h2><span style="font-size:11px;color:var(--ink-soft);">${achUnlocked}/${ACHIEVEMENTS.length}</span></div>
     ${prAchievements()}
@@ -5159,13 +5140,6 @@ function attachStudentHandlers(){
         };
       }
     }
-  }
-  if(STATE.tab==='progress'){
-    const sl=document.getElementById('startListen'),spL=document.getElementById('stopListen'),ss=document.getElementById('startSpeak'),spS=document.getElementById('stopSpeak');
-    if(sl) sl.onclick = ()=>startTimer('listening');
-    if(spL) spL.onclick = ()=>{ stopTimer('listening'); render(); };
-    if(ss) ss.onclick = ()=>startTimer('speaking');
-    if(spS) spS.onclick = ()=>{ stopTimer('speaking'); render(); };
   }
   if(STATE.tab==='ask'){
     const inp = document.getElementById('qInput');
