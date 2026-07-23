@@ -997,12 +997,12 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
 .sf-empty .sf-empty-icon{font-size:48px;margin-bottom:12px;opacity:.5;}
 .sf-empty h3{font-family:'Amiri',serif;font-size:20px;margin:0 0 6px;color:var(--ink);}
 .sf-empty p{font-size:13px;margin:0 0 20px;line-height:1.5;}
-/* PROGRESS TAB */
+/* PROGRESS TAB V2 — Professional Learning Dashboard */
 .pr-hero{background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:var(--radius-lg);padding:24px 28px;color:#fff;margin-bottom:20px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;box-shadow:0 4px 20px rgba(13,148,136,.25);}
 .pr-hero-badge{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,.2);}
 .pr-hero-level{font-size:28px;font-weight:900;line-height:1;}
 .pr-hero-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.8;}
-.pr-hero-stats{flex:1;min-width:160px;}
+.pr-hero-stats{flex:1;min-width:180px;}
 .pr-hero-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;font-weight:600;}
 .pr-hero-xp{font-size:18px;font-weight:900;}
 .pr-hero-next{font-size:12px;opacity:.8;}
@@ -1015,40 +1015,74 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
 .pr-card-num{font-size:24px;font-weight:900;color:var(--ink);}
 .pr-card-label{font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:2px;}
 .pr-card-sub{font-size:11px;color:var(--ink-soft);opacity:.7;margin-top:2px;}
-.pr-heatmap{margin:8px 0 4px;}
-.pr-hm-months{font-size:9px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;}
-.pr-hm-grid{display:flex;gap:3px;flex-wrap:wrap;}
-.pr-hm-cell{width:14px;height:14px;border-radius:3px;background:var(--border-subtle);transition:background .2s;}
-.pr-hm-cell.active{background:var(--teal);}
+/* CEFR Progress Bar */
+.pr-cefr{margin:12px 0 4px;}
+.pr-cefr-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.pr-cefr-label{font-size:13px;font-weight:800;width:28px;flex-shrink:0;color:var(--ink-soft);}
+.pr-cefr-bar{flex:1;height:10px;border-radius:5px;background:var(--border-subtle);overflow:hidden;position:relative;}
+.pr-cefr-fill{height:100%;border-radius:5px;transition:width .6s ease,background .3s;}
+.pr-cefr-fill.complete{background:var(--accent);}
+.pr-cefr-fill.active-bar{background:linear-gradient(90deg,var(--teal),var(--accent));}
+.pr-cefr-fill.locked{background:var(--border-subtle);}
+.pr-cefr-pct{font-size:12px;font-weight:700;width:38px;text-align:right;color:var(--ink-soft);}
+.pr-cefr-icon{font-size:12px;width:16px;text-align:center;}
+/* Heatmap full year */
+.pr-hm-wrap{overflow-x:auto;padding:4px 0;}
+.pr-hm-months{font-size:9px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;display:flex;gap:0;}
+.pr-hm-months span{min-width:28px;text-align:left;}
+.pr-hm-week{display:flex;gap:3px;margin-bottom:3px;}
+.pr-hm-cell{width:12px;height:12px;border-radius:3px;background:var(--border-subtle);transition:background .15s;flex-shrink:0;}
+.pr-hm-cell.l1{background:#D1FAE5;}
+.pr-hm-cell.l2{background:#A7F3D0;}
+.pr-hm-cell.l3{background:#34D399;}
+.pr-hm-cell.l4{background:#059669;}
 .pr-hm-cell.today{border:2px solid var(--teal-dark);}
 body.dark .pr-hm-cell{background:var(--border);}
-body.dark .pr-hm-cell.active{background:var(--accent);}
-.pr-chart{margin:4px 0;}
+body.dark .pr-hm-cell.l1{background:#064E3B;}
+body.dark .pr-hm-cell.l2{background:#065F46;}
+body.dark .pr-hm-cell.l3{background:#047857;}
+body.dark .pr-hm-cell.l4{background:#059669;}
+/* Chart + insights */
+.pr-chart-wrap{display:flex;gap:20px;flex-wrap:wrap;}
+.pr-chart{flex:2;min-width:200px;}
 .pr-chart-title{font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:10px;display:flex;justify-content:space-between;}
 .pr-chart-title small{font-weight:400;font-size:11px;}
-.pr-chart-bars{display:flex;gap:4px;align-items:flex-end;height:100px;}
-.pr-chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;}
-.pr-chart-bar{width:100%;max-width:28px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--teal),var(--accent));transition:height .4s ease;min-height:3px;}
-.pr-chart-label{font-size:8px;color:var(--ink-soft);font-weight:600;}
-.pr-ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
-.pr-ach{position:relative;padding:14px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);text-align:center;opacity:.5;transition:all .2s;}
+.pr-chart-bars{display:flex;gap:3px;align-items:flex-end;height:90px;}
+.pr-chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;}
+.pr-chart-bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--teal),var(--accent));transition:height .4s ease;min-height:2px;}
+.pr-chart-label{font-size:7px;color:var(--ink-soft);font-weight:600;}
+.pr-insights{flex:1;min-width:160px;}
+.pr-insight-card{padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);margin-bottom:8px;}
+.pr-insight-icon{font-size:18px;margin-right:6px;}
+.pr-insight-label{font-size:11px;color:var(--ink-soft);font-weight:600;}
+.pr-insight-val{font-size:13px;font-weight:700;margin-top:2px;}
+.pr-insight-rec{font-size:11px;color:var(--ink-soft);margin-top:4px;line-height:1.4;padding:6px 8px;border-radius:4px;background:var(--border-subtle);}
+/* Achievements */
+.pr-ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+.pr-ach{position:relative;padding:12px 8px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);text-align:center;opacity:.4;transition:all .2s;cursor:default;}
 .pr-ach.unlocked{opacity:1;border-color:var(--accent);background:var(--accent-soft);}
-.pr-ach-icon{font-size:22px;margin-bottom:4px;}
+.pr-ach-icon{font-size:20px;margin-bottom:3px;}
 .pr-ach.unlocked .pr-ach-icon{color:var(--accent);}
-.pr-ach-name{font-size:11px;font-weight:600;color:var(--ink-soft);}
+.pr-ach-name{font-size:10px;font-weight:600;color:var(--ink-soft);line-height:1.2;}
 .pr-ach.unlocked .pr-ach-name{color:var(--ink);}
-.pr-ach-check{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.pr-timers{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
-.pr-timer{text-align:center;min-width:140px;}
-.pr-timer-ring{width:80px;height:80px;border-radius:50%;border:3px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 8px;transition:border-color .3s;}
+.pr-ach-check{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+/* Timers */
+.pr-timers{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;}
+.pr-timer{text-align:center;min-width:130px;}
+.pr-timer-ring{width:76px;height:76px;border-radius:50%;border:3px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 8px;transition:border-color .3s;}
 .pr-timer-ring.running{border-color:var(--accent);animation:prRingPulse 1.5s infinite;}
 @keyframes prRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.3)}50%{box-shadow:0 0 0 8px rgba(16,185,129,0);}}
-.pr-timer-icon{font-size:18px;color:var(--ink-soft);margin-bottom:2px;}
-.pr-timer-time{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink);}
-.pr-timer-label{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:6px;}
+.pr-timer-icon{font-size:16px;color:var(--ink-soft);margin-bottom:2px;}
+.pr-timer-time{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink);}
+.pr-timer-label{font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:6px;}
 .pr-timer-btns{display:flex;gap:6px;justify-content:center;}
-.pr-timer-btns .ghost-btn{padding:6px 12px;font-size:13px;min-height:auto;}
-/* END PROGRESS */
+.pr-timer-btns .ghost-btn{padding:5px 10px;font-size:12px;min-height:auto;}
+/* Recommendation cards */
+.pr-rec-box{padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);margin-bottom:8px;}
+.pr-rec-icon{font-size:16px;margin-right:8px;}
+.pr-rec-text{font-size:13px;font-weight:600;}
+.pr-rec-sub{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+/* END PROGRESS V2 */
 .sf-listen-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;font-size:20px;color:var(--teal);display:inline-flex;align-items:center;justify-content:center;transition:all .15s ease;margin-bottom:8px;vertical-align:middle;}
 .sf-sess-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .sf-sess-bar{flex:1;height:6px;border-radius:3px;background:var(--border-subtle);overflow:hidden;}
@@ -1207,7 +1241,11 @@ const API_SECRET = '';
 const STATE = {
   role: null, name: '', email: '', avatar: null, bio: '', tab: 'deck',
   flashcards: [], resources: [], announcements: [],
-  progress: { srs:{}, listeningSec:0, speakingSec:0, activityDates:[], quiz:{attempts:0,correct:0}, examResults:{}, favorites:[], readAnnouncements:[] },
+  progress: { srs:{}, listeningSec:0, speakingSec:0, activityDates:[], quiz:{attempts:0,correct:0}, examResults:{}, favorites:[], readAnnouncements:[],
+    cefr:{A1:{score:0},A2:{score:0},B1:{score:0},B2:{score:0},C1:{score:0},C2:{score:0}},
+    dailyLog:{}, sessionsTotal:0, longestStreak:0, consistencyScore:0, daysStudied:0,
+    byCategory:{}, weakWords:[], totalXpEarned:0,
+  },
   filterCat: 'All', filterLevel: 'All', searchQ:'',
   deckMode: 'due', // 'due' | 'browse'
   deckIndex: 0, flipped: false,
@@ -2150,12 +2188,27 @@ const ACHIEVEMENTS = [
   {id:'first', icon:'seedling', name:'First Step', check:p=>masteredCount(p)>=1},
   {id:'ten', icon:'book', name:'Ten Words', check:p=>masteredCount(p)>=10},
   {id:'fifty', icon:'bookOpen', name:'Fifty Words', check:p=>masteredCount(p)>=50},
-  {id:'hundred', icon:'trophy', name:'One Hundred Words', check:p=>masteredCount(p)>=100},
-  {id:'streak3', icon:'fire', name:'Three-Day Streak', check:p=>computeStreak(p)>=3},
-  {id:'streak7', icon:'zap', name:'Full Week Streak', check:p=>computeStreak(p)>=7},
-  {id:'listen30', icon:'headphones', name:'30 Minutes of Listening', check:p=>p.listeningSec>=1800},
-  {id:'speak30', icon:'mic', name:'30 Minutes of Speaking', check:p=>p.speakingSec>=1800},
-  {id:'quiz20', icon:'target', name:'20 Correct Answers', check:p=>p.quiz.correct>=20},
+  {id:'hundred', icon:'trophy', name:'100 Words', check:p=>masteredCount(p)>=100},
+  {id:'twoHundred', icon:'medal', name:'200 Words', check:p=>masteredCount(p)>=200},
+  {id:'threeHundred', icon:'star', name:'300 Words', check:p=>masteredCount(p)>=300},
+  {id:'streak3', icon:'fire', name:'3-Day Streak', check:p=>computeStreak(p)>=3},
+  {id:'streak7', icon:'zap', name:'Full Week', check:p=>computeStreak(p)>=7},
+  {id:'streak14', icon:'flame', name:'2 Weeks', check:p=>computeStreak(p)>=14},
+  {id:'streak30', icon:'crown', name:'30-Day Streak', check:p=>computeStreak(p)>=30},
+  {id:'listen30', icon:'headphones', name:'30 min Listen', check:p=>p.listeningSec>=1800},
+  {id:'listen120', icon:'headphonesLg', name:'2h Listen', check:p=>p.listeningSec>=7200},
+  {id:'speak30', icon:'mic', name:'30 min Speak', check:p=>p.speakingSec>=1800},
+  {id:'speak120', icon:'micLg', name:'2h Speak', check:p=>p.speakingSec>=7200},
+  {id:'quiz20', icon:'target', name:'20 Quizzes', check:p=>p.quiz.correct>=20},
+  {id:'quizPerfect', icon:'target', name:'Perfect Quiz', check:p=>p.quiz.attempts>0 && p.quiz.correct===p.quiz.attempts},
+  {id:'firstSpeak', icon:'music', name:'First Speech', check:p=>p.speakingSec>=30},
+  {id:'sessions50', icon:'activity', name:'50 Sessions', check:p=>p.sessionsTotal>=50},
+  {id:'sessions100', icon:'award', name:'100 Sessions', check:p=>p.sessionsTotal>=100},
+  {id:'cefrA1', icon:'flag', name:'A1 Complete', check:p=>(p.cefr?.A1?.score||0)>=100},
+  {id:'cefrA2', icon:'flag', name:'A2 Complete', check:p=>(p.cefr?.A2?.score||0)>=100},
+  {id:'consistency30', icon:'heart', name:'30 Days Active', check:p=>(p.activityDates||[]).length>=30},
+  {id:'xp500', icon:'star', name:'500 XP', check:p=>(p.totalXpEarned||0)>=500},
+  {id:'xp2000', icon:'star', name:'2,000 XP', check:p=>(p.totalXpEarned||0)>=2000},
 ];
 
 function toast(msg){
@@ -2237,6 +2290,9 @@ async function loadProgress(){
   if(!STATE.progress.examResults) STATE.progress.examResults = {};
   if(!STATE.progress.favorites) STATE.progress.favorites = [];
   if(!STATE.progress.readAnnouncements) STATE.progress.readAnnouncements = [];
+  if(!STATE.progress.cefr) STATE.progress.cefr = {A1:{score:0},A2:{score:0},B1:{score:0},B2:{score:0},C1:{score:0},C2:{score:0}};
+  if(!STATE.progress.dailyLog) STATE.progress.dailyLog = {};
+  if(!STATE.progress.byCategory) STATE.progress.byCategory = {};
   if(!STATE.progress.readReplies) STATE.progress.readReplies = [];
 }
 async function saveExamResultForTeacher(examId, result){
@@ -2305,6 +2361,9 @@ async function loadLeaderboard(){
 function markActivityToday(){
   const today = new Date().toISOString().slice(0,10);
   if(!STATE.progress.activityDates.includes(today)) STATE.progress.activityDates.push(today);
+  // Keep daily log in sync
+  if(!STATE.progress.dailyLog) STATE.progress.dailyLog = {};
+  if(!STATE.progress.dailyLog[today]) STATE.progress.dailyLog[today] = {xp:0,sessions:0,minutes:0};
 }
 function computeStreak(p){
   const dates = new Set(p.activityDates||[]);
@@ -3980,7 +4039,7 @@ function sfStartRecording(){
           SF.stats.level = sfLevelFromXp(SF.stats.xp);
           sfUpdateStreak();
           saveSfStats();
-          saveSfHistory(SF.lastResult.score, SF.filtered[SF.index].level, SF.filtered[SF.index].category);
+          saveSfHistory(SF.lastResult.score, SF.filtered[SF.index].level, SF.filtered[SF.index].category, earned);
           SF.isRecording = false;
           if(SF.lastResult.score < 70){
             SF.showRetry = true;
@@ -4023,12 +4082,31 @@ function sfStopRecording(){
 function saveSfStats(){
   try { localStorage.setItem('minbar_sf_stats', JSON.stringify(SF.stats)); } catch(e) {}
 }
-function saveSfHistory(score, level, cat){
+function saveSfHistory(score, level, cat, earned){
   try {
     let h = JSON.parse(localStorage.getItem('minbar_sf_history')||'[]');
     h.push({score,level,cat,date:new Date().toISOString().slice(0,10),ts:Date.now()});
     if(h.length>500) h = h.slice(-500);
     localStorage.setItem('minbar_sf_history', JSON.stringify(h));
+    // Also update progress totals
+    const p = STATE.progress;
+    p.sessionsTotal = (p.sessionsTotal||0) + 1;
+    p.totalXpEarned = (p.totalXpEarned||0) + (earned||1);
+    if(!p.byCategory) p.byCategory = {};
+    if(cat){
+      if(!p.byCategory[cat]) p.byCategory[cat] = {count:0,score:0,total:0};
+      p.byCategory[cat].count++;
+      p.byCategory[cat].total += score;
+      p.byCategory[cat].score = p.byCategory[cat].total / p.byCategory[cat].count;
+    }
+    // CEFR progress
+    if(level){
+      if(!p.cefr) p.cefr = {};
+      if(!p.cefr[level]) p.cefr[level] = {score:0};
+      p.cefr[level].started = true;
+      p.cefr[level].score = Math.min(100, (p.cefr[level].score||0) + Math.round(score/20));
+    }
+    saveProgressBg();
   } catch(e) {}
 }
 function loadSfStats(){
@@ -4093,7 +4171,28 @@ function renderSentencesFactory(){
 }
 /* ---------- end sentences factory ---------- */
 
-/* ---------- STUDENT: progress (professional) ---------- */
+/* ================= PROGRESS V2 — Full Learning Dashboard ================= */
+const CEFR_LEVELS = ['A1','A2','B1','B2','C1','C2'];
+const CEFR_NAMES = {A1:'Beginner',A2:'Elementary',B1:'Intermediate',B2:'Upper Int.',C1:'Advanced',C2:'Mastery'};
+function prDailyKey(){ return new Date().toISOString().slice(0,10); }
+function prTouchDaily(){
+  const k = prDailyKey();
+  const p = STATE.progress;
+  if(!p.dailyLog) p.dailyLog = {};
+  if(!p.dailyLog[k]) p.dailyLog[k] = {xp:0,sessions:0,minutes:0};
+  markActivityToday();
+}
+function prCalcStreak(){
+  const dates = new Set(STATE.progress.activityDates||[]);
+  let s = 0, d = new Date();
+  if(!dates.has(d.toISOString().slice(0,10))) d.setDate(d.getDate()-1);
+  while(true){
+    const key = d.toISOString().slice(0,10);
+    if(dates.has(key)){ s++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return s;
+}
 function prStats(){
   const p = STATE.progress;
   const mastered = Object.values(p.srs||{}).filter(e=>e.interval>=21).length;
@@ -4105,38 +4204,87 @@ function prStats(){
   const speakMin = Math.round((p.speakingSec||0)/60);
   const sfLevel = SF.stats.level || 1;
   const sfXp = SF.stats.xp || 0;
-  const sfStreak = SF.stats.streak || 0;
+  const sfStreak = prCalcStreak();
   const sfSessions = (JSON.parse(localStorage.getItem('minbar_sf_history')||'[]')).length;
-  return {mastered,totalCards,quizPct,listenMin,speakMin,sfLevel,sfXp,sfStreak,sfSessions};
+  const sfTotalXp = p.totalXpEarned || 0;
+  const bestStreak = Math.max(p.longestStreak||0, sfStreak);
+  const activedays = (p.activityDates||[]).length;
+  const consistency = activedays > 0 ? Math.min(100, Math.round((activedays / Math.max(30, activedays)) * 100)) : 0;
+  const byCat = p.byCategory||{};
+  const catEntries = Object.entries(byCat);
+  const bestCat = catEntries.length ? catEntries.sort((a,b)=>b[1].score - a[1].score)[0] : null;
+  const worstCat = catEntries.length ? catEntries.sort((a,b)=>a[1].score - b[1].score)[0] : null;
+  return {mastered,totalCards,quizPct,quizAtt,quizCor,listenMin,speakMin,
+    sfLevel,sfXp,sfStreak,sfSessions,sfTotalXp,bestStreak,activedays,consistency,bestCat,worstCat,byCat};
 }
-function prActivityHeatmap(days){
+function prCefrBars(){
+  const cefr = STATE.progress.cefr||{};
+  return CEFR_LEVELS.map(l=>{
+    const data = cefr[l]||{score:0};
+    const score = Math.min(100, data.score||0);
+    const started = data.started||score>0;
+    const isComplete = score>=100;
+    const isLocked = !started;
+    const cls = isComplete ? 'complete' : (started ? 'active-bar' : 'locked');
+    const ico2 = isComplete ? '✓' : (started ? '▶' : '🔒');
+    return `<div class="pr-cefr-row"><span class="pr-cefr-icon">${ico2}</span><span class="pr-cefr-label">${l}</span><div class="pr-cefr-bar"><div class="pr-cefr-fill ${cls}" style="width:${score}%"></div></div><span class="pr-cefr-pct">${score}%</span></div>`;
+  }).join('');
+}
+function prFullYearHeatmap(){
   const dates = new Set(STATE.progress.activityDates||[]);
   const today = new Date();
+  const yearAgo = new Date(today); yearAgo.setFullYear(yearAgo.getFullYear()-1);
   const cells = [];
-  for(let i=days-1;i>=0;i--){
-    const d = new Date(today); d.setDate(d.getDate()-i);
+  const d = new Date(yearAgo);
+  while(d <= today){
     const key = d.toISOString().slice(0,10);
-    cells.push({key, active:dates.has(key), day:d.getDay(), isToday:i===0});
+    cells.push({key, active:dates.has(key), isToday:key===today.toISOString().slice(0,10)});
+    d.setDate(d.getDate()+1);
   }
-  const months=[];
-  let lastM=-1;
+  const weeks = [];
+  let week = [];
+  const startDow = new Date(yearAgo).getDay();
+  for(let i=0;i<startDow;i++) week.push(null);
+  cells.forEach(c=>{ week.push(c); if(week.length===7){ weeks.push(week); week=[]; }});
+  if(week.length) weeks.push(week);
+  const monthLabels = [];
+  let lastM = -1;
   cells.forEach((c,i)=>{
     const m = new Date(c.key).getMonth();
-    if(m!==lastM){ months.push({label:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m],index:i}); lastM=m; }
+    if(m!==lastM){ monthLabels.push({label:'JFMAMJJASOND'[m],col:Math.floor((i+startDow)/7)}); lastM=m; }
   });
-  return `<div class="pr-heatmap"><div class="pr-hm-months">${months.map(m=>`<span style="margin-left:${m.index*10}px">${m.label}</span>`).join('')}</div><div class="pr-hm-grid">${cells.map(c=>`<div class="pr-hm-cell ${c.active?'active':''} ${c.isToday?'today':''}" title="${c.key}${c.active?' ✓':''}"></div>`).join('')}</div></div>`;
+  const monthHtml = monthLabels.map((m,i)=>{
+    const gap = i>0 ? ((m.col - monthLabels[i-1].col)*15 - 14) : 0;
+    return `<span style="margin-left:${Math.max(0,gap)}px">${m.label}</span>`;
+  }).join('');
+  return `<div class="pr-hm-wrap"><div class="pr-hm-months">${monthHtml}</div>${weeks.map(w=>`<div class="pr-hm-week">${w.map(c=>c?`<div class="pr-hm-cell${c.active?' l2':''}${c.isToday?' today':''}" title="${c.key}"></div>`:'<div style="width:12px"></div>').join('')}</div>`).join('')}</div>`;
 }
-function prScoreChart(){
+function prScoreChart2(){
   const hist = JSON.parse(localStorage.getItem('minbar_sf_history')||'[]');
   if(!hist.length) return '';
-  const last = hist.slice(-20);
+  const last = hist.slice(-30);
   const max = Math.max(...last.map(h=>h.score),100);
-  return `<div class="pr-chart"><div class="pr-chart-title">Pronunciation Scores <small>Last ${last.length} sessions</small></div><div class="pr-chart-bars">${last.map((h,i)=>`<div class="pr-chart-col"><div class="pr-chart-bar" style="height:${Math.max(3,(h.score/max)*100)}%" title="${h.score}%"></div><div class="pr-chart-label">${(i+1)%5===0||i===last.length-1?i+1:''}</div></div>`).join('')}</div></div>`;
+  const avg = Math.round(last.reduce((a,h)=>a+h.score,0)/last.length);
+  const trend = last.length>=2 ? (last[last.length-1].score - last[0].score) : 0;
+  const trendTxt = trend>0 ? `↗️ +${trend}%` : (trend<0 ? `↘️ ${trend}%` : '→ 0%');
+  return `<div class="pr-chart-title">Pronunciation Scores <small>Avg ${avg}% · ${trendTxt} · Last ${last.length}</small></div>
+  <div class="pr-chart-bars">${last.map((h,i)=>`<div class="pr-chart-col"><div class="pr-chart-bar" style="height:${Math.max(2,(h.score/max)*100)}%;background:${h.score>=80?'var(--accent)':h.score>=60?'var(--teal)':'var(--rose)'}" title="${h.score}%"></div><div class="pr-chart-label">${(i+1)%5===0||i===last.length-1?i+1:''}</div></div>`).join('')}</div>`;
+}
+function prInsights(s){
+  let items = [];
+  if(s.consistency<30) items.push({icon:'💪',label:'Consistency',val:s.consistency+'%',rec:'Study 5+ min daily to build momentum'});
+  if(s.sfStreak<3) items.push({icon:'🔥',label:'Streak',val:s.sfStreak+' days',rec:'Start a streak — practice today!'});
+  if(s.worstCat) items.push({icon:'⚠️',label:'Weakest',val:s.worstCat[0]+' ('+Math.round(s.worstCat[1].score)+'%)',rec:'Review "'+s.worstCat[0]+'" sentences in Speak tab'});
+  if(s.speakMin<5) items.push({icon:'🎤',label:'Speaking',val:s.speakMin+' min',rec:'Use the Speak tab to train pronunciation'});
+  if(s.quizAtt<5) items.push({icon:'🎯',label:'Quizzes',val:s.quizAtt+' done',rec:'Test yourself with flashcards'});
+  if(!items.length) items.push({icon:'🌟',label:'Great!',val:'All areas strong',rec:'Keep up the excellent work!'});
+  return items.slice(0,4).map(i=>`<div class="pr-insight-card"><div><span class="pr-insight-icon">${i.icon}</span><span class="pr-insight-label">${i.label}</span></div><div class="pr-insight-val">${i.val}</div><div class="pr-insight-rec">💡 ${i.rec}</div></div>`).join('');
 }
 function prAchievements(){
-  return `<div class="pr-ach-grid">${ACHIEVEMENTS.map(a=>{
-    const unlocked = a.check(STATE.progress);
-    return `<div class="pr-ach ${unlocked?'unlocked':''}"><div class="pr-ach-icon">${ico(a.icon)}</div><div class="pr-ach-name">${a.name}</div>${unlocked?'<div class="pr-ach-check">✓</div>':''}</div>`;
+  const unlocked = ACHIEVEMENTS.map(a=>a.check(STATE.progress));
+  return `<div class="pr-ach-grid">${ACHIEVEMENTS.map((a,i)=>{
+    const u = unlocked[i];
+    return `<div class="pr-ach ${u?'unlocked':''}"><div class="pr-ach-icon">${ico(a.icon)}</div><div class="pr-ach-name">${a.name}</div>${u?'<div class="pr-ach-check">✓</div>':''}</div>`;
   }).join('')}</div>`;
 }
 function renderProgress(){
@@ -4148,6 +4296,7 @@ function renderProgress(){
   const isSpeak = STATE.timers.speaking;
   const lTime = isListen ? fmtClock(Date.now()-STATE.timers.listeningStart) : '00:00';
   const sTime = isSpeak ? fmtClock(Date.now()-STATE.timers.speakingStart) : '00:00';
+  const achUnlocked = ACHIEVEMENTS.filter(a=>a.check(STATE.progress)).length;
   return `
   <div class="pr-hero">
     <div class="pr-hero-badge"><div class="pr-hero-level">${s.sfLevel}</div><div class="pr-hero-label">Level</div></div>
@@ -4155,17 +4304,31 @@ function renderProgress(){
       <div class="pr-hero-row"><span class="pr-hero-xp">${s.sfXp} XP</span><span class="pr-hero-next">${nextXp-s.sfXp} to Level ${s.sfLevel+1}</span></div>
       <div class="pr-xp-bar"><div class="pr-xp-fill" style="width:${xpPct}%"></div></div>
       <div class="pr-hero-row"><span>${ico('fire')} ${s.sfStreak}-day streak</span><span>${s.sfSessions} practice sessions</span></div>
+      <div class="pr-hero-row" style="font-size:11px;opacity:.85;margin-bottom:0;"><span>${ico('star')} ${s.sfTotalXp} lifetime XP</span><span>${ico('heart')} ${s.consistency}% consistency</span></div>
     </div>
   </div>
   <div class="pr-grid2">
     <div class="panel pr-card"><div class="pr-card-icon">${ico('book')}</div><div class="pr-card-num">${s.mastered}</div><div class="pr-card-label">Cards Mastered</div><div class="pr-card-sub">of ${s.totalCards} total</div></div>
-    <div class="panel pr-card"><div class="pr-card-icon">${ico('target')}</div><div class="pr-card-num">${s.quizPct}%</div><div class="pr-card-label">Quiz Accuracy</div><div class="pr-card-sub">${STATE.progress.quiz?.correct||0}/${STATE.progress.quiz?.attempts||0}</div></div>
+    <div class="panel pr-card"><div class="pr-card-icon">${ico('target')}</div><div class="pr-card-num">${s.quizPct}%</div><div class="pr-card-label">Quiz Accuracy</div><div class="pr-card-sub">${s.quizCor}/${s.quizAtt}</div></div>
     <div class="panel pr-card"><div class="pr-card-icon">${ico('headphones')}</div><div class="pr-card-num">${Math.floor(s.listenMin/60)}h ${s.listenMin%60}m</div><div class="pr-card-label">Listening Time</div><div class="pr-card-sub">total</div></div>
     <div class="panel pr-card"><div class="pr-card-icon">${ico('mic')}</div><div class="pr-card-num">${Math.floor(s.speakMin/60)}h ${s.speakMin%60}m</div><div class="pr-card-label">Speaking Time</div><div class="pr-card-sub">total</div></div>
   </div>
   <div class="panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Activity</h2><span style="font-size:11px;color:var(--ink-soft);">${(STATE.progress.activityDates||[]).length} active days</span></div>
-    ${prActivityHeatmap(30)}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">CEFR Progress</h2><span style="font-size:11px;color:var(--ink-soft);">${CEFR_LEVELS.filter(l=>(STATE.progress.cefr||{})[l]?.score>=100).length}/${CEFR_LEVELS.length} complete</span></div>
+    ${prCefrBars()}
+  </div>
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><h2 style="margin:0;border:none;padding:0;">Activity</h2><span style="font-size:11px;color:var(--ink-soft);">${s.activedays} active days · Best streak ${s.bestStreak}d</span></div>
+    ${prFullYearHeatmap()}
+  </div>
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Pronunciation & Insights</h2></div>
+    <div class="pr-chart-wrap">
+      <div class="pr-chart">
+        ${prScoreChart2()||'<div style="text-align:center;padding:20px;color:var(--ink-soft);font-size:13px;">No speech data yet — practice in the Speak tab</div>'}
+      </div>
+      <div class="pr-insights">${prInsights(s)}</div>
+    </div>
   </div>
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Study Timers</h2></div>
@@ -4174,9 +4337,8 @@ function renderProgress(){
       <div class="pr-timer"><div class="pr-timer-ring ${isSpeak?'running':''}"><div class="pr-timer-icon">${ico('micLg')}</div><div class="pr-timer-time" id="speakClock">${sTime}</div></div><div class="pr-timer-label">Speaking</div><div class="pr-timer-btns"><button class="ghost-btn" id="startSpeak" ${isSpeak?'disabled':''}>${ico('play')}</button><button class="ghost-btn danger" id="stopSpeak" ${isSpeak?'':'disabled'}>${ico('x')}</button></div></div>
     </div>
   </div>
-  ${prScoreChart() ? `<div class="panel">${prScoreChart()}</div>` : ''}
   <div class="panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Achievements</h2><span style="font-size:11px;color:var(--ink-soft);">${ACHIEVEMENTS.filter(a=>a.check(STATE.progress)).length}/${ACHIEVEMENTS.length}</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Achievements</h2><span style="font-size:11px;color:var(--ink-soft);">${achUnlocked}/${ACHIEVEMENTS.length}</span></div>
     ${prAchievements()}
   </div>`;
 }
