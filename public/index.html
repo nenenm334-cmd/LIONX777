@@ -2779,16 +2779,18 @@ function attachGate(){
       STATE.email = enteredEmail;
       STATE.teacherEmail = lr.teacherEmail || '';
     }
-    STATE.role = 'student';
-    localStorage.setItem('minbar_session', JSON.stringify({role:STATE.role, name:STATE.name, email:STATE.email, teacherEmail:STATE.teacherEmail||''}));
-    if(!localStorage.getItem('minbar_onboarded')) setTimeout(showOnboarding, 300);
-    await loadShared();
-    await loadProgress();
-    syncStudentActivity();
-    STATE.tab = 'journey';
-    startPolling();
-    startNotificationLoop();
-    startHeartbeat();
+    try {
+      STATE.role = 'student';
+      localStorage.setItem('minbar_session', JSON.stringify({role:STATE.role, name:STATE.name, email:STATE.email, teacherEmail:STATE.teacherEmail||''}));
+      if(!localStorage.getItem('minbar_onboarded')) setTimeout(showOnboarding, 300);
+      await loadShared();
+      await loadProgress();
+      syncStudentActivity();
+      STATE.tab = 'journey';
+      startPolling();
+      startNotificationLoop();
+      startHeartbeat();
+    } catch(e){ console.error('Login render error', e); }
     render();
   };
 
@@ -2816,20 +2818,22 @@ function attachGate(){
         await reg.json();
       }
     }catch(e){}
-    STATE.role = 'student';
-    STATE.email = email;
-    STATE.name = name || email.split('@')[0];
-    STATE.avatar = avatar || null;
-    localStorage.setItem('minbar_session', JSON.stringify({role:STATE.role, name:STATE.name, email:STATE.email, teacherEmail:STATE.teacherEmail||''}));
-    if(!localStorage.getItem('minbar_onboarded')) setTimeout(showOnboarding, 300);
-    toast(ico('check')+' '+(isNew?'Welcome!':'Welcome back, ')+STATE.name);
-    await loadShared();
-    await loadProgress();
-    syncStudentActivity();
-    STATE.tab = 'journey';
-    startPolling();
-    startNotificationLoop();
-    startHeartbeat();
+    try {
+      STATE.role = 'student';
+      STATE.email = email;
+      STATE.name = name || email.split('@')[0];
+      STATE.avatar = avatar || null;
+      localStorage.setItem('minbar_session', JSON.stringify({role:STATE.role, name:STATE.name, email:STATE.email, teacherEmail:STATE.teacherEmail||''}));
+      if(!localStorage.getItem('minbar_onboarded')) setTimeout(showOnboarding, 300);
+      toast(ico('check')+' '+(isNew?'Welcome!':'Welcome back, ')+STATE.name);
+      await loadShared();
+      await loadProgress();
+      syncStudentActivity();
+      STATE.tab = 'journey';
+      startPolling();
+      startNotificationLoop();
+      startHeartbeat();
+    } catch(e){ console.error('Social login render error', e); }
     render();
   }
 
@@ -2864,13 +2868,13 @@ function attachGate(){
     const goBtn = overlay.querySelector('#socialGoBtn');
     const nameInput = overlay.querySelector('#socialNameInput');
     nameInput.focus();
-    const doLogin = ()=>{
+    const doLogin = async ()=>{
       const nm = nameInput.value.trim();
       const displayName = nm || (provider==='google'?'Google User':'Apple User');
       const uid = Math.random().toString(36).slice(2,10);
       const email = uid+'@'+provider+'.user';
       overlay.remove();
-      socialLogin(email, displayName, null, provider);
+      await socialLogin(email, displayName, null, provider);
     };
     goBtn.onclick = doLogin;
     nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
@@ -3198,7 +3202,7 @@ function renderLibrary(){
       <h2>${ico('bookOpen')} المكتبة التعليمية</h2>
       <p>اختر موضوعاً وأضف كلماته إلى بطاقاتك تدريجياً</p>
       <div class="lib-hstats">
-        <span>📦 ${total} قالب</span>
+        <span><img src="/images/arabic-book-premium.svg" style="width:18px;height:18px;vertical-align:middle;" alt=""> ${total} قالب</span>
         <span>📤 ${releasedCount} مضافة</span>
         <span>✅ ${masteredCount} متقنة</span>
       </div>
