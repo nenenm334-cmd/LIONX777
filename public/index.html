@@ -997,6 +997,58 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
 .sf-empty .sf-empty-icon{font-size:48px;margin-bottom:12px;opacity:.5;}
 .sf-empty h3{font-family:'Amiri',serif;font-size:20px;margin:0 0 6px;color:var(--ink);}
 .sf-empty p{font-size:13px;margin:0 0 20px;line-height:1.5;}
+/* PROGRESS TAB */
+.pr-hero{background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:var(--radius-lg);padding:24px 28px;color:#fff;margin-bottom:20px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;box-shadow:0 4px 20px rgba(13,148,136,.25);}
+.pr-hero-badge{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,.2);}
+.pr-hero-level{font-size:28px;font-weight:900;line-height:1;}
+.pr-hero-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.8;}
+.pr-hero-stats{flex:1;min-width:160px;}
+.pr-hero-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;font-weight:600;}
+.pr-hero-xp{font-size:18px;font-weight:900;}
+.pr-hero-next{font-size:12px;opacity:.8;}
+.pr-xp-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden;margin-bottom:8px;}
+.pr-xp-fill{height:100%;border-radius:3px;background:#fff;transition:width .5s ease;}
+.pr-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:480px){.pr-grid2{grid-template-columns:1fr;}}
+.pr-card{text-align:center;padding:20px 14px;margin-bottom:0;}
+.pr-card-icon{font-size:24px;margin-bottom:6px;color:var(--teal);}
+.pr-card-num{font-size:24px;font-weight:900;color:var(--ink);}
+.pr-card-label{font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:2px;}
+.pr-card-sub{font-size:11px;color:var(--ink-soft);opacity:.7;margin-top:2px;}
+.pr-heatmap{margin:8px 0 4px;}
+.pr-hm-months{font-size:9px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;}
+.pr-hm-grid{display:flex;gap:3px;flex-wrap:wrap;}
+.pr-hm-cell{width:14px;height:14px;border-radius:3px;background:var(--border-subtle);transition:background .2s;}
+.pr-hm-cell.active{background:var(--teal);}
+.pr-hm-cell.today{border:2px solid var(--teal-dark);}
+body.dark .pr-hm-cell{background:var(--border);}
+body.dark .pr-hm-cell.active{background:var(--accent);}
+.pr-chart{margin:4px 0;}
+.pr-chart-title{font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:10px;display:flex;justify-content:space-between;}
+.pr-chart-title small{font-weight:400;font-size:11px;}
+.pr-chart-bars{display:flex;gap:4px;align-items:flex-end;height:100px;}
+.pr-chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;}
+.pr-chart-bar{width:100%;max-width:28px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--teal),var(--accent));transition:height .4s ease;min-height:3px;}
+.pr-chart-label{font-size:8px;color:var(--ink-soft);font-weight:600;}
+.pr-ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+.pr-ach{position:relative;padding:14px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card);text-align:center;opacity:.5;transition:all .2s;}
+.pr-ach.unlocked{opacity:1;border-color:var(--accent);background:var(--accent-soft);}
+.pr-ach-icon{font-size:22px;margin-bottom:4px;}
+.pr-ach.unlocked .pr-ach-icon{color:var(--accent);}
+.pr-ach-name{font-size:11px;font-weight:600;color:var(--ink-soft);}
+.pr-ach.unlocked .pr-ach-name{color:var(--ink);}
+.pr-ach-check{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.pr-timers{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.pr-timer{text-align:center;min-width:140px;}
+.pr-timer-ring{width:80px;height:80px;border-radius:50%;border:3px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 8px;transition:border-color .3s;}
+.pr-timer-ring.running{border-color:var(--accent);animation:prRingPulse 1.5s infinite;}
+@keyframes prRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.3)}50%{box-shadow:0 0 0 8px rgba(16,185,129,0);}}
+.pr-timer-icon{font-size:18px;color:var(--ink-soft);margin-bottom:2px;}
+.pr-timer-time{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink);}
+.pr-timer-label{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:6px;}
+.pr-timer-btns{display:flex;gap:6px;justify-content:center;}
+.pr-timer-btns .ghost-btn{padding:6px 12px;font-size:13px;min-height:auto;}
+/* END PROGRESS */
 .sf-listen-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;font-size:20px;color:var(--teal);display:inline-flex;align-items:center;justify-content:center;transition:all .15s ease;margin-bottom:8px;vertical-align:middle;}
 .sf-sess-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .sf-sess-bar{flex:1;height:6px;border-radius:3px;background:var(--border-subtle);overflow:hidden;}
@@ -3928,6 +3980,7 @@ function sfStartRecording(){
           SF.stats.level = sfLevelFromXp(SF.stats.xp);
           sfUpdateStreak();
           saveSfStats();
+          saveSfHistory(SF.lastResult.score, SF.filtered[SF.index].level, SF.filtered[SF.index].category);
           SF.isRecording = false;
           if(SF.lastResult.score < 70){
             SF.showRetry = true;
@@ -3969,6 +4022,14 @@ function sfStopRecording(){
 }
 function saveSfStats(){
   try { localStorage.setItem('minbar_sf_stats', JSON.stringify(SF.stats)); } catch(e) {}
+}
+function saveSfHistory(score, level, cat){
+  try {
+    let h = JSON.parse(localStorage.getItem('minbar_sf_history')||'[]');
+    h.push({score,level,cat,date:new Date().toISOString().slice(0,10),ts:Date.now()});
+    if(h.length>500) h = h.slice(-500);
+    localStorage.setItem('minbar_sf_history', JSON.stringify(h));
+  } catch(e) {}
 }
 function loadSfStats(){
   try {
@@ -4032,62 +4093,91 @@ function renderSentencesFactory(){
 }
 /* ---------- end sentences factory ---------- */
 
-const AR_DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-function renderActivityChart(){
+/* ---------- STUDENT: progress (professional) ---------- */
+function prStats(){
+  const p = STATE.progress;
+  const mastered = Object.values(p.srs||{}).filter(e=>e.interval>=21).length;
+  const totalCards = Object.keys(p.srs||{}).length;
+  const quizAtt = p.quiz?.attempts||0;
+  const quizCor = p.quiz?.correct||0;
+  const quizPct = quizAtt ? Math.round(quizCor/quizAtt*100) : 0;
+  const listenMin = Math.round((p.listeningSec||0)/60);
+  const speakMin = Math.round((p.speakingSec||0)/60);
+  const sfLevel = SF.stats.level || 1;
+  const sfXp = SF.stats.xp || 0;
+  const sfStreak = SF.stats.streak || 0;
+  const sfSessions = (JSON.parse(localStorage.getItem('minbar_sf_history')||'[]')).length;
+  return {mastered,totalCards,quizPct,listenMin,speakMin,sfLevel,sfXp,sfStreak,sfSessions};
+}
+function prActivityHeatmap(days){
   const dates = new Set(STATE.progress.activityDates||[]);
   const today = new Date();
   const cells = [];
-  for(let i=6;i>=0;i--){
+  for(let i=days-1;i>=0;i--){
     const d = new Date(today); d.setDate(d.getDate()-i);
     const key = d.toISOString().slice(0,10);
-    cells.push({ label: AR_DAY_NAMES[d.getDay()], active: dates.has(key), isToday: i===0 });
+    cells.push({key, active:dates.has(key), day:d.getDay(), isToday:i===0});
   }
-  return `
-  <div class="panel"><h2>Your Activity in the Last 7 Days</h2>
-    <div class="activity-chart">
-      ${cells.map(c=>`<div class="activity-day ${c.isToday?'today':''}"><div class="activity-dot ${c.active?'active':''}">${c.active?ico('check'):''}</div><div class="activity-label">${c.label}</div></div>`).join('')}
-    </div>
-  </div>`;
+  const months=[];
+  let lastM=-1;
+  cells.forEach((c,i)=>{
+    const m = new Date(c.key).getMonth();
+    if(m!==lastM){ months.push({label:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m],index:i}); lastM=m; }
+  });
+  return `<div class="pr-heatmap"><div class="pr-hm-months">${months.map(m=>`<span style="margin-left:${m.index*10}px">${m.label}</span>`).join('')}</div><div class="pr-hm-grid">${cells.map(c=>`<div class="pr-hm-cell ${c.active?'active':''} ${c.isToday?'today':''}" title="${c.key}${c.active?' ✓':''}"></div>`).join('')}</div></div>`;
 }
-/* ---------- STUDENT: progress ---------- */
+function prScoreChart(){
+  const hist = JSON.parse(localStorage.getItem('minbar_sf_history')||'[]');
+  if(!hist.length) return '';
+  const last = hist.slice(-20);
+  const max = Math.max(...last.map(h=>h.score),100);
+  return `<div class="pr-chart"><div class="pr-chart-title">Pronunciation Scores <small>Last ${last.length} sessions</small></div><div class="pr-chart-bars">${last.map((h,i)=>`<div class="pr-chart-col"><div class="pr-chart-bar" style="height:${Math.max(3,(h.score/max)*100)}%" title="${h.score}%"></div><div class="pr-chart-label">${(i+1)%5===0||i===last.length-1?i+1:''}</div></div>`).join('')}</div></div>`;
+}
+function prAchievements(){
+  return `<div class="pr-ach-grid">${ACHIEVEMENTS.map(a=>{
+    const unlocked = a.check(STATE.progress);
+    return `<div class="pr-ach ${unlocked?'unlocked':''}"><div class="pr-ach-icon">${ico(a.icon)}</div><div class="pr-ach-name">${a.name}</div>${unlocked?'<div class="pr-ach-check">✓</div>':''}</div>`;
+  }).join('')}</div>`;
+}
 function renderProgress(){
+  const s = prStats();
+  const nextXp = sfXpForLevel(s.sfLevel+1);
+  const currXp = sfXpForLevel(s.sfLevel);
+  const xpPct = nextXp>currXp ? Math.min(100,Math.round(((s.sfXp-currXp)/(nextXp-currXp))*100)) : 100;
+  const isListen = STATE.timers.listening;
+  const isSpeak = STATE.timers.speaking;
+  const lTime = isListen ? fmtClock(Date.now()-STATE.timers.listeningStart) : '00:00';
+  const sTime = isSpeak ? fmtClock(Date.now()-STATE.timers.speakingStart) : '00:00';
   return `
-
-  <div class="panel"><h2>Study Timers</h2>
-    ${renderTimersCompact()}
+  <div class="pr-hero">
+    <div class="pr-hero-badge"><div class="pr-hero-level">${s.sfLevel}</div><div class="pr-hero-label">Level</div></div>
+    <div class="pr-hero-stats">
+      <div class="pr-hero-row"><span class="pr-hero-xp">${s.sfXp} XP</span><span class="pr-hero-next">${nextXp-s.sfXp} to Level ${s.sfLevel+1}</span></div>
+      <div class="pr-xp-bar"><div class="pr-xp-fill" style="width:${xpPct}%"></div></div>
+      <div class="pr-hero-row"><span>${ico('fire')} ${s.sfStreak}-day streak</span><span>${s.sfSessions} practice sessions</span></div>
+    </div>
   </div>
-  ${renderActivityChart()}
-  <div class="panel"><h2>Achievements</h2>
-    <div class="badges-grid">
-      ${ACHIEVEMENTS.map(a=>{const unlocked=a.check(STATE.progress);return `<div class="badge ${unlocked?'':'locked'}"><div class="bic">${ico(a.icon)}</div><div class="bname">${a.name}</div></div>`;}).join('')}
+  <div class="pr-grid2">
+    <div class="panel pr-card"><div class="pr-card-icon">${ico('book')}</div><div class="pr-card-num">${s.mastered}</div><div class="pr-card-label">Cards Mastered</div><div class="pr-card-sub">of ${s.totalCards} total</div></div>
+    <div class="panel pr-card"><div class="pr-card-icon">${ico('target')}</div><div class="pr-card-num">${s.quizPct}%</div><div class="pr-card-label">Quiz Accuracy</div><div class="pr-card-sub">${STATE.progress.quiz?.correct||0}/${STATE.progress.quiz?.attempts||0}</div></div>
+    <div class="panel pr-card"><div class="pr-card-icon">${ico('headphones')}</div><div class="pr-card-num">${Math.floor(s.listenMin/60)}h ${s.listenMin%60}m</div><div class="pr-card-label">Listening Time</div><div class="pr-card-sub">total</div></div>
+    <div class="panel pr-card"><div class="pr-card-icon">${ico('mic')}</div><div class="pr-card-num">${Math.floor(s.speakMin/60)}h ${s.speakMin%60}m</div><div class="pr-card-label">Speaking Time</div><div class="pr-card-sub">total</div></div>
+  </div>
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Activity</h2><span style="font-size:11px;color:var(--ink-soft);">${(STATE.progress.activityDates||[]).length} active days</span></div>
+    ${prActivityHeatmap(30)}
+  </div>
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Study Timers</h2></div>
+    <div class="pr-timers">
+      <div class="pr-timer"><div class="pr-timer-ring ${isListen?'running':''}"><div class="pr-timer-icon">${ico('headphonesLg')}</div><div class="pr-timer-time" id="listenClock">${lTime}</div></div><div class="pr-timer-label">Listening</div><div class="pr-timer-btns"><button class="ghost-btn" id="startListen" ${isListen?'disabled':''}>${ico('play')}</button><button class="ghost-btn danger" id="stopListen" ${isListen?'':'disabled'}>${ico('x')}</button></div></div>
+      <div class="pr-timer"><div class="pr-timer-ring ${isSpeak?'running':''}"><div class="pr-timer-icon">${ico('micLg')}</div><div class="pr-timer-time" id="speakClock">${sTime}</div></div><div class="pr-timer-label">Speaking</div><div class="pr-timer-btns"><button class="ghost-btn" id="startSpeak" ${isSpeak?'disabled':''}>${ico('play')}</button><button class="ghost-btn danger" id="stopSpeak" ${isSpeak?'':'disabled'}>${ico('x')}</button></div></div>
     </div>
-  </div>`;
-}
-function renderTimersCompact(){
-  return `
-  <div class="timer-compact-row">
-    ${renderTimerCompact('listening','headphonesLg','Listening')}
-    ${renderTimerCompact('speaking','micLg','Speaking')}
-  </div>`;
-}
-function renderTimerCompact(kind, icon, label){
-  const isListen = kind==='listening';
-  const running = STATE.timers[kind];
-  const clockId = isListen ? 'listenClock' : 'speakClock';
-  const time = running ? fmtClock(Date.now()-STATE.timers[kind+'Start']) : '00:00';
-  return `
-  <div class="timer-card">
-    <div class="timer-ring ${running?'running':''}">
-      <div class="timer-ring-inner">
-        <div class="timer-icon-lg">${ico(icon)}</div>
-        <div class="timer-time-lg" id="${clockId}">${time}</div>
-      </div>
-    </div>
-    <div class="timer-card-label">${label}</div>
-    <div class="tc-btns">
-      <button class="tc-btn start" id="start${isListen?'Listen':'Speak'}" ${running?'disabled':''}>${ico('play')} Start</button>
-      <button class="tc-btn stop" id="stop${isListen?'Listen':'Speak'}" ${running?'':'disabled'}>${ico('x')} Stop</button>
-    </div>
+  </div>
+  ${prScoreChart() ? `<div class="panel">${prScoreChart()}</div>` : ''}
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;border:none;padding:0;">Achievements</h2><span style="font-size:11px;color:var(--ink-soft);">${ACHIEVEMENTS.filter(a=>a.check(STATE.progress)).length}/${ACHIEVEMENTS.length}</span></div>
+    ${prAchievements()}
   </div>`;
 }
 
