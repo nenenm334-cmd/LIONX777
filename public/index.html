@@ -966,6 +966,7 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
 .sf-words{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;direction:rtl;}
 .sf-word{font-family:'Cairo',sans-serif;font-size:18px;padding:6px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--border-subtle);transition:all .3s ease;font-weight:600;}
 .sf-word.correct{background:var(--green-soft);border-color:var(--green);color:var(--green);}
+.sf-word.partial{background:#fef3c7;border-color:#d97706;color:#d97706;}
 .sf-word.incorrect{background:var(--rose-soft);border-color:var(--rose);color:var(--rose);}
 .sf-word.pending{opacity:.6;}
 .sf-record-btn{width:64px;height:64px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--teal),var(--accent));color:#fff;cursor:pointer;font-size:28px;box-shadow:0 4px 20px rgba(13,148,136,.35);transition:all .2s ease;margin:0 auto;display:flex;align-items:center;justify-content:center;}
@@ -3820,16 +3821,48 @@ function sfScoreHtml(score){
   if(score>=80) cls='excellent'; else if(score>=60) cls='good'; else if(score>=40) cls='fair';
   return `<div class="sf-score-wrap"><div class="sf-score ${cls}"><span class="sf-label">Score</span> ${score}%</div></div>`;
 }
+function sfNormAr(t){
+  return t.replace(/[أإآآ]/g,'ا').replace(/[ى]/g,'ي').replace(/[ة]/g,'ه').replace(/[ؤ]/g,'و').replace(/[ئ]/g,'ي').replace(/[ًٌٍَُِّْٰٖ]/g,'').replace(/[؟\.,!?;:()\-"'\s]+/g,' ').trim().toLowerCase();
+}
+function sfLevenshtein(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},()=>Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0]=i;
+  for(let j=0;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+function sfWordSim(a,b){
+  const an=sfNormAr(a),bn=sfNormAr(b);
+  if(!an||!bn) return 0;
+  if(an===bn) return 1;
+  const dist=sfLevenshtein(an,bn);
+  const maxLen=Math.max(an.length,bn.length);
+  if(maxLen===0) return 1;
+  return Math.max(0,1-dist/maxLen);
+}
 function sfCalcScore(recognized, targetWords){
-  if(!recognized || !recognized.trim()) return {score:0, wordStatus:targetWords.map(()=>'incorrect')};
-  const recWords = recognized.trim().toLowerCase().split(/[\s,\.!?;:]+/).filter(Boolean);
+  if(!recognized||!recognized.trim()) return {score:0,wordStatus:targetWords.map(()=>'incorrect')};
+  const recWords = recognized.trim().split(/[\s,\.!?;:]+/).filter(Boolean);
   const wordStatus = targetWords.map(tw=>{
-    const twLow = tw.replace(/[؟,\.!?;:()\-]/g,'').toLowerCase();
-    return recWords.some(rw=>rw.includes(twLow)||twLow.includes(rw)) ? 'correct' : 'incorrect';
+    let best=0;
+    for(const rw of recWords){
+      const sim=sfWordSim(tw,rw);
+      if(sim>best) best=sim;
+    }
+    if(best>=0.7) return 'correct';
+    if(best>=0.4) return 'partial';
+    return 'incorrect';
   });
-  const correct = wordStatus.filter(s=>s==='correct').length;
-  const score = Math.round((correct/targetWords.length)*100);
-  return {score, wordStatus};
+  const weighted=wordStatus.reduce((s,st,i)=>{
+    const w=1/(targetWords.length);
+    if(st==='correct') return s+w;
+    if(st==='partial') return s+w*0.5;
+    return s;
+  },0);
+  const score=Math.round(weighted*100);
+  return {score,wordStatus};
 }
 function sfGetCurrent(){
   if(!SF.filtered.length || SF.index>=SF.filtered.length) return null;
@@ -3878,8 +3911,14 @@ function sfStartRecording(){
       for(let i=e.resultIndex;i<e.results.length;i++){
         const r = e.results[i];
         if(r.isFinal){
-          const text = r[0].transcript;
-          SF.lastResult = sfCalcScore(text, SF.filtered[SF.index].words || SF.filtered[SF.index].ar.split(/[\s]+/).filter(Boolean));
+          const targetWords = SF.filtered[SF.index].words || SF.filtered[SF.index].ar.split(/[\s]+/).filter(Boolean);
+          let bestResult = null, bestScore = -1;
+          for(let j=0;j<r.length;j++){
+            const text = r[j].transcript;
+            const res = sfCalcScore(text, targetWords);
+            if(res.score>bestScore){ bestScore=res.score; bestResult=res; }
+          }
+          SF.lastResult = bestResult || sfCalcScore(r[0]?.transcript||'', targetWords);
           const diff = SF.filtered[SF.index].difficulty || 1;
           const earned = Math.round((SF.lastResult.score/100)*6*diff);
           SF.session.xp += earned;
