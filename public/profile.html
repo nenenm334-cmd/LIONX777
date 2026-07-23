@@ -440,6 +440,26 @@ body.dark .p-stat-num{color:var(--accent);}
         </div>
       </div>
 
+      <!-- My Progress -->
+      <div class="p-card">
+        <div class="p-card-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            My Progress
+          </h3>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="progressGrid">
+          <div style="grid-column:1/-1;background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:var(--radius-md);padding:16px 20px;color:#fff;display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.2);"><div style="font-size:22px;font-weight:900;line-height:1;" id="pLvl">1</div><div style="font-size:9px;font-weight:700;text-transform:uppercase;opacity:.8;">Level</div></div>
+            <div style="flex:1;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;"><span id="pXp">0 XP</span><span style="opacity:.8;" id="pXpNext">0 to L2</span></div><div style="height:5px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden;margin:6px 0;"><div style="height:100%;border-radius:3px;background:#fff;width:0%;" id="pXpBar"></div></div><div style="font-size:11px;opacity:.85;" id="pStudyDays">📅 0 study days</div></div>
+          </div>
+          <div style="text-align:center;padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);"><div style="font-size:20px;margin-bottom:4px;color:var(--teal);">📚</div><div style="font-size:20px;font-weight:900;" id="pMastered">0</div><div style="font-size:10px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Mastered</div><div style="font-size:10px;color:var(--ink-soft);opacity:.7;" id="pMasteredOf">of 0</div></div>
+          <div style="text-align:center;padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);"><div style="font-size:20px;margin-bottom:4px;color:var(--teal);">🎯</div><div style="font-size:20px;font-weight:900;" id="pQuizAcc">0%</div><div style="font-size:10px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Quiz Acc</div><div style="font-size:10px;color:var(--ink-soft);opacity:.7;" id="pQuizStats">0/0</div></div>
+          <div style="text-align:center;padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);"><div style="font-size:20px;margin-bottom:4px;color:var(--teal);">🎧</div><div style="font-size:20px;font-weight:900;" id="pListening">0h 0m</div><div style="font-size:10px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Listening</div></div>
+          <div style="text-align:center;padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);"><div style="font-size:20px;margin-bottom:4px;color:var(--teal);">🎤</div><div style="font-size:20px;font-weight:900;" id="pSpeaking">0h 0m</div><div style="font-size:10px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Speaking</div></div>
+        </div>
+      </div>
+
       <!-- Activity Heatmap -->
       <div class="p-card">
         <div class="p-card-head">
@@ -980,6 +1000,32 @@ async function loadProfile() {
   const quizAttempts = progress.quiz ? progress.quiz.attempts || 0 : 0;
   const quizCorrect = progress.quiz ? progress.quiz.correct || 0 : 0;
   const quizPct = quizAttempts > 0 ? Math.round(quizCorrect / quizAttempts * 100) : 0;
+
+  /* My Progress data */
+  const masteredStrict = Object.values(progress.srs || {}).filter(e => e.interval >= 21).length;
+  const totalCardsAll = Object.keys(progress.srs || {}).length;
+  const listenMin = Math.round((progress.listeningSec || 0) / 60);
+  const speakMin = Math.round((progress.speakingSec || 0) / 60);
+  const studyDays = (progress.activityDates || []).length;
+  const totalXp = Object.values(progress.srs || {}).reduce((s, e) => s + (e.totalReviews || 0) * 5, 0) + quizCorrect * 10;
+  function xpForLevel(l) { return 100 * Math.pow(l, 1.5); }
+  let lvl = 1;
+  while (xpForLevel(lvl + 1) <= totalXp) lvl++;
+  const lvlXp = xpForLevel(lvl);
+  const nextXp = xpForLevel(lvl + 1);
+  const xpPct = nextXp > lvlXp ? Math.min(100, Math.round(((totalXp - lvlXp) / (nextXp - lvlXp)) * 100)) : 100;
+
+  document.getElementById('pLvl').textContent = lvl;
+  document.getElementById('pXp').textContent = totalXp + ' XP';
+  document.getElementById('pXpNext').textContent = (nextXp - totalXp) + ' to L' + (lvl + 1);
+  document.getElementById('pXpBar').style.width = xpPct + '%';
+  document.getElementById('pStudyDays').textContent = '📅 ' + studyDays + ' study days';
+  document.getElementById('pMastered').textContent = masteredStrict;
+  document.getElementById('pMasteredOf').textContent = 'of ' + totalCardsAll;
+  document.getElementById('pQuizAcc').textContent = quizPct + '%';
+  document.getElementById('pQuizStats').textContent = quizCorrect + '/' + quizAttempts;
+  document.getElementById('pListening').textContent = Math.floor(listenMin / 60) + 'h ' + (listenMin % 60) + 'm';
+  document.getElementById('pSpeaking').textContent = Math.floor(speakMin / 60) + 'h ' + (speakMin % 60) + 'm';
 
   /* Animate stats */
   animateCount(document.getElementById('statTotal'), totalCards);
