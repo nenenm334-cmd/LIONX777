@@ -997,6 +997,12 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
 .sf-empty h3{font-family:'Amiri',serif;font-size:20px;margin:0 0 6px;color:var(--ink);}
 .sf-empty p{font-size:13px;margin:0 0 20px;line-height:1.5;}
 .sf-listen-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;font-size:20px;color:var(--teal);display:inline-flex;align-items:center;justify-content:center;transition:all .15s ease;margin-bottom:8px;vertical-align:middle;}
+.sf-sess-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sf-sess-bar{flex:1;height:6px;border-radius:3px;background:var(--border-subtle);overflow:hidden;}
+.sf-sess-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .4s ease;}
+.sf-sess-label{font-size:11px;color:var(--ink-soft);font-weight:600;white-space:nowrap;}
+.sf-card{animation:sfFadeIn .3s ease;}
+@keyframes sfFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .sf-listen-btn:hover{border-color:var(--teal);background:var(--teal-soft);transform:scale(1.05);}
 .sf-listen-btn:active{transform:scale(.95);}
 .sf-arabic-wrap{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 16px;}
@@ -3781,7 +3787,8 @@ const SF = {
   data: null, filtered: [], index: 0, selectedLevel: null, selectedCategory: null,
   session: { done:0, totalScore:0, xp:0 },
   recognition: null, isRecording: false, lastResult: null,
-  stats: { xp:0, level:1, streak:0 },
+  stats: { xp:0, level:1, streak:0, lastDate:'' },
+  showRetry: false, reviewQueue: [],
 };
 function sfLoadData(){
   if(SF.data) return Promise.resolve(SF.data);
@@ -3796,7 +3803,7 @@ function sfResetFilter(){
     if(SF.selectedCategory && s.category!==SF.selectedCategory) return false;
     return true;
   });
-  SF.index = 0; SF.lastResult = null;
+  sfShuffle();
 }
 function sfLevelsHtml(){
   return `<div class="sf-levels">${['A1','A2','B1','B2','C1','C2'].map(l=>`<button class="sf-level ${SF.selectedLevel===l?'active':''}" data-sf-level="${l}">${l}</button>`).join('')}<button class="sf-level ${!SF.selectedLevel?'active':''}" data-sf-level="">All</button></div>`;
@@ -3834,6 +3841,29 @@ function sfLevelFromXp(xp){
   while(sfXpForLevel(lvl+1)<=xp && lvl<100) lvl++;
   return lvl;
 }
+function sfShuffle(){
+  for(let i=SF.filtered.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [SF.filtered[i], SF.filtered[j]] = [SF.filtered[j], SF.filtered[i]];
+  }
+  SF.index = 0; SF.lastResult = null;
+}
+function sfUpdateStreak(){
+  const today = new Date().toISOString().slice(0,10);
+  if(SF.stats.lastDate === today) return;
+  const yesterday = new Date(Date.now()-864e5).toISOString().slice(0,10);
+  SF.stats.streak = SF.stats.lastDate === yesterday ? SF.stats.streak + 1 : 1;
+  SF.stats.lastDate = today;
+  saveSfStats();
+}
+function sfNext(){
+  SF.lastResult = null; SF.showRetry = false;
+  if(SF.reviewQueue.length && SF.index >= SF.filtered.length-1){
+    SF.filtered = SF.reviewQueue; SF.reviewQueue = []; SF.index = 0; render(); return;
+  }
+  if(SF.index < SF.filtered.length-1){ SF.index++; render(); return; }
+  render(); // "All done" screen
+}
 function sfStartRecording(){
   if(!SF.recognition){
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -3857,10 +3887,17 @@ function sfStartRecording(){
           SF.session.totalScore += SF.lastResult.score;
           SF.stats.xp += earned;
           SF.stats.level = sfLevelFromXp(SF.stats.xp);
+          sfUpdateStreak();
           saveSfStats();
           SF.isRecording = false;
-          render();
-          setTimeout(()=>{ if(SF.index<SF.filtered.length-1){ SF.index++; SF.lastResult=null; render(); } }, 1500);
+          if(SF.lastResult.score < 70){
+            SF.showRetry = true;
+            if(SF.lastResult.score < 60) SF.reviewQueue.push(SF.filtered[SF.index]);
+            render();
+          } else {
+            render();
+            setTimeout(sfNext, 1200);
+          }
           return;
         } else {
           interim += r[0].transcript;
@@ -3892,7 +3929,7 @@ function saveSfStats(){
 function loadSfStats(){
   try {
     const d = JSON.parse(localStorage.getItem('minbar_sf_stats'));
-    if(d){ SF.stats.xp = d.xp || 0; SF.stats.level = d.level || 1; SF.stats.streak = d.streak || 0; }
+    if(d){ SF.stats.xp = d.xp || 0; SF.stats.level = d.level || 1; SF.stats.streak = d.streak || 0; SF.stats.lastDate = d.lastDate || ''; }
   } catch(e) {}
 }
 function renderSentencesFactory(){
@@ -3913,6 +3950,7 @@ function renderSentencesFactory(){
   const scoreRes = SF.lastResult;
   const words = s.words || s.ar.split(/[\s]+/).filter(Boolean);
   const wordHtml = scoreRes ? words.map((w,i)=>sfWordHtml(w, scoreRes.wordStatus[i]||'pending')).join('') : words.map(w=>sfWordHtml(w,'pending')).join('');
+  const sessPct = total ? Math.round((done/total)*100) : 0;
   return `
     <div class="panel">
       ${sfLevelsHtml()}
@@ -3920,6 +3958,7 @@ function renderSentencesFactory(){
       <div class="sf-stats">
         <div class="sf-stat"><div class="sf-stat-val">${done}</div><div class="sf-stat-label">Done</div></div>
         <div class="sf-stat"><div class="sf-stat-val">${done?Math.round(SF.session.totalScore/done):0}%</div><div class="sf-stat-label">Avg Score</div></div>
+        <div class="sf-stat"><div class="sf-stat-val">${SF.stats.streak}${ico('fire')}</div><div class="sf-stat-label">Streak</div></div>
         <div class="sf-stat"><div class="sf-stat-val">${SF.session.xp}</div><div class="sf-stat-label">XP Session</div></div>
       </div>
       <div class="sf-xp-bar"><div class="sf-xp-fill" style="width:${xpPct}%"></div></div>
@@ -3927,6 +3966,7 @@ function renderSentencesFactory(){
     </div>
     <div class="sf-card">
       <div style="font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">${s.level} &middot; ${s.category.replace(/-/g,' ')} &middot; ${SF.index+1}/${total}</div>
+      <div class="sf-sess-bar-wrap"><div class="sf-sess-bar"><div class="sf-sess-fill" style="width:${sessPct}%"></div></div><span class="sf-sess-label">${done}/${total}</span></div>
       <div class="sf-arabic-wrap">
         <div class="sf-arabic">${s.ar}</div>
         <button class="sf-listen-btn" id="sfListenBtn" title="Listen">${ico('volume')}</button>
@@ -3934,6 +3974,7 @@ function renderSentencesFactory(){
       <div class="sf-translation" id="sfToggleTrans">${transText || (showTrans===undefined?'<span class="sf-trans-hint">Tap for translation</span>':'')}</div>
       ${scoreRes ? sfScoreHtml(scoreRes.score) : ''}
       <div class="sf-words">${wordHtml}</div>
+      ${SF.showRetry && scoreRes ? `<button class="primary-btn" id="sfRetryBtn" style="margin:0 auto 12px;display:block;">${ico('mic')} Try Again</button>` : ''}
       ${!hasRec ? `<div class="sf-not-supported"><p>Speech recognition is not supported in this browser. Try Chrome or Edge.</p></div>` : `
         <button class="sf-record-btn" id="sfRecordBtn">${SF.isRecording?'⬤':ico('mic')}</button>
         <div class="sf-record-label">${SF.isRecording?'Listening...':'Tap to speak'}</div>
@@ -3941,7 +3982,7 @@ function renderSentencesFactory(){
       `}
     </div>
     <div class="sf-nav">
-      <button class="ghost-btn" id="sfSkip" ${!s?'disabled':''}>${ico('skipBack')} Skip</button>
+      <button class="ghost-btn" id="sfSkip" ${!s?'disabled':''}>${ico('skipBack')} ${SF.showRetry?'Next':'Skip'}</button>
       <button class="ghost-btn" id="sfResetSession">Reset</button>
     </div>`;
 }
@@ -4081,13 +4122,15 @@ function attachHandlers(){
   const sfTrans = document.getElementById('sfToggleTrans');
   if(sfTrans) sfTrans.onclick = ()=>{ SF._showTrans = !SF._showTrans; render(); };
   const sfSkip = document.getElementById('sfSkip');
-  if(sfSkip) sfSkip.onclick = ()=>{ SF.lastResult=null; SF.index++; render(); };
+  if(sfSkip) sfSkip.onclick = ()=>{ sfNext(); };
   const sfResetSess = document.getElementById('sfResetSession');
-  if(sfResetSess) sfResetSess.onclick = ()=>{ SF.session={done:0,totalScore:0,xp:0}; SF.stats={xp:0,level:1,streak:0}; SF.lastResult=null; SF.index=0; saveSfStats(); render(); };
+  if(sfResetSess) sfResetSess.onclick = ()=>{ SF.session={done:0,totalScore:0,xp:0}; SF.stats={xp:0,level:1,streak:0,lastDate:''}; SF.lastResult=null; SF.showRetry=false; SF.reviewQueue=[]; SF.index=0; saveSfStats(); if(SF.data) sfResetFilter(); render(); };
   const sfResetBtn = document.getElementById('sfReset');
   if(sfResetBtn) sfResetBtn.onclick = ()=>{ SF.index=0; SF.lastResult=null; render(); };
   const sfListenBtn = document.getElementById('sfListenBtn');
   if(sfListenBtn) sfListenBtn.onclick = ()=>{ const s=sfGetCurrent(); if(s) speak(s.ar); };
+  const sfRetryBtn = document.getElementById('sfRetryBtn');
+  if(sfRetryBtn) sfRetryBtn.onclick = ()=>{ SF.lastResult=null; SF.showRetry=false; render(); };
   const refreshBtn = document.getElementById('refreshBtn');
   if(refreshBtn) refreshBtn.onclick = async ()=>{
     refreshBtn.disabled = true; refreshBtn.classList.add('spin');
