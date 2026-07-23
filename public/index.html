@@ -1083,9 +1083,19 @@ const API_SECRET = '';
     return h;
   }
 
+  const fetchCache = {};
+  function fetchWithTimeout(url, opts, ms) {
+    const ck = url + '|' + (opts?.method||'GET');
+    if (opts?.method !== 'PUT' && opts?.method !== 'DELETE' && fetchCache[ck]) return fetchCache[ck];
+    const c = new AbortController();
+    const timer = setTimeout(() => c.abort(), ms || 10000);
+    const p = fetch(url, { ...opts, signal: c.signal }).then(r => { clearTimeout(timer); return r; }).catch(e => { clearTimeout(timer); throw e; });
+    if (opts?.method !== 'PUT' && opts?.method !== 'DELETE') fetchCache[ck] = p;
+    return p;
+  }
   window.storage = {
     async get(key, shared) {
-      const res = await fetch(API_BASE + '?key=' + encodeURIComponent(key), {
+      const res = await fetchWithTimeout(API_BASE + '?key=' + encodeURIComponent(key), {
         headers: API_SECRET ? { 'Authorization': 'Bearer ' + API_SECRET } : {}
       });
       if (res.status === 401) throw new Error('Unauthorized — check API_SECRET');
@@ -1095,6 +1105,7 @@ const API_SECRET = '';
       return { key: data.key, value: data.value, shared: !!shared };
     },
     async set(key, value, shared) {
+      delete fetchCache[API_BASE + '?key=' + encodeURIComponent(key) + '|GET'];
       const res = await fetch(API_BASE + '?key=' + encodeURIComponent(key), {
         method: 'PUT',
         headers: authHeaders(),
@@ -1107,6 +1118,7 @@ const API_SECRET = '';
       return { key: data.key, value: data.value, shared: !!shared };
     },
     async delete(key, shared) {
+      Object.keys(fetchCache).forEach(k => delete fetchCache[k]);
       const res = await fetch(API_BASE + '?key=' + encodeURIComponent(key), {
         method: 'DELETE',
         headers: API_SECRET ? { 'Authorization': 'Bearer ' + API_SECRET } : {}
@@ -2123,16 +2135,18 @@ function safeSetBg(key, value, shared){
   }catch(e){ console.warn('bg save threw', key, e); }
 }
 async function loadShared(){
-  STATE.flashcards = (await safeGet('flashcards', true)) || [];
-  STATE.resources = (await safeGet('resources', true)) || [];
-  STATE.exams = (await safeGet('exams', true)) || [];
-  STATE.announcements = (await safeGet('announcements', true)) || [];
-  STATE.questions = (await safeGet('questions', true)) || [];
-  STATE.trash = (await safeGet('trash', true)) || [];
-  STATE.journeyVideos = (await safeGet('journeyVideos', true)) || {};
-  STATE.lessonsData = (await safeGet('lessonsData', true)) || {};
-  STATE.libProgress = (await safeGet('libProgress', true)) || {};
-  // Clean up old study template IDs replaced by language templates
+  const keys = ['flashcards','resources','exams','announcements','questions','trash','journeyVideos','lessonsData','libProgress'];
+  const results = await Promise.allSettled(keys.map(k => safeGet(k, true)));
+  const vals = results.map(r => r.status==='fulfilled' ? r.value : null);
+  STATE.flashcards = vals[0] || [];
+  STATE.resources = vals[1] || [];
+  STATE.exams = vals[2] || [];
+  STATE.announcements = vals[3] || [];
+  STATE.questions = vals[4] || [];
+  STATE.trash = vals[5] || [];
+  STATE.journeyVideos = vals[6] || {};
+  STATE.lessonsData = vals[7] || {};
+  STATE.libProgress = vals[8] || {};
   ['study_100','study_uni','study_class','study_exam','study_books'].forEach(id=>{if(STATE.libProgress[id]){delete STATE.libProgress[id];safeSetBg('libProgress',STATE.libProgress,true);}});
 }
 async function saveQuestions(){
@@ -4077,6 +4091,7 @@ function attachHandlers(){
   const refreshBtn = document.getElementById('refreshBtn');
   if(refreshBtn) refreshBtn.onclick = async ()=>{
     refreshBtn.disabled = true; refreshBtn.classList.add('spin');
+    Object.keys(fetchCache).forEach(k => delete fetchCache[k]);
     try {
       await loadShared();
       if(STATE.role==='teacher' && (STATE.tab==='students')){ STATE.students=await loadAllStudents(); await loadLeaderboard(); }
