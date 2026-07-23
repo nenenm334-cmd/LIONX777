@@ -3213,7 +3213,7 @@ function renderLibrary(){
     const tpls=getLibTemplates(cat.id);
     if(STATE.libSearchQ){const q=STATE.libSearchQ.toLowerCase();if(!tpls.some(t=>t.nameEn.toLowerCase().includes(q)||t.name.toLowerCase().includes(q)||t.desc.toLowerCase().includes(q)||(t.descEn||'').toLowerCase().includes(q)))continue;}
     h+=`<div class="lib-cat" data-lib-cat="${cat.id}" style="background:linear-gradient(145deg,${cat.color},${cat.color}cc);">
-      <div class="cat-bg"><div class="circle1"></div><div class="circle2"></div><div class="dots"></div></div>
+      <div class="cat-bg"><div class="circle1"></div><div class="circle2"></div></div>
       <div class="cat-glow"></div>
       <div class="cat-inner">
         <span class="lci">${LIB_IMG[cat.id]||LIB_SVGS[cat.id]||cat.icon}</span>
