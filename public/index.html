@@ -4151,9 +4151,8 @@ function renderProgress(){
       <div style="height:6px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden;margin-bottom:8px;">
         <div style="height:100%;border-radius:3px;background:#fff;width:${xpPct}%;transition:width .5s;"></div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
-        <span>${ico('fire')} ${streak}d streak</span>
-        <span>${(p.activityDates||[]).length} active days</span>
+      <div style="display:flex;justify-content:center;font-size:13px;font-weight:600;">
+        <span>📅 ${(p.activityDates||[]).length} total study days</span>
       </div>
     </div>
   </div>
