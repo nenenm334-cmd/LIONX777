@@ -3202,7 +3202,7 @@ function renderLibrary(){
       <h2>${ico('bookOpen')} المكتبة التعليمية</h2>
       <p>اختر موضوعاً وأضف كلماته إلى بطاقاتك تدريجياً</p>
       <div class="lib-hstats">
-        <span><img src="/images/arabic-book-premium.svg" style="width:18px;height:18px;vertical-align:middle;" alt=""> ${total} قالب</span>
+        <span><img src="/images/storage-box.svg" style="width:18px;height:18px;vertical-align:middle;" alt=""> ${total} قالب</span>
         <span>📤 ${releasedCount} مضافة</span>
         <span>✅ ${masteredCount} متقنة</span>
       </div>
@@ -3216,7 +3216,7 @@ function renderLibrary(){
       <div class="cat-bg"><div class="circle1"></div><div class="circle2"></div><div class="dots"></div></div>
       <div class="cat-glow"></div>
       <div class="cat-inner">
-        <span class="lci"><img src="/images/storage-box.svg" class="lsvg" alt=""></span>
+        <span class="lci">${LIB_IMG[cat.id]||LIB_SVGS[cat.id]||cat.icon}</span>
         <div class="lcn">${cat.name}</div>
         <div class="lce">${cat.nameEn}</div>
         <div class="lcc">${cat.desc}</div>
@@ -3237,7 +3237,7 @@ function renderLibCategory(){
   let h=`<div class="lib-wrap">
     <button class="lib-back" id="libBackCat">← All Categories</button>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,${cat.color},${cat.color}99);display:flex;align-items:center;justify-content:center;color:#fff;padding:8px;"><img src="/images/storage-box.svg" class="lsvg" alt=""></div>
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,${cat.color},${cat.color}99);display:flex;align-items:center;justify-content:center;color:#fff;padding:8px;">${LIB_IMG[cat.id]||LIB_SVGS[cat.id]||cat.icon}</div>
       <div><h2 style="margin:0;font-size:17px;">${cat.name}</h2><p style="margin:1px 0 0;font-size:11px;color:var(--ink-soft);">${cat.nameEn} · ${cat.desc}</p></div>
     </div>
     <div class="lib-templates">`;
@@ -3251,7 +3251,7 @@ function renderLibCategory(){
     h+=`<div class="lib-tcard" data-lib-add="${tpl.id}">
       <div class="tc-accent" style="background:linear-gradient(90deg,${cat.color},${cat.color}66);"></div>
       <div class="tc-body">
-        <div class="tc-icon" style="background:linear-gradient(135deg,${cat.color},${cat.color}88);"><img src="/images/storage-box.svg" class="lsvg" alt=""></div>
+        <div class="tc-icon" style="background:linear-gradient(135deg,${cat.color},${cat.color}88);">${LIB_IMG[cat.id]||LIB_SVGS[cat.id]||cat.icon}</div>
         <div class="tc-name">${tpl.name}</div>
         <div class="tc-name-en">${tpl.nameEn}</div>
         <div class="tc-desc">${tpl.desc}</div>
