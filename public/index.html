@@ -117,7 +117,6 @@ body.dark .brand h1{color:var(--accent);}
 @media (max-width:480px){
   .brand p{display:none;}
   .role-badge span,.role-badge{font-size:11px;}
-  .streak-chip{font-size:11px;padding:5px 10px;}
 }
 .role-badge{font-size:12.5px;background:var(--bg-card);border:1.5px solid var(--border);padding:7px 14px;border-radius:10px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-sm);}
 body.dark .role-badge{background:var(--bg-card);border-color:var(--border);}
@@ -129,7 +128,9 @@ body.dark .role-badge b{color:var(--accent);}
 body.dark .theme-toggle{border-color:var(--border);background:var(--bg-card);}
 .theme-toggle:hover{border-color:var(--teal);box-shadow:0 2px 8px rgba(13,148,136,.15);}
 body.dark .theme-toggle:hover{border-color:var(--accent);}
-.streak-chip{background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-size:12px;font-weight:700;padding:7px 14px;border-radius:10px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(249,115,22,.25);}
+.bell-btn{position:relative;padding:7px 9px;}
+.bell-btn svg{width:18px;height:18px;display:block;}
+.bell-badge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--rose);color:#fff;font-size:9px;font-weight:800;line-height:16px;text-align:center;box-shadow:0 2px 6px rgba(220,38,38,.3);}
 
 .gate{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:16px;position:relative;overflow:hidden;
   background:linear-gradient(135deg,#f0fdf4 0%,#f8fafc 50%,#ecfdf5 100%);}
@@ -644,7 +645,6 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
   .header-actions{gap:6px;}
   .role-badge{padding:5px 10px;font-size:11px;gap:5px;}
   .theme-toggle{padding:6px 9px;font-size:13px;}
-  .streak-chip{padding:4px 9px;}
 
   .panel{padding:16px 14px;}
   .panel h2{font-size:17px;padding-inline-start:19px;}
@@ -2593,7 +2593,7 @@ function renderLiveBanner(){
 }
 
 function renderHeader(){
-  const streak = STATE.role==='student' ? computeStreak(STATE.progress) : 0;
+  const unreadAnn = STATE.role==='student' ? unreadAnnouncementsCount() : 0;
   return `
   <div class="masthead">
     <div class="brand">
@@ -2601,8 +2601,8 @@ function renderHeader(){
       <div><h1>Minbar</h1></div>
     </div>
     <div class="header-actions">
-      ${STATE.role==='student' && streak>0 ? `<div class="streak-chip">${ico('fire')} ${streak}-day streak</div>` : ''}
       <div class="role-badge">${STATE.role==='teacher'?ico('teacher')+' <b>Teacher</b> mode':`<button class="header-avatar-btn" id="openProfile" title="Profile">${STATE.avatar?`<img src="${STATE.avatar}" class="header-avatar" alt="avatar" />`:`<span class="role-avatar-fallback">${(STATE.name||'S').charAt(0).toUpperCase()}</span>`}</button>` + ' <b class="role-badge-name">'+STATE.name+'</b>'} <button class="switch-btn" id="switchRole">Switch</button></div>
+      ${STATE.role==='student' ? `<button class="theme-toggle bell-btn" id="bellBtn" title="Announcements">${ico('bell')}${unreadAnn>0?`<span class="bell-badge">${unreadAnn>9?'9+':unreadAnn}</span>`:''}</button>` : ''}
       <button class="theme-toggle" id="refreshBtn" title="Refresh content">${ico('review')}</button>
       <button class="theme-toggle" id="themeToggle">${STATE.dark?ico('sun'):ico('moon')}</button>
     </div>
@@ -2901,7 +2901,6 @@ function renderTabs(){
     {k:'progress', l:ico('chart')+' Progress'},
     {k:'leaderboard', l:ico('award')+' Leaderboard'},
     {k:'ask', l:ico('send')+' Ask'},
-    {k:'announcements', l:ico('bell')+' News'},
     {k:'deck', l:ico('review')+' Review'},
     {k:'settings', l:ico('settings')+' Settings'},
   ];
@@ -3503,7 +3502,6 @@ function renderStudentsPanel(){
           <div>${ico('eye')} Joined ${s.createdAt ? timeAgo(s.createdAt) : 'unknown'}</div>
           ${(s.totalReviews||0)>0 ? `<div style="color:var(--ink);">${ico('review')} ${s.totalReviews} reviews</div>` : ''}
           ${(s.mastered||0)>0 ? `<div style="color:var(--ink);">${ico('star')} ${s.mastered} mastered</div>` : ''}
-          ${(prog.streak||0)>0 ? `<div style="color:var(--ink);">${ico('fire')} ${prog.streak}-day streak</div>` : ''}
           ${(prog.minutes||0)>0 ? `<div style="color:var(--ink);">${ico('clock')} ${prog.minutes} min studied</div>` : ''}
           ${(s.quizAttempts||0)>0 ? `<div style="color:var(--ink);">${ico('trophy')} Quiz ${s.quizCorrect||0}/${s.quizAttempts}</div>` : ''}
           ${(s.activityDays||0)>0 ? `<div>${ico('star')} ${s.activityDays} active day${s.activityDays>1?'s':''}</div>` : ''}
@@ -3523,7 +3521,6 @@ function renderStudentsPanel(){
       <div class="lb-row"><div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
         <div class="lb-name">${escapeHtml(s.name)}</div>
         <div class="lb-stat">${ico('trophy')} ${s.mastered} mastered</div>
-        <div class="lb-stat">${ico('fire')} ${s.streak}-day streak</div>
         <div class="lb-stat">${ico('clock')} ${s.minutes} min</div>
       </div>`).join('')}
   </div>` : ''}`;
@@ -4095,7 +4092,7 @@ function renderSentencesFactory(){
       <div class="sf-stats">
         <div class="sf-stat"><div class="sf-stat-val">${done}</div><div class="sf-stat-label">Done</div></div>
         <div class="sf-stat"><div class="sf-stat-val">${done?Math.round(SF.session.totalScore/done):0}%</div><div class="sf-stat-label">Avg Score</div></div>
-        <div class="sf-stat"><div class="sf-stat-val">${SF.stats.streak}${ico('fire')}</div><div class="sf-stat-label">Streak</div></div>
+        <div class="sf-stat"><div class="sf-stat-val">${SF.session.totalScore}</div><div class="sf-stat-label">Total Score</div></div>
         <div class="sf-stat"><div class="sf-stat-val">${SF.session.xp}</div><div class="sf-stat-label">XP Session</div></div>
       </div>
       <div class="sf-xp-bar"><div class="sf-xp-fill" style="width:${xpPct}%"></div></div>
@@ -4170,12 +4167,14 @@ function renderLeaderboardTab(){
     ${lb.length===0 ? '<div class="empty">Be the first to appear here by reviewing your cards!</div>' :
     lb.map((s,i)=>`<div class="lb-row"><div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
       <div class="lb-name">${s.name}${s.name===STATE.name?' (You)':''}</div>
-      <div class="lb-stat">${ico('trophy')} ${s.mastered}</div><div class="lb-stat">${ico('fire')} ${s.streak}</div><div class="lb-stat">${ico('clock')} ${s.minutes}m</div></div>`).join('')}
+      <div class="lb-stat">${ico('trophy')} ${s.mastered}</div><div class="lb-stat">${ico('clock')} ${s.minutes}m</div></div>`).join('')}
   </div>`;
 }
 
 /* ================= HANDLERS ================= */
 function attachHandlers(){
+  const bellBtn = document.getElementById('bellBtn');
+  if(bellBtn) bellBtn.onclick = ()=>{ STATE.tab='announcements'; render(); };
   const themeBtn = document.getElementById('themeToggle');
   if(themeBtn) themeBtn.onclick = ()=>{ STATE.dark=!STATE.dark; localStorage.setItem('minbar_dark', STATE.dark); render(); };
   const switchBtn = document.getElementById('switchRole');
@@ -5241,22 +5240,9 @@ async function notificationTick(){
                  'minbar-due');
       shown.due = true;
     }
-    // 2. Streak at risk (after 7 PM, if user hasn't studied today and had a streak yesterday)
-    const dates = new Set(STATE.progress.activityDates||[]);
-    const yesterdayStr = new Date(Date.now()-DAY_MS).toISOString().slice(0,10);
-    const hasYesterday = dates.has(yesterdayStr);
-    const hasToday = dates.has(todayStr);
-    if(hour>=19 && hasYesterday && !hasToday && !shown.streak){
-      const streak = computeStreak(STATE.progress);
-      if(streak>=1){
-        notifyUser('Your '+streak+'-day streak is about to break',
-                   'Study one card today to keep it alive!',
-                   'minbar-streak');
-        shown.streak = true;
-      }
-    }
-    // 3. Evening reminder (8 PM) even without a streak
-    if(hour>=20 && !hasToday && !shown.reminder){
+    // 2. Evening reminder (8 PM) if hasn't studied today
+    const actDates = new Set(STATE.progress.activityDates||[]);
+    if(hour>=20 && !actDates.has(todayStr) && !shown.reminder){
       notifyUser('Study reminder',
                  'A few minutes today builds fluency for life.',
                  'minbar-reminder');
