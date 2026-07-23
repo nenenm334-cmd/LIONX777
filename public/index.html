@@ -48,7 +48,7 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/common.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600&family=Cairo:wght@400;600;700&display=swap');
 
 :root{
   --bg:#F4F7F5; --bg-card:#FFFFFF; --ink:#0F1A14; --ink-soft:#5A7265;
@@ -959,12 +959,12 @@ body.dark .pref-pill.pref-pending{color:var(--accent);}
 .sf-cat:hover{border-color:var(--accent);color:var(--accent);}
 .sf-cat.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);}
 .sf-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 24px;margin-bottom:16px;box-shadow:var(--shadow);text-align:center;}
-.sf-arabic{font-family:'Amiri',serif;font-size:clamp(28px,6vw,40px);color:var(--ink);line-height:1.6;direction:rtl;}
+.sf-arabic{font-family:'Cairo',sans-serif;font-size:clamp(28px,6vw,40px);color:var(--ink);line-height:1.6;direction:rtl;font-weight:600;}
 .sf-translation{font-size:14px;color:var(--ink-soft);margin-bottom:16px;min-height:20px;cursor:pointer;transition:opacity .2s;}
 .sf-translation:hover{opacity:.8;}
 .sf-trans-hint{font-size:11px;color:var(--ink-soft);margin-bottom:12px;opacity:.6;}
 .sf-words{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;direction:rtl;}
-.sf-word{font-family:'Amiri',serif;font-size:18px;padding:6px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--border-subtle);transition:all .3s ease;}
+.sf-word{font-family:'Cairo',sans-serif;font-size:18px;padding:6px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--border-subtle);transition:all .3s ease;font-weight:600;}
 .sf-word.correct{background:var(--green-soft);border-color:var(--green);color:var(--green);}
 .sf-word.incorrect{background:var(--rose-soft);border-color:var(--rose);color:var(--rose);}
 .sf-word.pending{opacity:.6;}
@@ -3870,7 +3870,7 @@ function sfStartRecording(){
     if(!SR) return;
     SF.recognition = new SR();
     SF.recognition.lang = 'ar-SA';
-    SF.recognition.continuous = false;
+    SF.recognition.continuous = true;
     SF.recognition.interimResults = true;
     SF.recognition.maxAlternatives = 3;
     SF.recognition.onresult = function(e){
@@ -3907,19 +3907,24 @@ function sfStartRecording(){
       if(el && interim) el.textContent = interim;
     };
     SF.recognition.onerror = function(){
+      if(SF._maxTimer) clearTimeout(SF._maxTimer);
       SF.isRecording = false; render();
     };
     SF.recognition.onend = function(){
+      if(SF._maxTimer) clearTimeout(SF._maxTimer);
       if(SF.isRecording){ SF.isRecording = false; render(); }
     };
   }
   SF.isRecording = true;
   SF.lastResult = null;
+  if(SF._maxTimer) clearTimeout(SF._maxTimer);
+  SF._maxTimer = setTimeout(()=>{ if(SF.isRecording) sfStopRecording(); }, 20000);
   try { SF.recognition.start(); } catch(e) {}
   render();
 }
 function sfStopRecording(){
   SF.isRecording = false;
+  if(SF._maxTimer) clearTimeout(SF._maxTimer);
   if(SF.recognition) try { SF.recognition.stop(); } catch(e) {}
   render();
 }
@@ -3977,7 +3982,7 @@ function renderSentencesFactory(){
       ${SF.showRetry && scoreRes ? `<button class="primary-btn" id="sfRetryBtn" style="margin:0 auto 12px;display:block;">${ico('mic')} Try Again</button>` : ''}
       ${!hasRec ? `<div class="sf-not-supported"><p>Speech recognition is not supported in this browser. Try Chrome or Edge.</p></div>` : `
         <button class="sf-record-btn" id="sfRecordBtn">${SF.isRecording?'⬤':ico('mic')}</button>
-        <div class="sf-record-label">${SF.isRecording?'Listening...':'Tap to speak'}</div>
+        <div class="sf-record-label">${SF.isRecording?'Tap again to stop (max 20s)':'Tap to speak'}</div>
         <div style="font-size:11px;color:var(--ink-soft);margin-top:4px;min-height:16px;" id="sfInterim"></div>
       `}
     </div>
