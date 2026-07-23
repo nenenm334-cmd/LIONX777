@@ -257,17 +257,54 @@ body.dark .live-banner-btn{background:var(--accent);color:var(--teal-dark);}
 .header-avatar-btn{background:none;border:none;padding:0;cursor:pointer;display:flex;border-radius:50%;transition:transform .15s;}
 .header-avatar-btn:hover{transform:scale(1.1);}
 
-.tabs{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap;}
-.tab{padding:9px 18px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;font-weight:600;font-size:13px;color:var(--ink-soft);white-space:nowrap;min-height:40px;display:flex;align-items:center;gap:5px;transition:all .15s ease;}
+/* ===== NAVIGATION TABS — Premium Duolingo-style ===== */
+.tabs{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;padding:2px 0;}
+.tab{
+  padding:10px 20px;border-radius:999px;border:1.5px solid var(--border-subtle);
+  background:var(--bg-card);cursor:pointer;font-weight:650;font-size:13px;
+  color:var(--ink-soft);white-space:nowrap;min-height:42px;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:all .2s cubic-bezier(.4,0,.2,1);user-select:none;
+  position:relative;letter-spacing:.01em;
+}
+.tab svg{width:16px;height:16px;flex-shrink:0;}
 body.dark .tab{border-color:var(--border);background:var(--bg-card);color:var(--ink-soft);}
-.tab:hover{border-color:var(--teal);color:var(--teal);}
-body.dark .tab:hover{border-color:var(--accent);color:var(--accent);}
-.tab.active{background:linear-gradient(135deg,var(--teal),var(--accent));color:#fff;border-color:var(--teal);box-shadow:0 3px 12px rgba(13,148,136,.3);}
-body.dark .tab.active{background:linear-gradient(135deg,var(--accent),var(--teal));color:#0C1410;border-color:var(--accent);box-shadow:0 3px 12px rgba(16,185,129,.3);}
-@media (max-width:640px){
-  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin-inline:-14px;padding-inline:14px;scrollbar-width:none;}
+.tab:hover{
+  border-color:var(--teal);color:var(--teal);
+  transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,148,136,.12);
+}
+body.dark .tab:hover{
+  border-color:var(--accent);color:var(--accent);
+  box-shadow:0 4px 12px rgba(16,185,129,.12);
+}
+.tab:active{transform:scale(.96);}
+.tab.active{
+  background:linear-gradient(135deg,var(--teal),var(--accent));color:#fff;
+  border-color:transparent;box-shadow:0 4px 16px rgba(13,148,136,.3);
+  font-weight:700;
+}
+body.dark .tab.active{
+  background:linear-gradient(135deg,var(--accent),var(--teal));color:#0C1410;
+  border-color:transparent;box-shadow:0 4px 16px rgba(16,185,129,.35);
+}
+.tab.active svg{color:#fff;}
+body.dark .tab.active svg{color:#0C1410;}
+@media(max-width:768px){
+  .tabs{gap:8px;margin-bottom:20px;}
+  .tab{padding:9px 16px;font-size:12.5px;min-height:38px;}
+  .tab svg{width:15px;height:15px;}
+}
+@media(max-width:640px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    padding-bottom:6px;margin-inline:-16px;padding-inline:16px;
+    scrollbar-width:none;gap:8px;}
   .tabs::-webkit-scrollbar{display:none;}
   .tab{flex-shrink:0;}
+}
+@media(max-width:380px){
+  .tabs{gap:6px;margin-bottom:16px;}
+  .tab{padding:8px 14px;font-size:12px;min-height:36px;gap:5px;}
+  .tab svg{width:14px;height:14px;}
 }
 
 .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
@@ -2856,14 +2893,16 @@ function renderTabs(){
     {k:'settings', l:ico('settings')+' Settings'},
   ];
   const tStudent = [
-    {k:'journey', l:ico('map')+' 90-Day Journey'},
-    {k:'announcements', l:ico('alertCircle')+' Announcements'},
+    {k:'journey', l:ico('map')+' Journey'},
     {k:'library', l:ico('bookOpen')+' Library'},
-    {k:'deck', l:ico('book')+' Review'}, {k:'quiz', l:ico('edit')+' Quiz'},
-    {k:'exam', l:ico('edit')+' Exam'},
-    {k:'ask', l:ico('alertCircle')+' Ask Teacher'},
     {k:'resources', l:ico('volume')+' Speak'},
+    {k:'quiz', l:ico('target')+' Quiz'},
+    {k:'exam', l:ico('edit')+' Exam'},
+    {k:'progress', l:ico('chart')+' Progress'},
     {k:'leaderboard', l:ico('award')+' Leaderboard'},
+    {k:'ask', l:ico('send')+' Ask'},
+    {k:'announcements', l:ico('bell')+' News'},
+    {k:'deck', l:ico('review')+' Review'},
     {k:'settings', l:ico('settings')+' Settings'},
   ];
   const tabs = STATE.role==='teacher' ? tTeacher : tStudent;
@@ -2902,6 +2941,7 @@ function renderBody(){
     if(STATE.tab==='exam') return renderExamStudentTab();
     if(STATE.tab==='ask') return renderAskTeacher();
     if(STATE.tab==='resources'){ if(!SF.data) sfLoadData().then(()=>render()); loadSfStats(); return renderSentencesFactory(); }
+    if(STATE.tab==='progress') return renderProgress();
     if(STATE.tab==='leaderboard') return renderLeaderboardTab();
     if(STATE.tab==='settings') return renderStudentSettings();
   }
@@ -4085,7 +4125,45 @@ function renderSentencesFactory(){
 }
 /* ---------- end sentences factory ---------- */
 
-
+function renderProgress(){
+  const p = STATE.progress;
+  const mastered = Object.values(p.srs||{}).filter(e=>e.interval>=21).length;
+  const totalCards = Object.keys(p.srs||{}).length;
+  const quizAtt = p.quiz?.attempts||0; const quizCor = p.quiz?.correct||0;
+  const quizPct = quizAtt ? Math.round(quizCor/quizAtt*100) : 0;
+  const listenMin = Math.round((p.listeningSec||0)/60);
+  const speakMin = Math.round((p.speakingSec||0)/60);
+  const streak = (()=>{const d=new Set(p.activityDates||[]);let s=0,dt=new Date();if(!d.has(dt.toISOString().slice(0,10)))dt.setDate(dt.getDate()-1);while(true){const k=dt.toISOString().slice(0,10);if(d.has(k)){s++;dt.setDate(dt.getDate()-1);}else break;}return s;})();
+  const sfLvl = SF.stats.level||1; const sfXp = SF.stats.xp||0;
+  const nextXp = sfXpForLevel(sfLvl+1); const currXp = sfXpForLevel(sfLvl);
+  const xpPct = nextXp>currXp ? Math.min(100,Math.round(((sfXp-currXp)/(nextXp-currXp))*100)) : 100;
+  return `<div style="display:flex;flex-direction:column;gap:16px;">
+  <div style="background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:var(--radius-lg);padding:24px 28px;color:#fff;display:flex;gap:20px;align-items:center;flex-wrap:wrap;box-shadow:0 4px 20px rgba(13,148,136,.25);">
+    <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);">
+      <div style="font-size:28px;font-weight:900;line-height:1;">${sfLvl}</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;opacity:.8;">Level</div>
+    </div>
+    <div style="flex:1;min-width:160px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;font-weight:600;">
+        <span style="font-size:18px;font-weight:900;">${sfXp} XP</span>
+        <span style="font-size:12px;opacity:.8;">${nextXp-sfXp} to Level ${sfLvl+1}</span>
+      </div>
+      <div style="height:6px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden;margin-bottom:8px;">
+        <div style="height:100%;border-radius:3px;background:#fff;width:${xpPct}%;transition:width .5s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
+        <span>${ico('fire')} ${streak}d streak</span>
+        <span>${(p.activityDates||[]).length} active days</span>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="panel" style="text-align:center;padding:20px 14px;margin:0;"><div style="font-size:24px;margin-bottom:6px;color:var(--teal);">${ico('book')}</div><div style="font-size:24px;font-weight:900;color:var(--ink);">${mastered}</div><div style="font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Mastered</div><div style="font-size:11px;color:var(--ink-soft);opacity:.7;">of ${totalCards}</div></div>
+    <div class="panel" style="text-align:center;padding:20px 14px;margin:0;"><div style="font-size:24px;margin-bottom:6px;color:var(--teal);">${ico('target')}</div><div style="font-size:24px;font-weight:900;color:var(--ink);">${quizPct}%</div><div style="font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Quiz Acc</div><div style="font-size:11px;color:var(--ink-soft);opacity:.7;">${quizCor}/${quizAtt}</div></div>
+    <div class="panel" style="text-align:center;padding:20px 14px;margin:0;"><div style="font-size:24px;margin-bottom:6px;color:var(--teal);">${ico('headphones')}</div><div style="font-size:24px;font-weight:900;color:var(--ink);">${Math.floor(listenMin/60)}h ${listenMin%60}m</div><div style="font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Listening</div></div>
+    <div class="panel" style="text-align:center;padding:20px 14px;margin:0;"><div style="font-size:24px;margin-bottom:6px;color:var(--teal);">${ico('mic')}</div><div style="font-size:24px;font-weight:900;color:var(--ink);">${Math.floor(speakMin/60)}h ${speakMin%60}m</div><div style="font-size:12px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;">Speaking</div></div>
+  </div></div>`;
+}
 
 function renderLeaderboardTab(){
   const lb = STATE.leaderboard;
